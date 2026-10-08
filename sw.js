@@ -1,5 +1,5 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v18';
+const APP = 'cg-app-v19';
 const TILES = 'cg-tiles-v5';
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
   './leaflet.js', './comm-data.js', './font-latin.woff2', './font-latin-ext.woff2',
@@ -8,7 +8,10 @@ const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
 
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(APP).then(c => c.addAll(SHELL)).catch(() => {}));
+  e.waitUntil(caches.open(APP).then(c =>
+    // Cache each file on its own so one missing file can't block offline launch
+    Promise.all(SHELL.map(u => c.add(u).catch(err => console.warn('SW precache failed:', u, err))))
+  ).catch(() => {}));
 });
 
 self.addEventListener('activate', e => {
