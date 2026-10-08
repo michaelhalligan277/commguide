@@ -5,7 +5,8 @@ Live at https://commguide.netlify.app — Netlify publishes this repository auto
 
 ## Files
 - `index.html` — app shell and UI.
-- `comm-data.js` — all radio data (units, zones, channels, tones, repeaters). Plain JS; edit directly.
+- `comm-data.js` — radio data (units, channels, tones, repeaters). Plain JS; edit directly.
+- `comm-geo.js` — big geodata split out of comm-data.js (SRA grid, unit boundary polygons).
 - `dc-runtime.js`, `leaflet.js`, fonts, map marker images — app/runtime assets.
 - `sw.js` — service worker (offline launch + map tile cache).
 - `manifest.json`, `icon-192.png`, `icon-512.png` — home-screen install.
@@ -16,7 +17,7 @@ Live at https://commguide.netlify.app — Netlify publishes this repository auto
     Note: the app's channel data is the Statewide Load V25A6 Rev 03/08/25, a separate document.
 
 ## Updating
-- **Bump `APP` in `sw.js` (e.g. `cg-app-v18` → `cg-app-v19`) on every change** so installed phones drop the old offline copy.
+- **Bump `APP` in `sw.js` (e.g. `cg-app-v23` → `cg-app-v24`) on every change** so installed phones drop the old offline copy.
 - Data rule: every frequency, tone, coordinate and identifier must come from a verified source
   (CAL FIRE Statewide Radio Call Plan, FCC ULS, GNIS) or the crew's direct input. Unverified sites stay `null`.
-- React, ReactDOM and Babel load from unpkg.com and are cached by the service worker after first launch.
+- React, ReactDOM and Babel are vendored in `vendor/` (no CDN needed). Large geodata (SRA grid, unit boundaries) lives in `comm-geo.js` and loads on demand.

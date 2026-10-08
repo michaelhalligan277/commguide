@@ -720,6 +720,7 @@ class Component extends DCLogic {
 
   // ── unit boundaries (real county lines → CAL FIRE units) ──
   async loadBoundaries(){
+    try{ if(typeof this.D.loadGeo==='function') await this.D.loadGeo(); }catch(e){}
     const _cf=this.D.CF_UNITS;
     if(_cf&&_cf.length){
       const _zc={}; (this.D.UNITS||[]).forEach(u=>{ if(u.code) _zc[u.code.toUpperCase()]=u.z; });

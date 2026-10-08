@@ -1,8 +1,11 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v22';
+const APP = 'cg-app-v23';
 const TILES = 'cg-tiles-v5';
+const NET_TIMEOUT_MS = 3000;
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
-  './leaflet.js', './comm-data.js', './font-latin.woff2', './font-latin-ext.woff2',
+  './leaflet.js', './comm-data.js', './comm-geo.js',
+  './vendor/react.production.min.js', './vendor/react-dom.production.min.js', './vendor/babel.min.js',
+  './font-latin.woff2', './font-latin-ext.woff2',
   './layers.png', './layers-2x.png', './marker-icon.png',
   './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
 
@@ -55,17 +58,25 @@ self.addEventListener('fetch', e => {
   let sameOrigin = false;
   try { sameOrigin = new URL(url).origin === self.location.origin; } catch (e2) {}
 
-  // App shell / same-origin: network-first (fresh when online), cache fallback (offline)
+  // App shell / same-origin: network-first when the signal is good, but never wait
+  // long on a weak connection — after NET_TIMEOUT_MS fall back to the cached copy
+  // (the network request keeps going and refreshes the cache for next launch).
   if (req.mode === 'navigate' || sameOrigin) {
     e.respondWith((async () => {
-      try {
-        const res = await fetch(req);
+      const cached = await caches.match(req);
+      const net = fetch(req).then(async res => {
         if (res && res.ok && sameOrigin) (await caches.open(APP)).put(req, res.clone());
         return res;
-      } catch (err) {
-        const c = await caches.match(req);
-        return c || (await caches.match('./index.html')) || new Response('offline', { status: 503 });
+      });
+      if (!cached) {
+        try { return await net; }
+        catch (err) { return (await caches.match('./index.html')) || new Response('offline', { status: 503 }); }
       }
+      net.catch(() => {});
+      return Promise.race([
+        net.catch(() => cached),
+        new Promise(resolve => setTimeout(() => resolve(cached), NET_TIMEOUT_MS))
+      ]);
     })());
     return;
   }
