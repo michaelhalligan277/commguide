@@ -1,0 +1,3 @@
+# Plain static files. Post-processing left off so nothing rewrites the app.
+[build.processing]
+  skip_processing = true

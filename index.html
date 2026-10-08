@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0e1214">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>Comm Guide</title>
+<script src="./dc-runtime.js"></script>
+<script src="./leaflet.js"></script>
+<script src="./comm-data.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>.leaflet-image-layer,.leaflet-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-pane>canvas,.leaflet-pane>svg,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:0 0}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:focus,.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url("./layers.png");width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url("./layers-2x.png");background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url("./marker-icon.png")}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:focus,.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:rgba(255,255,255,.8);text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:17px 0;margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:0 0}.leaflet-container a.leaflet-popup-close-button:focus,.leaflet-container a.leaflet-popup-close-button:hover{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{position:absolute;pointer-events:none;border:6px solid transparent;background:0 0;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>/* latin-ext */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./font-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./font-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./font-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./font-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./font-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./font-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./font-latin-ext.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./font-latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+  html,body{margin:0;padding:0;background:#06070A;-webkit-tap-highlight-color:transparent}
+  *{box-sizing:border-box}
+  @keyframes mepulse{0%{transform:scale(.6);opacity:.9}70%{transform:scale(2.6);opacity:0}100%{opacity:0}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .me-dot{position:relative;width:18px;height:18px}
+  .me-dot i{position:absolute;inset:3px;border-radius:50%;background:#4C8DFF;border:2px solid #fff;box-shadow:0 0 8px rgba(76,141,255,.9)}
+  .me-dot b{position:absolute;inset:0;border-radius:50%;background:rgba(76,141,255,.55);animation:mepulse 2s ease-out infinite}
+  .rep-pin{display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #0A0C10;font:600 9px 'Spline Sans Mono',monospace;color:#06070A}
+  .stn-pin{display:flex;align-items:center;justify-content:center;border-radius:3px;border:2px solid #0A0C10;box-shadow:0 0 5px rgba(0,0,0,.6)}
+  .leaflet-interactive{cursor:pointer}
+  .leaflet-container{background:#0A0C10;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+  .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#1B1F27;color:#ECEEF1;border:1px solid #2E343E;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+  .leaflet-popup-content{margin:11px 13px;font-size:12px;line-height:1.5}
+  .leaflet-bar a{background:#1B1F27;color:#ECEEF1;border-bottom-color:#2E343E}
+  .leaflet-bar a:hover{background:#262B34}
+  .hscroll::-webkit-scrollbar{display:none}
+  .vscroll::-webkit-scrollbar{width:0}
+</style>
+</helmet>
+
+<div style="min-height:100dvh;background:#06070A;display:flex;justify-content:center">
+<div style="--bg:#0A0C10;--surf:#14171D;--surf2:#1B1F27;--bd:#262B34;--tx:#ECEEF1;--dim:#828B97;--dim2:#4A515C;--red:#E5484D;--amber:#FFB23E;--green:#3FB950;--blue:#4C8DFF;--teal:#46C9B4;--violet:#B68CFF;--yellow:#E6C84A;--mono:'Spline Sans Mono',ui-monospace,monospace;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;width:100%;max-width:448px;height:100dvh;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;overflow:hidden;border-left:1px solid #15171C;border-right:1px solid #15171C">
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:11px;padding:13px 15px 12px;background:linear-gradient(180deg,#15171C,var(--bg));border-bottom:1px solid var(--bd);flex-shrink:0">
+    <div style="width:42px;height:42px;border-radius:11px;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(229,72,77,.35)">
+      <div style="font:700 7px/1 'Helvetica Neue';letter-spacing:.06em;color:rgba(255,255,255,.8)">ENG</div>
+      <div style="font:700 15px/1.1 var(--mono);color:#fff">4454</div>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:15px;font-weight:700;letter-spacing:-.01em">Comm Guide</div>
+      <div style="font-size:11px;color:var(--dim);margin-top:1px">Skull Creek · TCU · Engine 4454</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.08em;color:var(--dim2)">BKR5000 LOAD</div>
+      <div style="font:600 11px/1.4 var(--mono);color:var(--dim)">{{ loadVer }}</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div style="flex:1;min-height:0;position:relative">
+
+    <!-- ░░░ STATUS ░░░ -->
+    <div id="panel-status" style="height:100%;display:flex;flex-direction:column">
+      <div style="padding:13px 13px 0;flex-shrink:0">
+        <sc-if value="{{ slimHdr }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--surf);border:1px solid var(--bd);border-radius:13px;display:flex;align-items:center;gap:9px;padding:8px 10px 8px 12px">
+            <button onclick="{{ goChannels }}" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:baseline;gap:7px;min-width:0">
+              <span style="font:700 20px/1 var(--mono);color:var(--tx);letter-spacing:-.02em">{{ su.code }}</span>
+              <span style="font:500 11px/1 'Helvetica Neue';color:var(--green);white-space:nowrap">“{{ su.callsign }}”</span>
+            </button>
+            <div style="display:flex;align-items:baseline;gap:5px;margin-left:auto;min-width:0">
+              <span style="font:600 10px/1 'Helvetica Neue';color:var(--dim2)">CH {{ disp.ch }}</span>
+              <span style="font:700 12px/1 'Helvetica Neue';color:var(--tx);white-space:nowrap">{{ disp.name }}</span>
+              <span style="font:700 14px/1 var(--mono);color:{{ slimToneColor }};margin-left:2px">{{ slimTone }}</span>
+            </div>
+            <button onclick="{{ locate }}" style="flex-shrink:0;display:flex;align-items:center;background:var(--surf2);border:1px solid var(--bd);border-radius:20px;padding:6px 8px;cursor:pointer">
+              <span style="width:7px;height:7px;border-radius:50%;background:{{ gpsDotColor }}"></span>
+            </button>
+            <button onclick="{{ toggleHdr }}" style="flex-shrink:0;background:none;border:none;cursor:pointer;padding:0 2px 5px;font:700 16px/1 'Helvetica Neue';color:var(--dim)">{{ hdrChevron }}</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ fullHdr }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--surf);border:1px solid var(--bd);border-radius:15px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 7px var(--blue);animation:blink 2s infinite"></div>
+            <div style="font:700 10px/1 'Helvetica Neue';letter-spacing:.13em;color:var(--dim)">YOU ARE IN — {{ regionLabel }}</div>
+            <button onclick="{{ locate }}" style="margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--bd);border-radius:20px;padding:5px 11px;cursor:pointer">
+              <span style="width:7px;height:7px;border-radius:50%;background:{{ gpsDotColor }}"></span>
+              <span style="font:600 11px/1 'Helvetica Neue';color:var(--tx)">{{ gpsChipLabel }}</span>
+            </button>
+            <button onclick="{{ toggleHdr }}" style="background:none;border:none;cursor:pointer;padding:0 0 5px 4px;font:700 16px/1 'Helvetica Neue';color:var(--dim)">{{ hdrChevron }}</button>
+          </div>
+          <button onclick="{{ goChannels }}" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:0 14px 13px;display:flex;align-items:flex-end;gap:13px">
+            <div style="flex-shrink:0">
+              <div style="font:700 40px/.9 var(--mono);color:var(--tx);letter-spacing:-.02em">{{ su.code }}</div>
+              <div style="font-size:13px;color:var(--dim);margin-top:5px">{{ su.zoneLabel }} · call <span style="color:var(--green);font-weight:600">“{{ su.callsign }}”</span></div>
+            </div>
+            <div style="margin-left:auto;text-align:right">
+              <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--dim2)">TUNE TO</div>
+              <div style="font:700 19px/1.1 'Helvetica Neue';color:var(--tx);margin-top:3px">CH {{ disp.ch }} · {{ disp.name }}</div>
+              <div style="font:500 12px/1.5 var(--mono);color:var(--dim)">RX {{ disp.rx }} · TX {{ disp.tx }}</div>
+              <div style="font-size:10px;color:var(--dim2);margin-top:2px">{{ disp.zoneTag }}</div>
+            </div>
+          </button>
+          <div style="display:flex;border-top:1px solid var(--bd)">
+            <div style="flex:1;padding:9px 14px;border-right:1px solid var(--bd)">
+              <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:{{ near.txLabelColor }}">{{ near.txLabel }}</div>
+              <div style="display:flex;align-items:baseline;gap:6px;margin-top:3px">
+                <span style="font:700 18px/1 var(--mono);color:{{ near.toneColor }}">{{ near.numLabel }}</span>
+                <span style="font:500 12px/1 var(--mono);color:var(--dim)">{{ near.hz }}</span>
+              </div>
+              <div style="font:500 10px/1.35 'Helvetica Neue';color:var(--dim);margin-top:4px;display:{{ near.noteDisplay }}">{{ near.prefNote }}</div>
+            </div>
+            <a href="{{ eccHref }}" style="flex:1;padding:9px 14px;text-decoration:none;display:block">
+              <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--dim2)">ECC · TAP TO CALL</div>
+              <div style="font:600 14px/1.3 var(--mono);color:var(--blue);margin-top:3px">{{ eccPhone }}</div>
+              <div style="display:{{ eccEmergShow }};align-items:baseline;gap:5px;margin-top:5px;padding-top:5px;border-top:1px solid var(--bd)">
+                <span style="font:600 8px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--red)">EMERG</span>
+                <span style="font:600 13px/1.2 var(--mono);color:var(--red)">{{ eccEmerg }}</span>
+              </div>
+            </a>
+          </div>
+        </div>
+        </sc-if>
+
+      </div>
+      <!-- map -->
+      <div style="flex:1;min-height:0;position:relative;margin-top:11px">
+        <div id="status-map" style="position:absolute;inset:0"></div>
+        <sc-if value="{{ sraOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:11px;top:52px;z-index:500;background:rgba(10,12,16,.86);backdrop-filter:blur(8px);border:1px solid {{ sra.color }};border-radius:10px;padding:6px 10px;pointer-events:none;max-width:62%">
+            <div style="font:700 13px var(--mono);color:{{ sra.color }};line-height:1">{{ sra.short }}</div>
+            <div style="font:500 9px 'Helvetica Neue';letter-spacing:.05em;color:var(--dim2);margin-top:3px">{{ sra.label }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ browseOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:11px;right:11px;bottom:11px;z-index:600;background:rgba(10,12,16,.92);backdrop-filter:blur(10px);border:1px solid var(--blue);border-radius:12px;padding:10px 12px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="min-width:0;flex:1">
+                <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--blue)">BROWSING · {{ browse.zoneLabel }}</div>
+                <div style="font-size:15px;font-weight:700;color:var(--tx);margin-top:4px">{{ browse.code }} — “{{ browse.callsign }}”</div>
+                <div style="font-size:11px;color:var(--dim);margin-top:2px">{{ browse.name }}</div>
+                <div style="font:500 10px var(--mono);color:var(--dim2);margin-top:3px">{{ browse.stat }}</div>
+              </div>
+              <button onclick="{{ browse.clear }}" style="flex-shrink:0;background:var(--surf2);border:1px solid var(--bd);border-radius:16px;padding:5px 10px;cursor:pointer;font:600 11px 'Helvetica Neue';color:var(--dim)">✕ back</button>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">
+              <button onclick="{{ browse.goCh }}" style="background:var(--surf2);border:1px solid var(--bd);border-radius:16px;padding:6px 12px;cursor:pointer;font:600 11px 'Helvetica Neue';color:var(--tx)">Channels · {{ browse.chCount }}</button>
+              <button onclick="{{ browse.goTone }}" style="background:var(--surf2);border:1px solid var(--bd);border-radius:16px;padding:6px 12px;cursor:pointer;font:600 11px 'Helvetica Neue';color:var(--tx)">Tones</button>
+              <button onclick="{{ browse.goCoop }}" style="display:{{ browse.coopDisplay }};background:var(--surf2);border:1px solid var(--bd);border-radius:16px;padding:6px 12px;cursor:pointer;font:600 11px 'Helvetica Neue';color:var(--tx)">Coop</button>
+              <a href="{{ browse.phoneHref }}" style="text-decoration:none;background:var(--surf2);border:1px solid var(--bd);border-radius:16px;padding:6px 12px;font:600 11px/1.4 'Helvetica Neue';color:var(--blue)">ECC {{ browse.phone }}</a>
+              <a href="{{ browse.emergHref }}" style="display:{{ browse.emergShow }};text-decoration:none;background:rgba(229,72,77,.12);border:1px solid var(--red);border-radius:16px;padding:6px 12px;font:600 11px/1.4 'Helvetica Neue';color:var(--red)">EMERG {{ browse.emerg }}</a>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ browseOff }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:11px;right:11px;bottom:11px;z-index:600;text-align:center;pointer-events:none">
+            <span style="display:inline-block;background:rgba(10,12,16,.8);backdrop-filter:blur(8px);border:1px solid var(--bd);border-radius:14px;padding:5px 12px;font:500 10px 'Helvetica Neue';color:var(--dim)">Tap any unit on the map to browse it</span>
+          </div>
+        </sc-if>
+        <div style="position:absolute;left:11px;top:11px;z-index:500;background:rgba(10,12,16,.82);backdrop-filter:blur(8px);border:1px solid var(--bd);border-radius:10px;padding:7px 11px;pointer-events:none">
+          <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.09em;color:{{ near.ovLabelColor }}">{{ near.ovLabel }}</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px">
+            <span style="font-size:14px;font-weight:700;color:var(--tx)">{{ near.name }}</span>
+            <span style="font:700 13px var(--mono);color:var(--amber)">{{ near.tone }} Hz</span>
+          </div>
+          <div style="font:500 11px var(--mono);color:var(--dim);margin-top:1px">{{ near.dist }}</div>
+          <div style="font:500 10px/1.3 'Helvetica Neue';color:var(--dim2);margin-top:3px;display:{{ near.noteDisplay }}">{{ near.nearestLine }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░░ CHANNELS ░░░ -->
+    <div id="panel-channels" style="height:100%;display:none;flex-direction:column">
+      <div class="hscroll" style="display:flex;gap:7px;padding:11px 13px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid var(--bd)">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="8">
+          <button onclick="{{ c.onClick }}" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;background:{{ c.bg }};border:1px solid {{ c.bd }};border-radius:10px;padding:7px 12px;cursor:pointer;position:relative">
+            <span style="font:700 13px var(--mono);color:{{ c.fg }}">{{ c.code }}</span>
+            <span style="font:500 8px 'Helvetica Neue';letter-spacing:.05em;color:{{ c.sub }}">{{ c.tag }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div class="vscroll" style="flex:1;min-height:0;overflow-y:auto">
+        <!-- ECC callsign banner -->
+        <div style="margin:13px;background:linear-gradient(180deg,rgba(63,185,80,.08),var(--surf));border:1px solid rgba(63,185,80,.35);border-radius:13px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+          <div style="min-width:0">
+            <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.11em;color:var(--green)">{{ selU.zoneLabel }} · {{ selU.code }} · ON THE RADIO, CALL</div>
+            <div style="font-size:24px;font-weight:700;color:var(--tx);margin-top:4px;line-height:1.05">“{{ selU.callsign }}”</div>
+            <div style="font-size:12px;color:var(--dim);margin-top:3px">{{ selU.name }}</div>
+          </div>
+          <a href="{{ eccHref2 }}" style="margin-left:auto;text-align:right;text-decoration:none;flex-shrink:0">
+            <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.08em;color:var(--dim2)">24-HR ECC</div>
+            <div style="font:600 13px/1.4 var(--mono);color:var(--blue);margin-top:3px">{{ eccPhone2 }}</div>
+            <div style="font-size:9px;color:var(--dim2);margin-top:2px">tap to call ›</div>
+          </a>
+        </div>
+        <!-- channel groups -->
+        <sc-for list="{{ channelGroups }}" as="g" hint-placeholder-count="4">
+          <div style="padding:0 13px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+              <span style="width:3px;height:13px;border-radius:2px;background:{{ g.color }}"></span>
+              <span style="font:700 10px 'Helvetica Neue';letter-spacing:.1em;color:{{ g.color }}">{{ g.label }}</span>
+              <span style="font:600 9px 'Helvetica Neue';color:var(--dim)">{{ g.sub }}</span>
+              <span style="font:500 10px var(--mono);color:var(--dim2);margin-left:auto">{{ g.count }}</span>
+            </div>
+            <div style="background:var(--surf);border:1px solid var(--bd);border-radius:13px;overflow:hidden">
+              <sc-for list="{{ g.channels }}" as="c" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-bottom:1px solid var(--bd)">
+                  <div class="rep-pin" style="width:30px;height:30px;flex-shrink:0;background:{{ c.roleColor }}">{{ c.ch }}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:14px;font-weight:700;color:var(--tx)">{{ c.name }}</div>
+                    <div style="font-size:11px;color:var(--dim);margin-top:1px">{{ c.note }}</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0">
+                    <div style="font:500 11px/1.55 var(--mono);color:var(--dim)">↑{{ c.tx }}</div>
+                    <div style="font:500 11px/1.55 var(--mono);color:var(--dim)">↓{{ c.rx }}</div>
+                    <div style="font:700 13px/1.1 var(--mono);color:{{ c.toneColor }}">{{ c.toneDisp }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:0 16px 24px;font-size:10px;line-height:1.7;color:var(--dim2);text-align:center">
+          Statewide Radio Load {{ loadVer }} · reference only<br>Verify against current IAP &amp; ECC before transmitting
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░░ TONES ░░░ -->
+    <div id="panel-tones" style="height:100%;display:none;flex-direction:column">
+      <div class="hscroll" style="display:flex;gap:7px;padding:11px 13px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid var(--bd)">
+        <sc-for list="{{ toneChips }}" as="c" hint-placeholder-count="8">
+          <button onclick="{{ c.onClick }}" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;background:{{ c.bg }};border:1px solid {{ c.bd }};border-radius:10px;padding:7px 12px;cursor:pointer">
+            <span style="font:700 13px var(--mono);color:{{ c.fg }}">{{ c.code }}</span>
+            <span style="font:500 8px 'Helvetica Neue';letter-spacing:.05em;color:{{ c.sub }}">{{ c.tag }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="padding:12px 13px 8px;flex-shrink:0">
+        <div style="font:700 11px 'Helvetica Neue';letter-spacing:.04em;color:var(--tx)">{{ tu.zoneLabel }} · {{ tu.name }}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px">Mountaintop repeaters &amp; tone coverage — tap a peak</div>
+      </div>
+      <sc-if value="{{ toneHasMap }}" hint-placeholder-val="{{ true }}">
+        <div style="height:230px;margin:0 13px;border-radius:13px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0;position:relative">
+          <div id="tone-map" style="position:absolute;inset:0"></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ toneNoMap }}" hint-placeholder-val="{{ false }}">
+        <div style="margin:0 13px;background:var(--surf);border:1px dashed var(--bd);border-radius:12px;padding:13px;font-size:11px;color:var(--dim);text-align:center;flex-shrink:0">
+          Map pins are mapped for your home unit (TCU). Tone coverage for {{ tu.code }} is listed below.
+        </div>
+      </sc-if>
+      <div class="vscroll" style="flex:1;min-height:0;overflow-y:auto;padding:11px 13px 22px;display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ toneList }}" as="t" hint-placeholder-count="4">
+          <button onclick="{{ t.onClick }}" style="text-align:left;background:{{ t.bg }};border:1px solid {{ t.bd }};border-radius:12px;padding:11px 13px;cursor:pointer;display:block;width:100%">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span class="rep-pin" style="width:22px;height:22px;background:var(--amber)">{{ t.toneNum }}</span>
+              <span style="font-size:15px;font-weight:700;color:var(--tx)">{{ t.peak }}</span>
+              <span style="margin-left:auto;font:700 15px var(--mono);color:var(--amber)">{{ t.hz }} Hz</span>
+            </div>
+            <div style="font-size:12px;line-height:1.45;color:var(--dim);margin-top:7px">{{ t.desc }}</div>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- ░░░ COOPERATORS ░░░ -->
+    <div id="panel-coop" style="height:100%;display:none;flex-direction:column">
+      <div class="hscroll" style="display:flex;gap:7px;padding:11px 13px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid var(--bd)">
+        <sc-for list="{{ coopChips }}" as="c" hint-placeholder-count="8">
+          <button onclick="{{ c.onClick }}" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;background:{{ c.bg }};border:1px solid {{ c.bd }};border-radius:10px;padding:7px 12px;cursor:pointer">
+            <span style="font:700 13px var(--mono);color:{{ c.fg }}">{{ c.code }}</span>
+            <span style="font:500 8px 'Helvetica Neue';letter-spacing:.05em;color:{{ c.sub }}">{{ c.tag }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div class="vscroll" style="flex:1;min-height:0;overflow-y:auto;padding:12px 13px 22px">
+        <sc-if value="{{ coopHas }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-bottom:12px">
+            <div style="font:700 11px 'Helvetica Neue';letter-spacing:.04em;color:var(--tx)">{{ cu.zoneLabel }} · {{ cu.name }} — AUTO AID</div>
+            <div style="font-size:11px;line-height:1.5;color:var(--dim);margin-top:3px">{{ coopIntro }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ coopNone }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--surf);border:1px dashed var(--bd);border-radius:12px;padding:16px;font-size:12px;line-height:1.6;color:var(--dim);text-align:center">
+            No auto-aid schedule loaded for {{ cu.code }}.<br>Cooperator agreements are currently mapped for TUU (Tulare Unit).
+          </div>
+        </sc-if>
+        <sc-for list="{{ coopList }}" as="a" hint-placeholder-count="4">
+          <div style="background:var(--surf);border:1px solid var(--bd);border-radius:13px;overflow:hidden;margin-bottom:10px">
+            <div style="padding:11px 13px 9px;border-bottom:1px solid var(--bd)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:3px;height:13px;border-radius:2px;background:{{ a.color }}"></span>
+                <span style="font:700 9px 'Helvetica Neue';letter-spacing:.1em;color:{{ a.color }}">{{ a.tag }}</span>
+              </div>
+              <div style="font-size:15px;font-weight:700;color:var(--tx);margin-top:5px">{{ a.name }}</div>
+              <div style="font-size:11px;color:var(--dim);margin-top:2px;display:{{ a.metaDisplay }}">{{ a.meta }}</div>
+            </div>
+            <div style="align-items:stretch;display:{{ a.giveDisplay }}">
+              <div style="flex:1;padding:9px 13px;border-right:1px solid var(--bd)">
+                <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--red)">WE GIVE</div>
+                <sc-for list="{{ a.we }}" as="w" hint-placeholder-count="2">
+                  <div style="font-size:12px;line-height:1.45;color:var(--tx);margin-top:6px">{{ w.t }}</div>
+                </sc-for>
+              </div>
+              <div style="flex:1;padding:9px 13px">
+                <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--green)">THEY GIVE</div>
+                <sc-for list="{{ a.they }}" as="w" hint-placeholder-count="2">
+                  <div style="font-size:12px;line-height:1.45;color:var(--tx);margin-top:6px">{{ w.t }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding:9px 13px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5;color:var(--dim);display:{{ a.noteDisplay }}">{{ a.note }}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ facHas }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+              <span style="width:3px;height:13px;border-radius:2px;background:var(--teal)"></span>
+              <span style="font:700 10px 'Helvetica Neue';letter-spacing:.1em;color:var(--teal)">UNIT FACILITIES · {{ facCount }}</span>
+            </div>
+            <sc-for list="{{ facGroups }}" as="g" hint-placeholder-count="3">
+              <div style="background:var(--surf);border:1px solid var(--bd);border-radius:13px;overflow:hidden;margin-bottom:8px">
+                <div style="padding:8px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between">
+                  <span style="font:700 9px 'Helvetica Neue';letter-spacing:.1em;color:var(--dim)">{{ g.kind }}</span>
+                  <span style="font:600 9px var(--mono);color:var(--dim2)">{{ g.count }}</span>
+                </div>
+                <sc-for list="{{ g.items }}" as="f" hint-placeholder-count="4">
+                  <div style="padding:9px 13px;border-bottom:1px solid var(--bd)">
+                    <div style="display:flex;align-items:baseline;gap:6px">
+                      <span style="font-size:13px;font-weight:700;color:var(--tx);flex:1;min-width:0">{{ f.name }}</span>
+                      <span style="display:{{ f.pinShow }};font-size:9px;color:var(--teal)">{{ f.pin }}</span>
+                      <a href="{{ f.phoneHref }}" style="font:600 12px var(--mono);color:var(--blue);text-decoration:none;flex-shrink:0">{{ f.phone }}</a>
+                    </div>
+                    <div style="display:{{ f.whereShow }};font-size:11px;color:var(--dim);margin-top:2px">{{ f.where }}</div>
+                    <div style="display:{{ f.dirShow }};font-size:10px;line-height:1.5;color:var(--dim2);margin-top:4px">{{ f.dir }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ xbHas }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+              <span style="width:3px;height:13px;border-radius:2px;background:var(--violet)"></span>
+              <span style="font:700 10px 'Helvetica Neue';letter-spacing:.1em;color:var(--violet)">CROSSING THE UNIT LINE</span>
+            </div>
+            <div style="background:var(--surf);border:1px solid var(--bd);border-radius:13px;overflow:hidden">
+              <sc-for list="{{ xbList }}" as="x" hint-placeholder-count="2">
+                <div style="padding:10px 13px;border-bottom:1px solid var(--bd);font-size:12px;line-height:1.5;color:var(--tx)">{{ x.note }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+            <span style="width:3px;height:13px;border-radius:2px;background:var(--dim)"></span>
+            <span style="font:700 10px 'Helvetica Neue';letter-spacing:.1em;color:var(--dim)">REFERENCE SOURCES</span>
+          </div>
+          <div style="background:var(--surf);border:1px solid var(--bd);border-radius:13px;overflow:hidden">
+            <sc-for list="{{ srcList }}" as="r" hint-placeholder-count="4">
+              <a href="{{ r.url }}" target="_blank" rel="noopener" style="display:block;padding:10px 13px;border-bottom:1px solid var(--bd);text-decoration:none">
+                <div style="font-size:13px;font-weight:700;color:var(--blue)">{{ r.label }} ›</div>
+                <div style="font-size:11px;line-height:1.45;color:var(--dim);margin-top:2px">{{ r.note }}</div>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:4px 3px 0;font-size:10px;line-height:1.7;color:var(--dim2);text-align:center">
+          Auto-aid summary — reference only<br>Signed agreement, the CSOP and the ECC govern the actual dispatch
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB BAR -->
+  <div style="display:flex;background:#101319;border-top:1px solid var(--bd);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)">
+    <button onclick="{{ tabStatus }}" style="flex:1;background:none;border:none;cursor:pointer;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="color:{{ tabStatusColor }};line-height:0;display:flex"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6.5"></circle><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg></span>
+      <span style="font:600 10px 'Helvetica Neue';letter-spacing:.03em;color:{{ tabStatusColor }}">Status</span>
+    </button>
+    <button onclick="{{ tabCh }}" style="flex:1;background:none;border:none;cursor:pointer;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="color:{{ tabChColor }};line-height:0;display:flex"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8.5 6h13M8.5 12h13M8.5 18h13"></path><circle cx="3.8" cy="6" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="3.8" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="3.8" cy="18" r="1.2" fill="currentColor" stroke="none"></circle></svg></span>
+      <span style="font:600 10px 'Helvetica Neue';letter-spacing:.03em;color:{{ tabChColor }}">Channels</span>
+    </button>
+    <button onclick="{{ tabTone }}" style="flex:1;background:none;border:none;cursor:pointer;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="color:{{ tabToneColor }};line-height:0;display:flex"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6.2-11.5 4.1 7.4 2.7-4.6L21 20z"></path><path d="M15.5 4.5a6 6 0 0 1 3.4 3.4"></path></svg></span>
+      <span style="font:600 10px 'Helvetica Neue';letter-spacing:.03em;color:{{ tabToneColor }}">Tones</span>
+    </button>
+    <button onclick="{{ tabCoop }}" style="flex:1;background:none;border:none;cursor:pointer;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="color:{{ tabCoopColor }};line-height:0;display:flex"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 13.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"></path><path d="M17 13a2.7 2.7 0 1 0 0-5.4"></path><path d="M2.5 20.2c.6-2.8 3-4.5 6-4.5s5.4 1.7 6 4.5"></path><path d="M16.2 15.9c2.3.4 3.9 1.9 4.4 4.3"></path></svg></span>
+      <span style="font:600 10px 'Helvetica Neue';letter-spacing:.03em;color:{{ tabCoopColor }}">Coop</span>
+    </button>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:448,&quot;height&quot;:860},&quot;defaultTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;status&quot;,&quot;channels&quot;,&quot;tones&quot;],&quot;default&quot;:&quot;status&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;mapBase&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Dark&quot;,&quot;Terrain&quot;,&quot;Satellite&quot;],&quot;default&quot;:&quot;Dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  state = {
+    tab: this.props.defaultTab || 'status', selZ: 44, toneZ: 44, detZ: 44, coopZ: 41, mapZ: null,
+    slimHdr: (function(){ try{ return localStorage.getItem('cg_slim_hdr')==='1'; }catch(e){ return false; } })(),
+    gps: null, gpsState: 'idle', nearInfo: null, selToneId: 'Fowler Peak', detCounty: null, gpsMsg: '',
+  };
+
+  // ── role / tone color systems ──
+  ROLE = {
+    dispatch:{label:'DISPATCH / ECC',color:'var(--green)'},
+    local:{label:'LOCAL NET',color:'var(--amber)'},
+    cmd:{label:'COMMAND',color:'var(--blue)'},
+    tac:{label:'TACTICAL',color:'var(--teal)'},
+    ag:{label:'AIR-TO-GROUND',color:'var(--violet)'},
+    interop:{label:'INTEROP / MUTUAL AID',color:'var(--yellow)'},
+    other:{label:'OTHER AGENCIES',color:'var(--dim)'},
+  };
+  ROLE_ORDER = ['dispatch','local','cmd','tac','ag','interop','other'];
+  ROLE_HEX = {dispatch:'#3FB950',local:'#FFB23E',cmd:'#4C8DFF',tac:'#46C9B4',ag:'#B68CFF',interop:'#E6C84A',other:'#828B97'};
+
+  toneColor(t){
+    if(!t||t==='None') return 'var(--dim2)';
+    if(t==='103.5') return 'var(--blue)';
+    if(t==='192.8'||t==='67.0') return 'var(--teal)';
+    if(t==='156.7') return 'var(--yellow)';
+    return 'var(--amber)';
+  }
+
+  componentDidMount(){ this._poll = setInterval(()=>this._tryInit(), 90); this._tryInit(); }
+  componentWillUnmount(){ clearInterval(this._poll); if(this._watch&&navigator.geolocation) navigator.geolocation.clearWatch(this._watch); }
+
+  _tryInit(){
+    if(this.D || !window.RADIO || !window.L) return;
+    this.D = window.RADIO;
+    clearInterval(this._poll);
+    this.forceUpdate();
+    setTimeout(()=>{ this.initMaps(); this._show(this.state.tab); this.locate(); this.loadBoundaries(); this.loadHomeCounties(); }, 30);
+  }
+
+  unit(z){ return (this.D? this.D.UNITS.find(u=>u.z===z):null) || null; }
+  home(){ return this.unit(this.D? this.D.HOME_Z : 44); }
+
+  haversine(a,b,c,d){const R=6371,p=Math.PI/180,x=(c-a)*p,y=(d-b)*p,s=Math.sin(x/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2;return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));}
+
+  // ── maps ──
+  initMaps(){
+    const L=window.L, h=this.home();
+    // CARTO basemaps now need a (free) API key: https://carto.com/basemaps/apikey  -- restrict it to this site's domain.
+    const CARTO_KEY='cb1_3q8f_1_4cd3662a1089d3f737cd8e35';
+    const CARTO='https://{s}.basemaps.cartocdn.com/', KQ='?key='+CARTO_KEY;
+    const ATTR_CARTO='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+    const ATTR_ESRI='Tiles &copy; Esri';
+    const cfg={
+      Dark:{u:CARTO+'dark_all/{z}/{x}/{y}{r}.png'+KQ,a:ATTR_CARTO},
+      Terrain:{u:CARTO+'rastertiles/voyager/{z}/{x}/{y}{r}.png'+KQ,a:ATTR_CARTO},
+      Satellite:{u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',a:ATTR_ESRI}
+    }[this.props.mapBase||'Dark'];
+    const tiles=()=>L.tileLayer(cfg.u,{maxZoom:18,attribution:cfg.a});
+    // required credit line, styled to sit quietly on the dark map
+    if(!document.getElementById('cg-attr-css')){
+      const st=document.createElement('style'); st.id='cg-attr-css';
+      st.textContent='.leaflet-control-attribution{background:rgba(14,18,20,.72)!important;color:#8a958f!important;font-size:9px!important;padding:1px 5px!important}.leaflet-control-attribution a{color:#8a958f!important}';
+      document.head.appendChild(st);
+    }
+    const attr=m=>{ m.attributionControl.setPrefix(false); return m; };
+    // status map
+    this.sMap=attr(L.map('status-map',{attributionControl:true,zoomControl:false})).setView([h.lat,h.lng],9);
+    tiles().addTo(this.sMap);
+    this._repMarkers=[];
+    this._stnOn=false;
+    this.renderStatusReps(h.z);
+    setTimeout(()=>this.sMap.invalidateSize(),120);
+    // tone map
+    this.tMap=attr(L.map('tone-map',{attributionControl:true,zoomControl:false})).setView([h.lat,h.lng],9);
+    tiles().addTo(this.tMap);
+    this.renderToneMarkers();
+  }
+
+  _pin(bg,size,label,approx){
+    const st=approx
+      ?`width:${size}px;height:${size}px;background:${bg}99;border:2px dashed rgba(236,238,241,.75)`
+      :`width:${size}px;height:${size}px;background:${bg};box-shadow:0 0 7px ${bg}99`;
+    return window.L.divIcon({className:'',iconSize:[size,size],iconAnchor:[size/2,size/2],
+      html:`<div class="rep-pin" style="${st}">${label}</div>`});
+  }
+
+  _stnPin(color,approx){
+    const s=13;
+    const st=approx
+      ?`width:${s}px;height:${s}px;background:${color}D9;border:2px dashed rgba(255,255,255,.7)`
+      :`width:${s}px;height:${s}px;background:${color}`;
+    return window.L.divIcon({className:'',iconSize:[s,s],iconAnchor:[s/2,s/2],
+      html:`<div class="stn-pin" style="${st}"></div>`});
+  }
+  _esc(x){ return (''+(x==null?'':x)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  renderStations(){
+    if(!this.sMap||!this.D) return;
+    const L=window.L, AG=this.D.STATION_AGENCY||{};
+    const _z=this._repZ, _u=(this.unit(_z)||{}).code;
+    const _fac=(this.D.FACILITIES||[]).filter(f=>f.unit===_u);
+    // TCU keeps its hand-built list (has apparatus + federal stations FRAP omits)
+    const list=(_u===((this.unit(this.D.HOME_Z)||{}).code) ? (this.D.STATIONS||[]) : _fac);
+    if(this._stnLayer && this._stnUnit!==_u){ if(this.sMap.hasLayer(this._stnLayer)) this.sMap.removeLayer(this._stnLayer); this._stnLayer=null; }
+    this._stnUnit=_u;
+    if(!this._stnOn && !this._stnLayer){ 
+      const self0=this;
+      window.__cgStations=function(){ self0._stnOn=!self0._stnOn; try{ self0.renderStations(); }catch(e){ console.error('stations',e); self0._stnOn=false; } return self0._stnOn; };
+      window.__cgStationsState=function(){ return !!self0._stnOn; };
+      return;
+    }
+    if(!this._stnLayer){
+      const grp=L.layerGroup();
+      list.forEach(st=>{
+        const a=AG[st.agency]||{label:st.agency,color:'#9AA'};
+        if(!isFinite(+st.lat)||!isFinite(+st.lng)) return;
+        const m=L.marker([st.lat,st.lng],{icon:this._stnPin(a.color,st.approx)});
+        const _extra=st.kind?('<div style="color:#828B97;font-size:11px;margin-top:4px">'+this._esc(st.kind)+(st.phone?(' · '+this._esc(st.phone)):'')+'</div>'):'';
+        const eq=(st.equip&&st.equip!=='—')
+          ? `<div style="margin-top:6px"><div style="font:600 9px 'Helvetica Neue';letter-spacing:.09em;color:#828B97">APPARATUS</div><div style="font:600 13px 'Spline Sans Mono';color:#ECEEF1;margin-top:2px;line-height:1.5">${this._esc(st.equip)}</div></div>`
+          : `<div style="margin-top:6px;color:#828B97;font-size:12px">No apparatus listed</div>`;
+        m.bindPopup(
+          `<div style="min-width:180px">`+
+          `<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><span style="width:9px;height:9px;border-radius:2px;background:${a.color};flex-shrink:0"></span>`+
+          `<span style="font:600 9px 'Helvetica Neue';letter-spacing:.08em;color:${a.color}">${this._esc(a.label).toUpperCase()}${st.approx?' · ~APPROX':''}</span></div>`+
+          `<div style="font-weight:700;color:#ECEEF1;font-size:14px;line-height:1.25">${this._esc(st.name)}</div>`+
+          `<div style="color:#828B97;font-size:12px;margin-top:1px">${this._esc(st.loc)}</div>`+(st.addr?`<div style="color:#586170;font-size:11px;margin-top:2px">${this._esc(st.addr)}</div>`:'')+
+          eq+_extra+`</div>`,
+          {maxWidth:260});
+        grp.addLayer(m);
+      });
+      this._stnLayer=grp;
+    }
+    const self=this;
+    if(this._stnOn){ this._stnLayer.addTo(this.sMap); } else if(this.sMap.hasLayer(this._stnLayer)){ this.sMap.removeLayer(this._stnLayer); }
+    window.__cgStations=function(){ self._stnOn=!self._stnOn; try{ self.renderStations(); }catch(e){ console.error('stations',e); self._stnOn=false; } return self._stnOn; };
+    window.__cgStationsState=function(){ return !!self._stnOn; };
+  }
+
+  unitRepeaters(z){
+    const u=this.unit(z); if(!u) return [];
+    if(u.home) return this.D.TCU_REPEATERS.map(r=>({name:r.name,tone:r.tone,lat:r.lat,lng:r.lng,note:r.net+' · '+r.batt,sub:r.note,approx:!!r.approx,batt:r.batt}));
+    const peaks=(this.D.TONES[u.code]||[]).filter(p=>p.lat);
+    const out=peaks.map(p=>({name:p.peak,tone:p.hz,lat:p.lat,lng:p.lng,note:'Tone '+p.toneNum+' · '+u.code+' Local',sub:p.desc,approx:!!p.approx}));
+    // official CAL FIRE comm sites (FRAP) not already covered by a tone entry
+    const _n=x=>(''+(x||'')).toLowerCase().replace(/\b(com\/lo|com|lo|mtn|mountain|peak|hill|ridge|butte)\b/g,'').replace(/\./g,'').trim();
+    const have=new Set(out.map(o=>_n(o.name)));
+    (this.D.COMSITES||[]).forEach(cs=>{
+      if(cs.unit!==u.code||have.has(_n(cs.name))) return;
+      out.push({name:cs.name,tone:'—',lat:cs.lat,lng:cs.lng,
+        note:(cs.kind==='LO'?'Lookout':'Comm site')+' · '+u.code+' · FRAP',
+        sub:'Official CAL FIRE site position. Tone assignment not published — confirm with the ECC.',approx:false,site:true});
+    });
+    return out;
+  }
+
+  renderStatusReps(z){
+    if(!this.sMap) return;
+    const L=window.L;
+    (this._repMarkers||[]).forEach(m=>this.sMap.removeLayer(m));
+    this._repMarkers=[];
+    const _home=!!(this.unit(z)||{}).home;
+    const _BC={'1':'#4CC2FF','2':'#5BD06A','3':'#E0A13A','4':'#C98BF0','5':'#FF7A5C','6':'#34D0C4'};
+    this.unitRepeaters(z).forEach(r=>{
+      const _bn=_home?((''+(r.batt||'')).match(/\d+/)||[''])[0]:'';
+      const _col=_home?(_BC[_bn]||'#FFB23E'):'#FFB23E';
+      const m=L.marker([r.lat,r.lng],{icon:this._pin(_col,_home?16:13,_home?String((this.D.TONE_NUM||{})[r.tone]||''):'',r.approx)}).addTo(this.sMap);
+      m.bindPopup(`<div style="font-weight:700;color:${_col};margin-bottom:5px">${r.name}${r.approx?' <span style="color:#828B97;font-weight:400">~approx</span>':''}</div><div style="color:#828B97">${r.note}</div><div style="margin-top:5px;font:700 16px 'Spline Sans Mono'">${r.tone} Hz</div><div style="color:#828B97;margin-top:4px">${r.sub||''}</div>`);
+      this._repMarkers.push(m);
+    });
+    // Battalion boundary overlay + legend removed (replaced by the Stations layer).
+    // Repeater pins keep their per-battalion colors. Stations layer rendered here.
+    window.__cgHome=_home;
+    this._repZ=z;
+    this.renderStations();
+  }
+
+  renderToneMarkers(){
+    if(!this.tMap) return;
+    const L=window.L;
+    (this.toneMarkers||[]).forEach(m=>this.tMap.removeLayer(m));
+    this.toneMarkers=[];
+    const peaks=(this.D.TONES[this.unit(this.state.toneZ)?.code]||[]).filter(p=>p.lat);
+    if(!peaks.length) return;
+    const pts=[];
+    peaks.forEach(p=>{
+      const m=L.marker([p.lat,p.lng],{icon:this._pin('#FFB23E',24,String(p.toneNum),p.approx)}).addTo(this.tMap);
+      m.bindPopup(`<div style="font-weight:700;color:#FFB23E;margin-bottom:4px">${p.peak}${p.approx?' <span style="color:#828B97;font-weight:400">~approx</span>':''}</div><div style="font:700 16px 'Spline Sans Mono'">${p.hz} Hz · Tone ${p.toneNum}</div><div style="color:#828B97;margin-top:5px;max-width:200px">${p.desc}</div>`);
+      m.on('click',()=>this.setState({selToneId:p.peak}));
+      this.toneMarkers.push(m); pts.push([p.lat,p.lng]);
+    });
+    if(pts.length) this.tMap.fitBounds(pts,{padding:[36,36],maxZoom:10});
+    setTimeout(()=>this.tMap.invalidateSize(),120);
+  }
+
+  // ── gps ──
+  locate(){
+    if(!navigator.geolocation){ this.setState({gpsState:'error',gpsMsg:'Geolocation not supported on this device'}); return; }
+    if(window.isSecureContext===false){ this.setState({gpsState:'error',gpsMsg:'GPS needs HTTPS — open the hosted link, not a saved file'}); return; }
+    this.setState({gpsState:'locating',gpsMsg:''});
+    const opt={enableHighAccuracy:true,timeout:15000,maximumAge:10000};
+    const err=e=>{const m={1:'Location blocked — allow it in Settings ▸ Privacy ▸ Location',2:'Position unavailable — no GPS fix yet',3:'GPS timed out — tap to retry'}[e&&e.code]||'GPS error — tap to retry';this.setState({gpsState:'error',gpsMsg:m});};
+    try{ navigator.geolocation.getCurrentPosition(p=>{this._got=true;this._onPos(p,true);},err,opt); }catch(e){ this.setState({gpsState:'error',gpsMsg:'GPS error'}); }
+    try{ if(this._watch) navigator.geolocation.clearWatch(this._watch); this._watch=navigator.geolocation.watchPosition(p=>this._onPos(p,false),()=>{},{enableHighAccuracy:true,timeout:20000,maximumAge:5000}); }catch(e){}
+  }
+  _onPos(pos,first){ this._applyPos(pos.coords.latitude,pos.coords.longitude,first); }
+  _nearestUnit(lat,lng){let dz=this.state.detZ,best=1e9;this.D.UNITS.forEach(u=>{const d=this.haversine(lat,lng,u.lat,u.lng);if(d<best){best=d;dz=u.z;}});return dz;}
+  _applyPos(lat,lng,first){
+    const L=window.L;
+    // exact unit by county boundary; fall back to nearest unit centroid
+    let dz=null,county=null,src='approx';
+    if(this._boundReady&&this.countyFeats){
+      for(const c of this.countyFeats){ if(this._pip(lng,lat,c.geom)){ county=c.name; if(c.z){dz=c.z;src='boundary';} break; } }
+    }
+    if(dz==null) dz=this._nearestUnit(lat,lng);
+    if(dz===this.D.HOME_Z&&this._homeCounties){ for(const hc of this._homeCounties){ if(this._pip(lng,lat,hc.geom)){ county=hc.name; break; } } }
+    if(this.state.mapZ==null && dz!==this._repZ) this.renderStatusReps(dz);
+    const reps=this.unitRepeaters(dz); let nr=null,rb=1e9;
+    reps.forEach(r=>{const d=this.haversine(lat,lng,r.lat,r.lng);if(d<rb){rb=d;nr=r;}});
+    const ucode=(this.unit(dz)||{}).code||'';
+    // Site-specific tone preference (e.g. Skull Creek → Blue Mtn/T5 over nearest Liberty/T6)
+    let pref=null;
+    (this.D.SITE_PREF||[]).forEach(p=>{ if(this.haversine(lat,lng,p.lat,p.lng)<=(p.radiusKm||5)) pref=p; });
+    if(nr){
+      if(pref){
+        const pr=reps.find(r=>r.tone===pref.preferTone)||nr;
+        this._near={name:pr.name,tone:pr.tone,dist:rb.toFixed(1)+' km · '+ucode+(pr.approx?' (approx)':''),
+                    prefNote:pref.note, nearestName:nr.name, nearestTone:nr.tone};
+      } else {
+        this._near={name:nr.name,tone:nr.tone,dist:rb.toFixed(1)+' km · '+ucode+(nr.approx?' (approx)':'')};
+      }
+    } else { this._near=null; }
+    this._detSrc=src;
+    let _sra=null; try{ if(typeof this.D.sraAt==='function') _sra=this.D.sraAt(lat,lng); }catch(e){}
+    const patch={gps:{lat,lng},gpsState:'active',detZ:dz,detCounty:county,nearInfo:this._near,sra:_sra};
+    if(!this._manual) patch.selZ=dz;
+    this.setState(patch);
+    if(this.state.mapZ==null) this._highlightUnit(dz);
+    if(this.sMap){
+      if(!this._me){ this._me=L.marker([lat,lng],{icon:L.divIcon({className:'',iconSize:[18,18],iconAnchor:[9,9],html:'<div class="me-dot"><b></b><i></i></div>'}),zIndexOffset:1000}).addTo(this.sMap); }
+      else this._me.setLatLng([lat,lng]);
+      if(first && this.state.mapZ==null) this.sMap.setView([lat,lng],10);
+    }
+  }
+
+  // ── unit boundaries (real county lines → CAL FIRE units) ──
+  async loadBoundaries(){
+    const _cf=this.D.CF_UNITS;
+    if(_cf&&_cf.length){
+      const _zc={}; (this.D.UNITS||[]).forEach(u=>{ if(u.code) _zc[u.code.toUpperCase()]=u.z; });
+      this.countyFeats=_cf.map(f=>({name:f.u,z:_zc[(f.c||'').toUpperCase()]||null,geom:f.g,draw:f.gs||f.g}));
+      this._drawBoundaries(); this._boundReady=true;
+      if(this.state.gps) this._applyPos(this.state.gps.lat,this.state.gps.lng,false);
+      return;
+    }
+    let gj=null;
+    try{ const c=localStorage.getItem('cc_ca_counties_v1'); if(c) gj=JSON.parse(c); }catch(e){}
+    if(!gj){
+      try{ const r=await fetch(this.D.BOUNDARY_URL); gj=await r.json(); try{localStorage.setItem('cc_ca_counties_v1',JSON.stringify(gj));}catch(e){} }
+      catch(e){ this._boundErr=true; return; }
+    }
+    this._buildBoundaries(gj);
+  }
+  async loadHomeCounties(){
+    try{
+      const CU=this.D.COUNTY_UNIT||{}, want=Object.keys(CU).filter(k=>CU[k]===this.D.HOME_Z);
+      if(!want.length) return;
+      let gj=null;
+      try{ const c=localStorage.getItem('cc_ca_counties_v1'); if(c) gj=JSON.parse(c); }catch(e){}
+      if(!gj){ const r=await fetch(this.D.BOUNDARY_URL); gj=await r.json(); try{localStorage.setItem('cc_ca_counties_v1',JSON.stringify(gj));}catch(e){} }
+      this._homeCounties=(((gj&&gj.features)||[]).map(f=>({name:this._cname(f.properties),geom:f.geometry}))).filter(c=>want.includes((c.name||'').toLowerCase()));
+      this._drawHomeCounties();
+      if(this.state.gps) this._applyPos(this.state.gps.lat,this.state.gps.lng,false);
+    }catch(e){}
+  }
+  _drawHomeCounties(){
+    if(!this.sMap||!this._homeCounties||!this._homeCounties.length||this._hcLayer) return;
+    const L=window.L; this._hcLayer=true;
+    this._homeCounties.forEach(c=>{ L.geoJSON({type:'Feature',geometry:c.geom},{interactive:false,style:{color:'rgba(255,255,255,.4)',weight:0.8,dashArray:'4,3',fill:false}}).addTo(this.sMap); });
+  }
+  _cname(p){ return ((p&&(p.name||p.NAME||p.County||p.county||p.NAMELSAD))||'').replace(/ County$/i,'').trim(); }
+  _buildBoundaries(gj){
+    const feats=(gj&&gj.features)||[];
+    this.countyFeats=feats.map(f=>{const nm=this._cname(f.properties);return {name:nm,z:this.D.COUNTY_UNIT[nm.toLowerCase()]||null,geom:f.geometry};});
+    this._drawBoundaries();
+    this._boundReady=true;
+    if(this.state.gps) this._applyPos(this.state.gps.lat,this.state.gps.lng,false);
+  }
+  _baseStyle(z){const home=z===this.D.HOME_Z;return {color:home?'#E5484D':'rgba(255,255,255,.16)',weight:home?1.5:0.7,fillColor:home?'#E5484D':'#ffffff',fillOpacity:home?0.06:0};}
+  _drawBoundaries(){
+    if(!this.sMap||this._boundLayer) return;
+    const L=window.L,self=this; this._unitLayers={}; this._boundLayer=true;
+    this._touch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+    this._cvs=this._cvs||L.canvas({padding:0.3});
+    this.countyFeats.forEach(c=>{
+      const lyr=L.geoJSON({type:'Feature',geometry:(c.draw||c.geom)},
+        {interactive:!!c.z,renderer:self._cvs,style:self._baseStyle(c.z)});
+      lyr.addTo(self.sMap);
+      if(c.z){
+        lyr.on('click',function(ev){ if(ev&&ev.originalEvent&&ev.originalEvent.stopPropagation) ev.originalEvent.stopPropagation(); self.browseUnit(c.z); });
+        if(!self._touch){
+          lyr.on('mouseover',function(){ if(self.state.mapZ!==c.z) lyr.setStyle({weight:1.6,fillOpacity:0.10}); });
+          lyr.on('mouseout',function(){ if(self.state.mapZ!==c.z) lyr.setStyle(self._baseStyle(c.z)); });
+        }
+      }
+      const key=c.z||('x'+c.name); (self._unitLayers[key]=self._unitLayers[key]||[]).push(lyr);
+    });
+    this._highlightUnit(this.state.detZ);
+  }
+  browseUnit(z){
+    const u=this.unit(z); if(!u) return;
+    this.setState({mapZ:z},()=>{
+      this.renderStatusReps(z);
+      this._highlightUnit(z);
+      const lyrs=(this._unitLayers||{})[z];
+      if(lyrs&&lyrs.length&&this.sMap){
+        try{
+          let b=lyrs[0].getBounds();
+          lyrs.forEach(l=>{ b=b.extend(l.getBounds()); });
+          this.sMap.fitBounds(b,{padding:[24,24],maxZoom:9});
+        }catch(e){}
+      }
+    });
+  }
+  clearBrowse(){
+    const dz=this.state.detZ;
+    this.setState({mapZ:null},()=>{
+      this.renderStatusReps(dz);
+      this._highlightUnit(dz);
+      const g=this.state.gps;
+      if(g&&this.sMap) this.sMap.setView([g.lat,g.lng],10);
+    });
+  }
+  _highlightUnit(z){
+    if(!this._unitLayers) return;
+    const prev=this._hlZ;
+    if(prev===z) return;
+    if(prev!=null && this._unitLayers[prev]){
+      const pz=/^x/.test(''+prev)?null:parseInt(prev);
+      this._unitLayers[prev].forEach(l=>l.setStyle(this._baseStyle(pz)));
+    }
+    if(z!==this.D.HOME_Z&&this._unitLayers[z]) this._unitLayers[z].forEach(l=>l.setStyle({color:'#4C8DFF',weight:1.8,fillColor:'#4C8DFF',fillOpacity:0.13}));
+    this._hlZ=z;
+  }
+  _pip(x,y,geom){
+    if(!geom) return false;
+    const polys=geom.type==='Polygon'?[geom.coordinates]:geom.type==='MultiPolygon'?geom.coordinates:[];
+    for(const poly of polys){ if(poly[0]&&this._inRing(x,y,poly[0])) return true; }
+    return false;
+  }
+  _inRing(x,y,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))inside=!inside;}return inside;}
+
+  // ── nav ──
+  _show(tab){
+    ['status','channels','tones','coop'].forEach(t=>{const el=document.getElementById('panel-'+t);if(el)el.style.display=(t===tab)?'flex':'none';});
+    this.setState({tab});
+    setTimeout(()=>{ if(tab==='status'&&this.sMap)this.sMap.invalidateSize(); if(tab==='tones'&&this.tMap)this.tMap.invalidateSize(); },80);
+  }
+
+  renderVals(){
+    const D=this.D, S=this.state;
+    const dim='var(--dim)';
+    if(!D){ // skeleton until data+leaflet ready
+      return {loadVer:'V25A6 · Rev 03/08/25',regionLabel:'—',gpsChipLabel:'Locate',gpsDotColor:dim,
+        slimHdr:false,fullHdr:true,toggleHdr:()=>{},hdrChevron:'\u2303',slimTone:'—',slimToneColor:dim,
+        su:{code:'—',zoneLabel:'',callsign:'—'},disp:{ch:'—',name:'—',rx:'—',tx:'—',toneNumLabel:'—',toneHzLabel:'—',toneColor:dim,zoneTag:''},
+        eccPhone:'—',eccHref:'#',eccEmerg:'',eccEmergHref:'#',eccEmergShow:'none',eccEmerg2:'',eccEmergHref2:'#',eccEmergShow2:'none',ce:{name:'CESRS',zone:10,ch:53,rx:'153.7550',numLabel:'T16',hz:'192.8 Hz'},cc:{name:'CALCORD',alias:'car-to-car',rx:'156.0750',numLabel:'T6',hz:'156.7 Hz'},
+        near:{name:'—',tone:'—',dist:'enable GPS'},chips:[],channelGroups:[],selU:{zoneLabel:'',code:'',name:'',callsign:'—'},
+        eccPhone2:'—',eccHref2:'#',toneChips:[],tu:{code:'',name:'',zoneLabel:''},toneHasMap:false,toneNoMap:false,toneList:[],
+        sra:{on:false,short:'',label:'',color:'var(--dim)',note:''},sraOn:false,
+        browse:{on:false,code:'',name:'',callsign:'',zoneLabel:'',phone:'',phoneHref:'#',stat:'',chCount:'',emerg:'',emergHref:'#',emergShow:'none',hasCoop:false,coopDisplay:'none',goCh:()=>{},goTone:()=>{},goCoop:()=>{},clear:()=>{}},browseOn:false,browseOff:true,
+        facGroups:[],facHas:false,facCount:'0',
+        xbList:[],xbHas:false,srcList:[],
+        coopChips:[],coopList:[],coopHas:false,coopNone:false,coopIntro:'',cu:{code:'',name:'',zoneLabel:''},
+        tabStatus:()=>{},tabCh:()=>{},tabTone:()=>{},tabCoop:()=>{},locate:()=>{},goChannels:()=>{},
+        tabStatusColor:'var(--blue)',tabChColor:dim,tabToneColor:dim,tabCoopColor:dim};
+    }
+
+    const TN=D.TONE_NUM;
+    const tnum=hz=>(hz&&hz!=='None')?(TN[hz]||null):null;
+    const tfmt=hz=>{const n=tnum(hz);const none=(!hz||hz==='None');return {numLabel:n?('T'+n):'—',hz:none?'No Tone':(hz+' Hz'),line:none?'no tone':((n?('T'+n+' · '):'')+hz)};};
+    const su=this.unit(S.detZ)||this.home();
+    let disp;
+    if(su.home&&D.BAT4){
+      const zi=((S.detCounty||'').toLowerCase()==='tuolumne')?1:0;
+      const z=D.BAT4[zi], c0=z.channels[0], t=tfmt(c0.rxT);
+      disp={ch:c0.pos,name:c0.name,rx:c0.rx,tx:c0.tx,toneNumLabel:t.numLabel,toneHzLabel:t.hz,toneColor:this.toneColor(c0.rxT),zoneTag:'Zone '+z.zone+' · '+z.name+' load'};
+    } else {
+      const d0=su.channels.find(c=>c.role==='dispatch')||su.channels[0], dtf=tfmt(d0.rxT);
+      disp={ch:d0.ch,name:d0.name,rx:d0.rx,tx:d0.tx,toneNumLabel:dtf.numLabel,toneHzLabel:dtf.hz,toneColor:this.toneColor(d0.rxT),zoneTag:''};
+    }
+    const ce=D.CESRS;
+    const locLabel=S.detCounty?(S.detCounty.toUpperCase()+' CO'):(su.region==='S'?'SOUTH OPS':'NORTH OPS');
+    const tel=p=>'tel:+1'+(p||'').replace(/\D/g,'');
+    const eccFor=c=>((D.ECC||[]).filter(e=>e.code===c)[0])||null;
+
+    // gps chip
+    const gp={idle:['Locate',dim],locating:['Locating…','var(--amber)'],active:['GPS LIVE','var(--green)'],error:['Retry GPS','var(--red)']}[S.gpsState];
+
+    // nearest repeater (of the unit you're currently in)
+    let near;
+    if(S.nearInfo){
+      const _pn=S.nearInfo.prefNote||'';
+      near={name:S.nearInfo.name,tone:S.nearInfo.tone,dist:S.nearInfo.dist,numLabel:tfmt(S.nearInfo.tone).numLabel,hz:tfmt(S.nearInfo.tone).hz,toneColor:this.toneColor(S.nearInfo.tone),
+        prefNote:_pn,
+        txLabel:_pn?'TX TONE · BEST':'TX TONE', txLabelColor:_pn?'var(--green)':'var(--dim2)',
+        noteDisplay:_pn?'block':'none',
+        ovLabel:_pn?'RECOMMENDED REPEATER':'NEAREST REPEATER', ovLabelColor:_pn?'var(--green)':'var(--dim2)',
+        nearestLine:''};
+    } else {
+      near={name:'—',tone:'—',dist:(S.gpsState==='active'?'no mapped repeaters in this unit':(S.gpsMsg||'tap Locate to detect')),numLabel:'—',hz:'',toneColor:'var(--dim)',
+        prefNote:'',txLabel:'TX TONE',txLabelColor:'var(--dim2)',noteDisplay:'none',ovLabel:'NEAREST REPEATER',ovLabelColor:'var(--dim2)',nearestLine:''};
+    }
+
+    // unit chips builder
+    const chipFor=(activeZ,onPick)=>D.UNITS.map(u=>{
+      const active=u.z===activeZ, det=u.z===S.detZ;
+      return {code:u.code,tag:det?'YOU':('Z'+u.z),onClick:()=>onPick(u.z),
+        bg:active?'rgba(76,141,255,.16)':(u.home?'rgba(229,72,77,.1)':'var(--surf)'),
+        bd:active?'var(--blue)':(det?'var(--green)':'var(--bd)'),
+        fg:active?'var(--blue)':'var(--tx)',
+        sub:det?'var(--green)':'var(--dim2)'};
+    });
+    const chips=chipFor(S.selZ,z=>{this._manual=true;this.setState({selZ:z});});
+    const toneChips=chipFor(S.toneZ,z=>{this.setState({toneZ:z},()=>this.renderToneMarkers());});
+
+    // channel groups for selected unit
+    const selU=this.unit(S.selZ)||this.home();
+    const _nt=(S.nearInfo&&selU&&selU.z===S.detZ)?S.nearInfo.tone:null;
+    let groups;
+    const _zl=selU.home?D.BAT4:(selU.code==='MMU'?D.MMU_LOAD:null);
+    if(_zl){
+      groups=_zl.map(z=>({label:'ZONE '+z.zone+' · '+z.name.toUpperCase(),sub:z.sub,color:z.color,count:z.channels.length+' ch',
+        channels:z.channels.map(c=>({ch:c.pos,name:c.name,note:c.note,rx:c.rx,tx:c.tx,
+          toneLine:tfmt(c.rxT).line,toneDisp:(c.role==='dispatch'||c.role==='local')?(_nt?tfmt(_nt).numLabel:'per tower'):tfmt(c.rxT).numLabel,toneColor:this.toneColor(((c.role==='dispatch'||c.role==='local')&&_nt)?_nt:c.rxT),roleColor:this.ROLE_HEX[c.role]||this.ROLE_HEX.other}))}));
+    } else {
+      groups=this.ROLE_ORDER.map(role=>{
+        const chs=selU.channels.filter(c=>c.role===role);
+        if(!chs.length) return null;
+        return {label:this.ROLE[role].label,sub:'',color:this.ROLE[role].color,count:chs.length+' ch',
+          channels:chs.map(c=>({ch:c.ch,name:c.name,note:c.note,rx:c.rx,tx:c.tx,
+            toneLine:tfmt(c.rxT).line,toneDisp:(c.role==='dispatch'||c.role==='local')?(_nt?tfmt(_nt).numLabel:'per tower'):tfmt(c.rxT).numLabel,toneColor:this.toneColor(((c.role==='dispatch'||c.role==='local')&&_nt)?_nt:c.rxT),roleColor:this.ROLE_HEX[role]}))};
+      }).filter(Boolean);
+    }
+    // Blend user-added zones (call-plan builder) after native groups — renders as native
+    const _azk=selU.home?'HOME':((selU.code||'').toUpperCase());
+    const _az=((D.ADDZ||{})[_azk])||[];
+    if(_az.length){
+      groups=groups.concat(_az.map(z=>({label:'ZONE '+z.zone+' · '+String(z.name||'').toUpperCase(),sub:z.sub||'',color:z.color||'#B68CFF',count:(z.channels||[]).length+' ch',
+        channels:(z.channels||[]).map(c=>{const _tf=tfmt(c.rxT);return {ch:c.pos,name:c.name,note:c.note||'',rx:c.rx,tx:c.tx,
+          toneLine:_tf.line,toneDisp:(_tf.numLabel!=='—')?_tf.numLabel:((c.rxT&&c.rxT!=='None')?c.rxT:'—'),toneColor:this.toneColor(c.rxT),roleColor:this.ROLE_HEX.other};})})));
+    }
+
+    // tones
+    const tu=this.unit(S.toneZ)||this.home();
+    const peaks=D.TONES[tu.code]||[];
+    const hasMap=peaks.some(p=>p.lat);
+    const toneList=peaks.map(p=>{
+      const active=p.peak===S.selToneId;
+      return {peak:p.peak,hz:p.hz,toneNum:p.toneNum,desc:(p.approx?'≈ approx pin · ':(p.lat?'':'◌ pin pending · '))+p.desc,
+        onClick:()=>{this.setState({selToneId:p.peak});if(p.lat&&this.tMap){this.tMap.setView([p.lat,p.lng],11);const m=(this.toneMarkers||[]).find(mm=>mm.getLatLng().lat===p.lat);if(m)m.openPopup();}},
+        bg:active?'rgba(255,178,62,.1)':'var(--surf)',bd:active?'var(--amber)':'var(--bd)'};
+    });
+
+    // cooperators
+    const cu=this.unit(S.coopZ)||this.home();
+    const coopChips=chipFor(S.coopZ,z=>this.setState({coopZ:z}));
+    const _cd=((D.COOP||{})[cu.code])||null;
+    const _ctag=t=>/FEDERAL/.test(t)?'var(--teal)':(/TRIBAL/.test(t)?'var(--violet)':(/LAW/.test(t)?'var(--blue)':'var(--amber)'));
+    const coopList=(_cd?_cd.agencies:[]).map(a=>{
+      const meta=[a.callsign?('call "'+a.callsign+'"'):'',a.chans].filter(Boolean).join(' · ');
+      const has=(a.we&&a.we.length)||(a.they&&a.they.length);
+      return {name:a.name,tag:a.tag,color:_ctag(a.tag),
+        meta,metaDisplay:meta?'block':'none',
+        giveDisplay:has?'flex':'none',
+        we:(a.we||[]).map(t=>({t})),they:(a.they||[]).map(t=>({t})),
+        note:a.note||'',noteDisplay:a.note?'block':'none'};
+    });
+
+    // map browse card
+    const bz=S.mapZ, bu0=bz!=null?this.unit(bz):null;
+    let browse;
+    if(bu0){
+      const _reps=this.unitRepeaters(bz);
+      const _pin=_reps.filter(r=>r.lat).length;
+      const _stn=(D.STATIONS||[]).length&&bu0.home?(D.STATIONS||[]).length:0;
+      const _tones=((D.TONES||{})[bu0.code]||[]).length;
+      browse={on:true,code:bu0.code,name:bu0.name,callsign:bu0.callsign||'—',
+        zoneLabel:'Zone '+bu0.z,phone:bu0.phone||'',phoneHref:tel(bu0.phone),
+        stat:_pin+' of '+_tones+' sites pinned'+(_stn?(' · '+_stn+' stations'):''),
+        chCount:(bu0.channels||[]).length+' ch',
+        hasCoop:!!((D.COOP||{})[bu0.code]),
+        coopDisplay:((D.COOP||{})[bu0.code])?'inline-block':'none',
+        goCh:()=>{this._manual=true;this.setState({selZ:bz},()=>this._show('channels'));},
+        goTone:()=>{this.setState({toneZ:bz},()=>{this._show('tones');this.renderToneMarkers();});},
+        goCoop:()=>{this.setState({coopZ:bz},()=>this._show('coop'));},
+        emerg:((eccFor(bu0.code)||{}).emergency)||'',
+        emergHref:tel((eccFor(bu0.code)||{}).emergency),
+        emergShow:((eccFor(bu0.code)||{}).emergency)?'inline-block':'none',
+        clear:()=>this.clearBrowse()};
+    } else {
+      browse={on:false,code:'',name:'',callsign:'',zoneLabel:'',phone:'',phoneHref:'#',stat:'',chCount:'',emerg:'',emergHref:'#',emergShow:'none',
+        hasCoop:false,coopDisplay:'none',goCh:()=>{},goTone:()=>{},goCoop:()=>{},clear:()=>{}};
+    }
+
+    // cross-boundary notes + reference sources for the browsed coop unit
+    const _xb=((D.CROSSBOUNDARY||{})[cu.code])||[];
+    const xbList=_xb.map(x=>({from:x.from,note:x.note}));
+    // unit facility directory from the Travel Guide, grouped by kind
+    const _tv=(D.TRAVEL||[]).filter(x=>x.u===cu.code);
+    const _order=['UNIT HQ','FIRE STATION','CONSERVATION CAMP','FIRE CENTER','AIR ATTACK BASE','HELITACK','TRAINING CENTER','SERVICE CENTER','LOOKOUT','DIVISION / BATTALION','ADMIN','HEADQUARTERS','FACILITY'];
+    const _g={};
+    _tv.forEach(x=>{(_g[x.k]=_g[x.k]||[]).push(x);});
+    const facGroups=_order.filter(k=>_g[k]).map(k=>({kind:k,count:_g[k].length+'',
+      items:_g[k].map(x=>({name:x.n,phone:x.p||'',phoneHref:tel(x.p),
+        where:[x.a,x.c].filter(Boolean).join(', '),
+        whereShow:(x.a||x.c)?'block':'none',
+        dir:x.d||'', dirShow:x.d?'block':'none',
+        pin:x.lat?'\u25c9':'', pinShow:x.lat?'inline':'none'}))}));
+    const _src=((D.SOURCES||{})[cu.code]||[]).concat((D.SOURCES||{})._all||[]);
+    const srcList=_src.map(x=>({label:x.label,url:x.url,note:x.note||''}));
+
+    // responsibility area at the current fix
+    const _SRA={SRA:{label:'STATE RESPONSIBILITY AREA',short:'SRA',color:'var(--red)',note:'CAL FIRE has wildland fire protection responsibility here.'},
+                LRA:{label:'LOCAL RESPONSIBILITY AREA',short:'LRA',color:'var(--blue)',note:'Local government has responsibility. CAL FIRE responds by agreement.'},
+                FRA:{label:'FEDERAL RESPONSIBILITY AREA',short:'FRA',color:'var(--green)',note:'A federal agency has responsibility. Check the DPA — it does not always follow ownership.'}};
+    const _s=S.sra?_SRA[S.sra]:null;
+    const sra=_s?{on:true,short:_s.short,label:_s.label,color:_s.color,note:_s.note}
+                :{on:false,short:'',label:'',color:'var(--dim)',note:''};
+
+    const slim=!!S.slimHdr;
+    const toggleHdr=()=>{ const v=!S.slimHdr; try{ localStorage.setItem('cg_slim_hdr', v?'1':'0'); }catch(e){}
+      this.setState({slimHdr:v},()=>{ setTimeout(()=>{ if(this.sMap) this.sMap.invalidateSize(); },60); }); };
+
+    const tc=t=>S.tab===t;
+    return {
+      loadVer:D.LOAD,
+      slimHdr:slim, fullHdr:!slim, toggleHdr, hdrChevron: slim?'\u2304':'\u2303',
+      slimTone: near.numLabel, slimToneColor: near.toneColor,
+
+      regionLabel:locLabel,
+      gpsChipLabel:gp[0],gpsDotColor:gp[1],
+      su:{code:su.code,zoneLabel:'Zone '+su.z,callsign:su.callsign},
+      disp,eccPhone:su.phone,eccHref:tel(su.phone),
+      eccEmerg:((eccFor(su.code)||{}).emergency)||'',
+      eccEmergHref:tel((eccFor(su.code)||{}).emergency),
+      eccEmergShow:((eccFor(su.code)||{}).emergency)?'flex':'none',
+      ce:{name:ce.name+' Travel Net',zone:ce.zone,ch:ce.ch,rx:ce.rx,numLabel:tfmt(ce.rxT).numLabel,hz:tfmt(ce.rxT).hz},
+      cc:{name:D.CARTOCAR.name,alias:D.CARTOCAR.alias,rx:D.CARTOCAR.rx,numLabel:tfmt(D.CARTOCAR.rxT).numLabel,hz:tfmt(D.CARTOCAR.rxT).hz},
+      near,
+      chips,channelGroups:groups,
+      selU:{zoneLabel:'Zone '+selU.z,code:selU.code,name:selU.name,callsign:selU.callsign},
+      eccPhone2:selU.phone,eccHref2:tel(selU.phone),
+      eccEmerg2:((eccFor(selU.code)||{}).emergency)||'',
+      eccEmergHref2:tel((eccFor(selU.code)||{}).emergency),
+      eccEmergShow2:((eccFor(selU.code)||{}).emergency)?'flex':'none',
+      toneChips,tu:{code:tu.code,name:tu.name,zoneLabel:'Zone '+tu.z},
+      toneHasMap:hasMap,toneNoMap:!hasMap,toneList,
+      locate:()=>this.locate(),
+      goChannels:()=>{this._manual=false;this.setState({selZ:S.detZ},()=>this._show('channels'));},
+      sra,sraOn:sra.on,
+      browse,browseOn:!!bu0,browseOff:!bu0,
+      facGroups,facHas:facGroups.length>0,facCount:_tv.length+'',
+      xbList,xbHas:xbList.length>0,srcList,
+      coopChips,coopList,coopHas:!!_cd,coopNone:!_cd,coopIntro:(_cd?_cd.intro:''),
+      cu:{code:cu.code,name:cu.name,zoneLabel:'Zone '+cu.z},
+      tabStatus:()=>this._show('status'),tabCh:()=>this._show('channels'),tabTone:()=>this._show('tones'),tabCoop:()=>this._show('coop'),
+      tabStatusColor:tc('status')?'var(--blue)':dim,
+      tabChColor:tc('channels')?'var(--blue)':dim,
+      tabToneColor:tc('tones')?'var(--blue)':dim,
+      tabCoopColor:tc('coop')?'var(--blue)':dim,
+    };
+  }
+}
+</script>
+
+<script>
+/* Comm Guide — Channel quick filter. Self-contained, fail-safe.
+   Injects a search box into the Channels panel and hides non-matching rows.
+   Survives re-renders via MutationObserver; touches no app state. */
+(function(){
+  var q='';
+  function norm(s){ return (s||'').toLowerCase(); }
+  function panel(){ return document.getElementById('panel-channels'); }
+  function apply(){
+    var p=panel(); if(!p) return;
+    var v=p.querySelector('.vscroll'); if(!v) return;
+    var rows=v.querySelectorAll('div');
+    for(var i=0;i<rows.length;i++){
+      var r=rows[i], f=r.firstElementChild;
+      if(f && f.classList && f.classList.contains('rep-pin') && r.children.length>=3){
+        r.style.display=(!q||norm(r.textContent).indexOf(q)>-1)?'':'none';
+      }
+    }
+  }
+  function addBox(){
+    var p=panel(); if(!p||document.getElementById('cg-chsearch')) return;
+    var chips=p.firstElementChild; if(!chips) return;
+    var wrap=document.createElement('div');
+    wrap.id='cg-chsearch-wrap';
+    wrap.style.cssText='padding:10px 13px 2px;flex-shrink:0';
+    wrap.innerHTML='<input id="cg-chsearch" type="search" placeholder="Filter channels — name, freq, note…" autocomplete="off" style="width:100%;background:#14171D;border:1px solid #262B34;border-radius:10px;padding:9px 12px;color:#ECEEF1;font:500 13px \'Helvetica Neue\',Helvetica,sans-serif;outline:none;-webkit-appearance:none">';
+    chips.insertAdjacentElement('afterend',wrap);
+    var inp=wrap.querySelector('input');
+    inp.value=q;
+    inp.addEventListener('input',function(){ q=norm(inp.value.trim()); apply(); });
+    inp.addEventListener('focus',function(){ inp.style.borderColor='#4C8DFF'; });
+    inp.addEventListener('blur',function(){ inp.style.borderColor='#262B34'; });
+  }
+  function boot(){
+    var t=setInterval(function(){
+      var p=panel(); if(!p) return;
+      clearInterval(t);
+      addBox();
+      try{ new MutationObserver(function(){ addBox(); if(q) apply(); }).observe(p,{childList:true,subtree:true}); }catch(e){}
+    },250);
+  }
+  if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
+})();
+</script>
+
+<script>
+/* Comm Guide — Map menu + Corrections editor. Self-contained, fail-safe.
+   - Bottom-right menu button (built as a Leaflet control in the DC) calls window.__cgOpenMenu().
+   - Menu: Stations toggle + Corrections.
+   - Corrections editor edits repeaters (home unit) and channels, persisted to
+     localStorage 'cg_overrides_v1' with schema { REP:[...], TONES:{}, CH:{}, ADDZ:{} }.
+   - After saving, the page reloads so data.js re-applies overrides cleanly. */
+(function(){
+  var OVKEY='cg_overrides_v1';
+  function R(){ return window.RADIO||{}; }
+  function esc(s){ return (''+(s==null?'':s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function loadOv(){ try{ return JSON.parse(localStorage.getItem(OVKEY)||'null')||{}; }catch(e){ return {}; } }
+  function saveOv(o){ try{ localStorage.setItem(OVKEY, JSON.stringify(o)); return true; }catch(e){ return false; } }
+
+  // ---------- overlay scaffolding ----------
+  var host=null;
+  function ensureHost(){
+    if(host) return host;
+    host=document.createElement('div');
+    host.id='cg-menu-host';
+    host.style.cssText='position:fixed;inset:0;z-index:4000;display:none;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif';
+    document.body.appendChild(host);
+    return host;
+  }
+  function closeAll(){ if(host){ host.style.display='none'; host.innerHTML=''; } if(addzDirty){ addzDirty=false; setTimeout(function(){ location.reload(); },50); } }
+
+  function overlayShell(title, bodyHtml, onBack){
+    var h=ensureHost(); h.style.display='block';
+    h.innerHTML=''+
+      '<div style="position:absolute;inset:0;background:rgba(4,6,8,.55)" data-cg-dismiss="1"></div>'+
+      '<div style="position:absolute;left:0;right:0;bottom:0;max-height:88%;display:flex;flex-direction:column;'+
+        'background:#0E1214;border-top:1px solid #2a3439;border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.5)">'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;flex-shrink:0;border-bottom:1px solid #1c2226">'+
+          (onBack?'<button id="cg-back" style="background:none;border:none;color:#9AA3AE;font-size:20px;cursor:pointer;padding:0 4px;line-height:1">‹</button>':'')+
+          '<div style="font:700 15px \'Helvetica Neue\';color:#ECEEF1">'+esc(title)+'</div>'+
+          '<button id="cg-close" style="margin-left:auto;background:none;border:none;color:#9AA3AE;font-size:22px;cursor:pointer;line-height:1;padding:0 4px">×</button>'+
+        '</div>'+
+        '<div id="cg-body" style="overflow:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 22px">'+bodyHtml+'</div>'+
+      '</div>';
+    h.querySelector('[data-cg-dismiss]').onclick=closeAll;
+    h.querySelector('#cg-close').onclick=closeAll;
+    if(onBack){ var b=h.querySelector('#cg-back'); if(b) b.onclick=onBack; }
+    return h.querySelector('#cg-body');
+  }
+
+  // ---------- main menu ----------
+  function stationsOn(){ return (typeof window.__cgStationsState==='function')?window.__cgStationsState():false; }
+  function toggleStations(){ if(typeof window.__cgStations==='function') return window.__cgStations(); return false; }
+
+  function rowBtn(label, sub, right){
+    return '<button class="cg-row" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;border-radius:12px;'+
+      'padding:13px 14px;margin-bottom:9px;cursor:pointer;display:flex;align-items:center;gap:12px">'+
+      '<div style="flex:1"><div style="font:600 14px \'Helvetica Neue\';color:#ECEEF1">'+esc(label)+'</div>'+
+      (sub?'<div style="font:500 11px \'Helvetica Neue\';color:#7A828C;margin-top:2px">'+esc(sub)+'</div>':'')+'</div>'+
+      (right||'')+'</button>';
+  }
+
+  function openMenu(){
+    var edited=!!R().__edited;
+    var pill=function(on){ return '<span style="width:38px;height:22px;border-radius:11px;background:'+(on?'#2E7D46':'#2A2F35')+';position:relative;display:inline-block;transition:background .15s">'+
+      '<span style="position:absolute;top:2px;left:'+(on?'18px':'2px')+';width:18px;height:18px;border-radius:50%;background:#ECEEF1;transition:left .15s"></span></span>'; };
+    var body=''+
+      rowBtn('Stations','Show fire stations on the map', '<span id="cg-stn-pill">'+pill(stationsOn())+'</span>')+
+      rowBtn('Report on Conditions','Radio format, traffic priorities, ROC templates','<span style=\"color:#586170;font-size:18px\">\u203a</span>')+
+      rowBtn('Corrections', (edited?'Local edits active — repeaters & channels':'Edit repeaters & channels · saved to device'),
+        '<span style="color:#586170;font-size:18px">›</span>')+
+      '<div style="font:500 10px \'Helvetica Neue\';color:#586170;margin-top:6px;padding:0 2px;line-height:1.5">'+
+        'Corrections are stored only on this device. Reset returns to the built-in data.</div>';
+    var b=overlayShell('Menu', body, null);
+    var rows=b.querySelectorAll('.cg-row');
+    rows[0].onclick=function(){ var on=toggleStations(); var p=document.getElementById('cg-stn-pill'); if(p) p.innerHTML=pill(on); };
+    rows[1].onclick=function(){ openProcedures(); };
+    rows[2].onclick=function(){ openCorrections(); };
+  }
+
+
+  // ---------- report on conditions / radio procedure ----------
+  function openProcedures(){
+    var P=(R().PROCEDURES)||{};
+    function card(title, inner, accent){
+      return '<div style="background:#161C1F;border:1px solid #2A3439;border-radius:13px;overflow:hidden;margin-bottom:10px">'+
+        '<div style="padding:10px 13px 8px;border-bottom:1px solid #2A3439">'+
+        '<span style="font:700 10px \'Helvetica Neue\';letter-spacing:.1em;color:'+(accent||'#4C8DFF')+'">'+esc(title)+'</span></div>'+
+        inner+'</div>';
+    }
+    function nlist(arr, num){
+      return '<div style="padding:8px 13px 10px">'+arr.map(function(x,i){
+        return '<div style="display:flex;gap:8px;font-size:12px;line-height:1.5;color:#ECEEF1;padding:3px 0">'+
+          (num?'<span style="color:#586170;font:700 11px \'Spline Sans Mono\';min-width:14px">'+(i+1)+'</span>':'<span style="color:#586170">\u00b7</span>')+
+          '<span>'+esc(x)+'</span></div>';
+      }).join('')+'</div>';
+    }
+    var body='';
+    if(P.emergency){
+      body+='<div style="background:#2A1215;border:1px solid #5C2B2E;border-radius:13px;padding:11px 13px;margin-bottom:10px">'+
+        '<div style="font:700 10px \'Helvetica Neue\';letter-spacing:.1em;color:#FF6B6B">EMERGENCY TRAFFIC</div>'+
+        '<div style="font-size:12px;line-height:1.55;color:#ECEEF1;margin-top:5px">'+esc(P.emergency)+'</div></div>';
+    }
+    if(P.priorities) body+=card(P.priorities.title.toUpperCase(), nlist(P.priorities.lines,true), '#FFB23E');
+    if(P.format){
+      body+=card(P.format.title.toUpperCase(),
+        nlist(P.format.lines,true)+
+        '<div style="padding:0 13px 10px"><div style="font:600 9px \'Helvetica Neue\';letter-spacing:.1em;color:#828B97;margin-bottom:4px">EXAMPLE</div>'+
+        P.format.example.map(function(x){return '<div style="font:500 12px \'Spline Sans Mono\';color:#5BD06A;line-height:1.6">'+esc(x)+'</div>';}).join('')+
+        '<div style="font-size:11px;line-height:1.5;color:#828B97;margin-top:7px">'+esc(P.format.note)+'</div></div>');
+    }
+    (P.roc||[]).forEach(function(r){ body+=card('ROC \u2014 '+r.kind.toUpperCase(), nlist(r.items,false), '#5BD06A'); });
+    if(P.status){
+      body+=card('RESOURCE STATUS', '<div style="padding:8px 13px 10px">'+P.status.map(function(p){
+        return '<div style="padding:4px 0"><span style="font:700 12px \'Spline Sans Mono\';color:#4CC2FF">'+esc(p[0])+'</span>'+
+          '<div style="font-size:11px;line-height:1.45;color:#828B97">'+esc(p[1])+'</div></div>';
+      }).join('')+'</div>', '#4CC2FF');
+    }
+    body+='<div style="padding:2px 3px 0;font:500 10px \'Helvetica Neue\';color:#586170;text-align:center;line-height:1.6">'+
+      'CAL FIRE Radio Operations 2023</div>';
+    overlayShell('Report on Conditions', body, null);
+  }
+
+  // ---------- corrections: pick category ----------
+  function openCorrections(){
+    var body=''+
+      rowBtn('Repeaters','Edit tone, coordinates, notes','<span style="color:#586170;font-size:18px">›</span>')+
+      rowBtn('Channels','Edit channels · add zones & channels on the fly','<span style="color:#586170;font-size:18px">›</span>')+
+      '<button id="cg-reset" style="width:100%;text-align:center;background:none;border:1px solid #4A2326;border-radius:12px;'+
+        'padding:11px;margin-top:6px;cursor:pointer;color:#E5686E;font:600 13px \'Helvetica Neue\'">Reset all corrections</button>';
+    var b=overlayShell('Corrections', body, closeAll);
+    var rows=b.querySelectorAll('.cg-row');
+    rows[0].onclick=openRepeaters;
+    rows[1].onclick=openChannelUnits;
+    b.querySelector('#cg-reset').onclick=function(){
+      if(confirm('Remove ALL local corrections and reload with built-in data?')){ try{ localStorage.removeItem(OVKEY); }catch(e){} location.reload(); }
+    };
+  }
+
+  // ---------- repeater editor ----------
+  function fieldRow(label, id, val, ph){
+    return '<label style="display:block;margin-bottom:9px">'+
+      '<div style="font:600 9px \'Helvetica Neue\';letter-spacing:.08em;color:#7A828C;margin-bottom:3px">'+esc(label)+'</div>'+
+      '<input id="'+id+'" value="'+esc(val)+'" placeholder="'+esc(ph||'')+'" autocomplete="off" '+
+      'style="width:100%;background:#0B0E10;border:1px solid #262B31;border-radius:9px;padding:9px 11px;color:#ECEEF1;'+
+      'font:500 13px \'Spline Sans Mono\',monospace;outline:none;-webkit-appearance:none"></label>';
+  }
+  function openRepeaters(){
+    var reps=R().TCU_REPEATERS||[];
+    var body=reps.map(function(r,i){
+      return '<button class="cg-rep" data-i="'+i+'" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;'+
+        'border-radius:11px;padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1"><div style="font:600 13px \'Helvetica Neue\';color:#ECEEF1">'+esc(r.name)+(r._edited?' <span style="color:#E0A13A;font-weight:400">· edited</span>':'')+'</div>'+
+        '<div style="font:500 11px \'Spline Sans Mono\';color:#7A828C;margin-top:2px">'+esc(r.tone)+' Hz · '+esc((r.lat!=null?r.lat:'—'))+', '+esc((r.lng!=null?r.lng:'—'))+'</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    }).join('');
+    var b=overlayShell('Repeater corrections', body, openCorrections);
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-rep'), function(btn){
+      btn.onclick=function(){ editRepeater(parseInt(btn.getAttribute('data-i'),10)); };
+    });
+  }
+  function editRepeater(i){
+    var reps=(R().TCU_REPEATERS||[]).slice();
+    var r=reps[i]; if(!r) return;
+    var body=''+
+      fieldRow('Name','cg-f-name',r.name)+
+      fieldRow('TX tone (Hz)','cg-f-tone',r.tone,'e.g. 146.2')+
+      fieldRow('Latitude','cg-f-lat',(r.lat!=null?r.lat:''),'38.34241')+
+      fieldRow('Longitude','cg-f-lng',(r.lng!=null?r.lng:''),'-120.36520')+
+      fieldRow('Note','cg-f-note',r.note||'')+
+      '<button id="cg-save" style="width:100%;background:#2E7D46;border:none;border-radius:11px;padding:13px;margin-top:4px;'+
+        'cursor:pointer;color:#fff;font:700 14px \'Helvetica Neue\'">Save to device</button>';
+    var b=overlayShell('Edit · '+r.name, body, openRepeaters);
+    b.querySelector('#cg-save').onclick=function(){
+      var ov=loadOv(); var base=(ov.REP&&ov.REP.length===reps.length)?ov.REP:reps.map(function(x){var c={};for(var k in x)c[k]=x[k];return c;});
+      var lat=parseFloat(document.getElementById('cg-f-lat').value);
+      var lng=parseFloat(document.getElementById('cg-f-lng').value);
+      base[i]=Object.assign({},base[i],{
+        name:document.getElementById('cg-f-name').value.trim(),
+        tone:document.getElementById('cg-f-tone').value.trim(),
+        note:document.getElementById('cg-f-note').value.trim(),
+        lat:isNaN(lat)?null:lat, lng:isNaN(lng)?null:lng
+      });
+      ov.REP=base; if(saveOv(ov)) location.reload(); else alert('Could not save (storage blocked).');
+    };
+  }
+
+  // ---------- channel editor: pick unit ----------
+  function homeZ(){ return R().HOME_Z; }
+  function openChannelUnits(){
+    var units=(R().UNITS||[]).slice().sort(function(a,b){return (a.code||'').localeCompare(b.code||'');});
+    var rowsHtml='';
+    // Home (TCU / BAT4) first
+    rowsHtml+='<button class="cg-u" data-kind="HOME" style="width:100%;text-align:left;background:#14181C;border:1px solid #2E7D46;'+
+      'border-radius:11px;padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+      '<div style="flex:1"><div style="font:600 13px \'Helvetica Neue\';color:#ECEEF1">TCU · Home (Batt 4)</div>'+
+      '<div style="font:500 11px \'Helvetica Neue\';color:#7A828C;margin-top:2px">Zoned call plan · '+((R().BAT4||[]).length)+' zones</div></div>'+
+      '<span style="color:#586170;font-size:16px">›</span></button>';
+    units.forEach(function(u){
+      if(u.home) return;
+      var _nch=(u.channels&&u.channels.length)||0;
+      rowsHtml+='<button class="cg-u" data-kind="UNIT" data-code="'+esc(u.code)+'" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;'+
+        'border-radius:11px;padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1"><div style="font:600 13px \'Helvetica Neue\';color:#ECEEF1">'+esc(u.code)+' · '+esc(u.name)+'</div>'+
+        '<div style="font:500 11px \'Helvetica Neue\';color:#7A828C;margin-top:2px">'+_nch+' channels</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    });
+    var b=overlayShell('Channels · pick unit', rowsHtml, openCorrections);
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-u'), function(btn){
+      btn.onclick=function(){ var kind=btn.getAttribute('data-kind');
+        if(kind==='HOME') openHomeZones(); else openUnitZones(btn.getAttribute('data-code')); };
+    });
+  }
+
+  // Home: zones screen — native zones + added zones + add-zone (call plan builder)
+  function openHomeZones(){
+    var bat=R().BAT4||[];
+    var rowsHtml=bat.map(function(z){
+      return '<button class="cg-z" data-zone="'+esc(z.zone)+'" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;border-radius:11px;padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<span style="width:10px;height:10px;border-radius:3px;background:'+esc(z.color||'#888')+';flex-shrink:0"></span>'+
+        '<div style="flex:1"><div style="font:600 13px Helvetica,Arial,sans-serif;color:#ECEEF1">Zone '+esc(z.zone)+' · '+esc(z.name)+'</div>'+
+        '<div style="font:500 11px Helvetica,Arial,sans-serif;color:#7A828C;margin-top:2px">'+z.channels.length+' channels</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    }).join('');
+    rowsHtml+=azRowsHtml('HOME')+azAddBtnHtml();
+    var b=overlayShell('TCU Home · zones', rowsHtml, openChannelUnits);
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-z'), function(btn){
+      btn.onclick=function(){ openHomeChannels(btn.getAttribute('data-zone')); };
+    });
+    wireAz(b,'HOME',openHomeZones);
+  }
+
+  // ---------- on-the-fly call plan builder (added zones & channels, device-only) ----------
+  var ZPAL=['#B68CFF','#46C9B4','#FFB23E','#4C8DFF','#E6C84A'];
+  var addzDirty=false;
+  function azList(key){ var ov=loadOv(); return (ov.ADDZ&&ov.ADDZ[key])?ov.ADDZ[key]:[]; }
+  function azSave(key,list){
+    var ov=loadOv(); ov.ADDZ=ov.ADDZ||{};
+    if(list&&list.length) ov.ADDZ[key]=list; else delete ov.ADDZ[key];
+    if(ov.ADDZ&&!Object.keys(ov.ADDZ).length) delete ov.ADDZ;
+    if(saveOv(ov)){ addzDirty=true; try{ if(window.RADIO) window.RADIO.ADDZ=(loadOv().ADDZ)||{}; }catch(e){} return true; }
+    alert('Could not save (storage blocked).'); return false;
+  }
+  function azRowsHtml(key){
+    return azList(key).map(function(z,zi){
+      return '<button class="cg-az" data-zi="'+zi+'" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;border-radius:11px;padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<span style="width:10px;height:10px;border-radius:3px;background:'+esc(z.color||'#B68CFF')+';flex-shrink:0"></span>'+
+        '<div style="flex:1"><div style="font:600 13px Helvetica,Arial,sans-serif;color:#ECEEF1">Zone '+esc(z.zone)+' · '+esc(z.name)+' <span style="color:#B68CFF;font-weight:400">· added</span></div>'+
+        '<div style="font:500 11px Helvetica,Arial,sans-serif;color:#7A828C;margin-top:2px">'+(z.channels||[]).length+' channels</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    }).join('');
+  }
+  function azAddBtnHtml(){
+    return '<button id="cg-addz" style="width:100%;text-align:center;background:none;border:1px dashed #2E7D46;border-radius:12px;padding:12px;margin-bottom:9px;cursor:pointer;color:#5BD06A;font:600 13px Helvetica,Arial,sans-serif">+ Add zone</button>';
+  }
+  function wireAz(b,key,backToZones){
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-az'), function(btn){
+      btn.onclick=function(){ openAddedZone(key,parseInt(btn.getAttribute('data-zi'),10),backToZones); };
+    });
+    var a=b.querySelector('#cg-addz');
+    if(a) a.onclick=function(){
+      if(azList(key).length>=5){ alert('Limit reached: 5 added zones per unit.'); return; }
+      zoneForm(key,null,backToZones);
+    };
+  }
+  function zoneForm(key,zi,backToZones){
+    var list=azList(key);
+    var z=(zi!=null)?list[zi]:{zone:'',name:'',sub:''};
+    if(!z) return;
+    var body=''+
+      fieldRow('Zone number / letter','cg-z-num',z.zone,'e.g. 7')+
+      fieldRow('Zone name','cg-z-name',z.name,'e.g. Rim Incident')+
+      fieldRow('Sub label (optional)','cg-z-sub',z.sub||'','e.g. per IAP 7/9')+
+      '<button id="cg-zsave" style="width:100%;background:#2E7D46;border:none;border-radius:11px;padding:13px;margin-top:4px;cursor:pointer;color:#fff;font:700 14px Helvetica,Arial,sans-serif">Save to device</button>'+
+      ((zi!=null)?'<button id="cg-zdel" style="width:100%;background:none;border:1px solid #4A2326;border-radius:11px;padding:12px;margin-top:9px;cursor:pointer;color:#E5686E;font:600 13px Helvetica,Arial,sans-serif">Delete zone</button>':'');
+    var b=overlayShell((zi!=null)?('Edit zone · '+z.name):'Add zone', body, backToZones);
+    b.querySelector('#cg-zsave').onclick=function(){
+      var num=document.getElementById('cg-z-num').value.trim();
+      var nm=document.getElementById('cg-z-name').value.trim();
+      var sub=document.getElementById('cg-z-sub').value.trim();
+      if(!num||!nm){ alert('Zone number and name are required.'); return; }
+      var l=azList(key);
+      if(zi!=null){ l[zi].zone=num; l[zi].name=nm; l[zi].sub=sub; }
+      else l.push({zone:num,name:nm,sub:sub,color:ZPAL[l.length%ZPAL.length],channels:[]});
+      if(azSave(key,l)) backToZones();
+    };
+    var d=b.querySelector('#cg-zdel');
+    if(d) d.onclick=function(){
+      if(!confirm('Delete this zone and all its channels?')) return;
+      var l=azList(key); l.splice(zi,1);
+      if(azSave(key,l)) backToZones();
+    };
+  }
+  function openAddedZone(key,zi,backToZones){
+    var list=azList(key), z=list[zi]; if(!z) return;
+    var chs=z.channels||[];
+    var html=chs.map(function(c,i){
+      return '<button class="cg-ach" data-i="'+i+'" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;border-radius:11px;padding:11px 13px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1"><div style="font:600 13px Helvetica,Arial,sans-serif;color:#ECEEF1">'+esc(c.pos)+' · '+esc(c.name)+'</div>'+
+        '<div style="font:500 11px monospace;color:#7A828C;margin-top:2px">RX '+esc(c.rx)+' · TX '+esc(c.tx)+' · '+esc(c.rxT||'No tone')+'</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    }).join('');
+    html+='<button id="cg-addch" style="width:100%;text-align:center;background:none;border:1px dashed #2E7D46;border-radius:12px;padding:12px;margin-bottom:9px;cursor:pointer;color:#5BD06A;font:600 13px Helvetica,Arial,sans-serif">+ Add channel</button>';
+    html+='<button id="cg-zedit" style="width:100%;text-align:center;background:#14181C;border:1px solid #232A2F;border-radius:11px;padding:12px;cursor:pointer;color:#ECEEF1;font:600 13px Helvetica,Arial,sans-serif">Edit / delete zone</button>';
+    var back=function(){ openAddedZone(key,zi,backToZones); };
+    var b=overlayShell('Zone '+z.zone+' · '+z.name, html, backToZones);
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-ach'), function(btn){
+      btn.onclick=function(){ chForm(key,zi,parseInt(btn.getAttribute('data-i'),10),back); };
+    });
+    b.querySelector('#cg-addch').onclick=function(){
+      var l=azList(key); if(((l[zi]||{}).channels||[]).length>=16){ alert('Limit reached: 16 channels per zone.'); return; }
+      chForm(key,zi,null,back);
+    };
+    b.querySelector('#cg-zedit').onclick=function(){ zoneForm(key,zi,backToZones); };
+  }
+  function cpPickerHtml(){
+    var cp=R().CALLPLAN||[];
+    if(!cp.length) return '';
+    var zopts='<option value="">Select zone / unit…</option>';
+    cp.forEach(function(zz,i){
+      zopts+='<option value="'+i+'">Z'+zz.z+' · '+esc(zz.tag)+(zz.name?(' — '+esc(zz.name)):'')+'</option>';
+    });
+    var sel='width:100%;background:#0B0E10;border:1px solid #262B31;border-radius:9px;padding:9px 11px;color:#ECEEF1;font:500 13px monospace;outline:none;-webkit-appearance:none';
+    return '<div style="border:1px solid #1E3A2A;border-radius:11px;padding:10px 11px;margin-bottom:11px;background:#0F1512">'+
+      '<div style="font:600 9px Helvetica,Arial,sans-serif;letter-spacing:.08em;color:#5BD06A;margin-bottom:6px">PICK FROM STATEWIDE CALL PLAN · LOAD V25A6</div>'+
+      '<select id="cg-cp-z" style="'+sel+'">'+zopts+'</select>'+
+      '<select id="cg-cp-c" style="'+sel+';margin-top:7px" disabled><option value="">Channel…</option></select>'+
+      '<div style="font:500 10px Helvetica,Arial,sans-serif;color:#586170;margin-top:6px;line-height:1.4">Fills the fields below — review before saving.</div></div>';
+  }
+  function wireCpPicker(b,m){
+    m=m||{name:'cg-a-name',rx:'cg-a-rx',tx:'cg-a-tx',tone:'cg-a-tone',note:'cg-a-note'};
+    var zs=b.querySelector('#cg-cp-z'), cs=b.querySelector('#cg-cp-c');
+    if(!zs||!cs) return;
+    zs.onchange=function(){
+      var cp=R().CALLPLAN||[], zz=cp[parseInt(zs.value,10)];
+      cs.innerHTML='<option value="">Channel…</option>';
+      if(!zz){ cs.disabled=true; return; }
+      zz.ch.forEach(function(row,i){
+        cs.innerHTML+='<option value="'+i+'">CH '+row[0]+' · '+esc(row[1])+' · '+esc(row[2])+'</option>';
+      });
+      cs.disabled=false;
+    };
+    cs.onchange=function(){
+      var cp=R().CALLPLAN||[], zz=cp[parseInt(zs.value,10)];
+      if(!zz) return;
+      var row=zz.ch[parseInt(cs.value,10)];
+      if(!row) return;
+      var g=function(id){ return document.getElementById(id); };
+      if(g(m.name)) g(m.name).value=row[1];
+      if(g(m.rx)) g(m.rx).value=row[2];
+      if(g(m.tx)) g(m.tx).value=row[4];
+      if(g(m.tone)) g(m.tone).value=row[3];
+      var no=g(m.note);
+      if(no){
+        var parts=[];
+        if(row[6]) parts.push(row[6]);
+        if(row[5]&&row[5]!=='None'&&row[5]!==row[3]) parts.push('TX CTCSS '+row[5]);
+        no.value=parts.join(' · ');
+      }
+    };
+  }
+  function chForm(key,zi,ci,back){
+    var list=azList(key), z=list[zi]; if(!z) return;
+    z.channels=z.channels||[];
+    var c=(ci!=null)?z.channels[ci]:{name:'',rx:'',tx:'',rxT:'',note:''};
+    if(!c) return;
+    var body=''+
+      cpPickerHtml()+
+      fieldRow('Channel name','cg-a-name',c.name,'e.g. CMD 10')+
+      fieldRow('RX (receive)','cg-a-rx',c.rx,'151.1750')+
+      fieldRow('TX (transmit)','cg-a-tx',c.tx,'159.4500')+
+      fieldRow('Tone (RX CTCSS)','cg-a-tone',c.rxT||'','146.2 or None')+
+      fieldRow('Note (optional)','cg-a-note',c.note||'','')+
+      '<button id="cg-asave" style="width:100%;background:#2E7D46;border:none;border-radius:11px;padding:13px;margin-top:4px;cursor:pointer;color:#fff;font:700 14px Helvetica,Arial,sans-serif">Save to device</button>'+
+      ((ci!=null)?'<button id="cg-adel" style="width:100%;background:none;border:1px solid #4A2326;border-radius:11px;padding:12px;margin-top:9px;cursor:pointer;color:#E5686E;font:600 13px Helvetica,Arial,sans-serif">Delete channel</button>':'');
+    var b=overlayShell((ci!=null)?('Edit · '+c.name):('Add channel · Zone '+z.zone), body, back);
+    wireCpPicker(b);
+    b.querySelector('#cg-asave').onclick=function(){
+      var nm=document.getElementById('cg-a-name').value.trim();
+      if(!nm){ alert('Channel name is required.'); return; }
+      var rx=document.getElementById('cg-a-rx').value.trim();
+      var tx=document.getElementById('cg-a-tx').value.trim();
+      var tn=document.getElementById('cg-a-tone').value.trim();
+      var no=document.getElementById('cg-a-note').value.trim();
+      var l=azList(key), zz=l[zi]; zz.channels=zz.channels||[];
+      if(ci!=null){ var e=zz.channels[ci]; e.name=nm; e.rx=rx; e.tx=tx; e.rxT=tn; e.note=no; }
+      else zz.channels.push({pos:zz.channels.length+1,name:nm,rx:rx,tx:tx,rxT:tn,note:no});
+      if(azSave(key,l)) back();
+    };
+    var d=b.querySelector('#cg-adel');
+    if(d) d.onclick=function(){
+      if(!confirm('Delete this channel?')) return;
+      var l=azList(key), zz=l[zi];
+      zz.channels.splice(ci,1);
+      zz.channels.forEach(function(cc,i2){ cc.pos=i2+1; });
+      if(azSave(key,l)) back();
+    };
+  }
+  function openUnitZones(code){
+    var u=(R().UNITS||[]).filter(function(uu){return (uu.code||'').toUpperCase()===(code||'').toUpperCase();})[0]; if(!u) return;
+    var key=(u.code||'').toUpperCase();
+    var nch=(u.channels&&u.channels.length)||0;
+    var html='';
+    if(nch){
+      html+='<button id="cg-native" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;border-radius:11px;padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1"><div style="font:600 13px Helvetica,Arial,sans-serif;color:#ECEEF1">Native channels</div>'+
+        '<div style="font:500 11px Helvetica,Arial,sans-serif;color:#7A828C;margin-top:2px">'+nch+' channels · edit RX / TX / tone</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    }
+    html+=azRowsHtml(key)+azAddBtnHtml();
+    var b=overlayShell(u.code+' · zones', html, openChannelUnits);
+    var n=b.querySelector('#cg-native');
+    if(n) n.onclick=function(){ openUnitChannels(code); };
+    wireAz(b,key,function(){ openUnitZones(code); });
+  }
+  function chListHtml(chs, labelFn){
+    return chs.map(function(c,i){
+      return '<button class="cg-ch" data-i="'+i+'" style="width:100%;text-align:left;background:#14181C;border:1px solid #232A2F;'+
+        'border-radius:11px;padding:11px 13px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:10px">'+
+        '<div style="flex:1"><div style="font:600 13px \'Helvetica Neue\';color:#ECEEF1">'+esc(labelFn(c))+(c._edited?' <span style="color:#E0A13A;font-weight:400">· edited</span>':'')+(c._added?' <span style="color:#B68CFF;font-weight:400">· added</span>':'')+'</div>'+
+        '<div style="font:500 11px \'Spline Sans Mono\';color:#7A828C;margin-top:2px">RX '+esc(c.rx)+' · TX '+esc(c.tx)+' · '+esc(c.rxT)+'</div></div>'+
+        '<span style="color:#586170;font-size:16px">›</span></button>';
+    }).join('');
+  }
+  function openHomeChannels(zoneStr){
+    var z=(R().BAT4||[]).filter(function(zz){return String(zz.zone)===String(zoneStr);})[0]; if(!z) return;
+    var key='HOME|'+z.zone;
+    var nat=(z.channels||[]).filter(function(c){return !c._added;});
+    var mx=0; nat.forEach(function(c){ var p=parseInt(c.pos,10); if(p>mx) mx=p; });
+    var added=acList(key).map(function(c,i){ var n={}; for(var k in c){ n[k]=c[k]; } n.pos=mx+i+1; n._added=true; return n; });
+    var all=nat.concat(added);
+    var html=chListHtml(all,function(c){return c.pos+' · '+c.name;})+acAddBtnHtml();
+    var back=function(){ openHomeChannels(zoneStr); };
+    var b=overlayShell('Zone '+z.zone+' · '+z.name, html, openHomeZones);
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-ch'), function(btn){
+      btn.onclick=function(){
+        var i=parseInt(btn.getAttribute('data-i'),10);
+        if(i<nat.length) editChannel('HOME', String(z.zone), nat[i], 'pos', back);
+        else acForm(key, i-nat.length, back);
+      };
+    });
+    var a=b.querySelector('#cg-addnch');
+    if(a) a.onclick=function(){
+      if(acList(key).length>=16){ alert('Limit reached: 16 added channels per zone.'); return; }
+      acForm(key, null, back);
+    };
+  }
+  function openUnitChannels(code){
+    var u=(R().UNITS||[]).filter(function(uu){return (uu.code||'').toUpperCase()===(code||'').toUpperCase();})[0]; if(!u) return;
+    var key='UNIT|'+(u.code||'').toUpperCase();
+    var nat=(u.channels||[]).filter(function(c){return !c._added;});
+    var mx=0; nat.forEach(function(c){ var p=parseInt(c.ch,10); if(p>mx) mx=p; });
+    var added=acList(key).map(function(c,i){ var n={}; for(var k in c){ n[k]=c[k]; } n.ch=mx+i+1; n._added=true; return n; });
+    var all=nat.concat(added);
+    var html=chListHtml(all,function(c){return c.ch+' · '+c.name;})+acAddBtnHtml();
+    var back=function(){ openUnitChannels(code); };
+    var b=overlayShell(u.code+' · channels', html, function(){ openUnitZones(code); });
+    Array.prototype.forEach.call(b.querySelectorAll('.cg-ch'), function(btn){
+      btn.onclick=function(){
+        var i=parseInt(btn.getAttribute('data-i'),10);
+        if(i<nat.length) editChannel('UNIT', u.code, nat[i], 'ch', back);
+        else acForm(key, i-nat.length, back);
+      };
+    });
+    var a=b.querySelector('#cg-addnch');
+    if(a) a.onclick=function(){
+      if(acList(key).length>=16){ alert('Limit reached: 16 added channels per zone.'); return; }
+      acForm(key, null, back);
+    };
+  }
+  // ---------- added channels on NATIVE zones/units (ADDCH) ----------
+  function acAddBtnHtml(){
+    return '<button id="cg-addnch" style="width:100%;text-align:center;background:none;border:1px dashed #2E7D46;border-radius:12px;padding:12px;margin-bottom:9px;cursor:pointer;color:#5BD06A;font:600 13px Helvetica,Arial,sans-serif">+ Add channel</button>';
+  }
+  function acList(key){ var ov=loadOv(); return (ov.ADDCH&&ov.ADDCH[key])?ov.ADDCH[key]:[]; }
+  function acSave(key,list){
+    var ov=loadOv(); ov.ADDCH=ov.ADDCH||{};
+    if(list&&list.length) ov.ADDCH[key]=list; else delete ov.ADDCH[key];
+    if(ov.ADDCH&&!Object.keys(ov.ADDCH).length) delete ov.ADDCH;
+    if(saveOv(ov)){ addzDirty=true; return true; }
+    alert('Could not save (storage blocked).'); return false;
+  }
+  function acForm(key,ci,back){
+    var list=acList(key);
+    var c=(ci!=null)?list[ci]:{name:'',rx:'',tx:'',rxT:'',note:''};
+    if(!c) return;
+    var body=''+cpPickerHtml()+
+      fieldRow('Channel name','cg-n-name',c.name,'e.g. CMD 10')+
+      fieldRow('RX (receive)','cg-n-rx',c.rx,'151.1750')+
+      fieldRow('TX (transmit)','cg-n-tx',c.tx,'159.4500')+
+      fieldRow('Tone (RX CTCSS)','cg-n-tone',c.rxT||'','146.2 or None')+
+      fieldRow('Note (optional)','cg-n-note',c.note||'','')+
+      '<button id="cg-nsave" style="width:100%;background:#2E7D46;border:none;border-radius:11px;padding:13px;margin-top:4px;cursor:pointer;color:#fff;font:700 14px Helvetica,Arial,sans-serif">Save to device</button>'+
+      ((ci!=null)?'<button id="cg-ndel" style="width:100%;background:none;border:1px solid #4A2326;border-radius:11px;padding:12px;margin-top:9px;cursor:pointer;color:#E5686E;font:600 13px Helvetica,Arial,sans-serif">Delete channel</button>':'');
+    var b=overlayShell((ci!=null)?('Edit added · '+c.name):'Add channel', body, back);
+    wireCpPicker(b,{name:'cg-n-name',rx:'cg-n-rx',tx:'cg-n-tx',tone:'cg-n-tone',note:'cg-n-note'});
+    b.querySelector('#cg-nsave').onclick=function(){
+      var nm=document.getElementById('cg-n-name').value.trim();
+      if(!nm){ alert('Channel name is required.'); return; }
+      var obj={name:nm,
+        rx:document.getElementById('cg-n-rx').value.trim(),
+        tx:document.getElementById('cg-n-tx').value.trim(),
+        rxT:document.getElementById('cg-n-tone').value.trim(),
+        note:document.getElementById('cg-n-note').value.trim()};
+      var l=acList(key);
+      if(ci!=null){ for(var k in obj){ l[ci][k]=obj[k]; } } else l.push(obj);
+      if(acSave(key,l)) back();
+    };
+    var d=b.querySelector('#cg-ndel');
+    if(d) d.onclick=function(){
+      if(!confirm('Delete this added channel?')) return;
+      var l=acList(key); l.splice(ci,1);
+      if(acSave(key,l)) back();
+    };
+  }
+  function editChannel(kind, scope, ch, idField, back){
+    if(!ch) return;
+    var idx=ch[idField];
+    var body=''+cpPickerHtml()+
+      fieldRow('Channel name','cg-c-name',ch.name)+
+      fieldRow('RX (receive)','cg-c-rx',ch.rx,'151.1750')+
+      fieldRow('TX (transmit)','cg-c-tx',ch.tx,'159.4500')+
+      fieldRow('RX tone','cg-c-tone',ch.rxT,'136.5 or None')+
+      fieldRow('Note','cg-c-note',ch.note||'')+
+      '<button id="cg-csave" style="width:100%;background:#2E7D46;border:none;border-radius:11px;padding:13px;margin-top:4px;'+
+        'cursor:pointer;color:#fff;font:700 14px \'Helvetica Neue\'">Save to device</button>';
+    var b=overlayShell('Edit · '+ch.name, body, back);
+    wireCpPicker(b,{name:'cg-c-name',rx:'cg-c-rx',tx:'cg-c-tx',tone:'cg-c-tone',note:'cg-c-note'});
+    b.querySelector('#cg-csave').onclick=function(){
+      var ov=loadOv(); ov.CH=ov.CH||{};
+      var key=kind+'|'+scope+'|'+idx;
+      ov.CH[key]={
+        name:document.getElementById('cg-c-name').value.trim(),
+        rx:document.getElementById('cg-c-rx').value.trim(),
+        tx:document.getElementById('cg-c-tx').value.trim(),
+        rxT:document.getElementById('cg-c-tone').value.trim(),
+        note:document.getElementById('cg-c-note').value.trim()
+      };
+      if(saveOv(ov)) location.reload(); else alert('Could not save (storage blocked).');
+    };
+  }
+
+  window.__cgOpenMenu=openMenu;
+  window.__cgOpenCorrections=openCorrections;
+})();
+</script>
+
+<script>
+/* Comm Guide — offline support: SW registration + TCU basemap downloader */
+(function(){
+  // ---- register service worker (fail-safe) + auto-update on new version ----
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').then(function(reg){
+        // When a new SW takes control (cache bump), reload once so the fresh shell shows.
+        var reloaded=false;
+        navigator.serviceWorker.addEventListener('controllerchange', function(){
+          if(reloaded) return; reloaded=true; window.location.reload();
+        });
+        // Nudge any waiting worker to activate immediately.
+        function nudge(w){ if(w) try{ w.postMessage({type:'skipWaiting'}); }catch(e){} }
+        if(reg.waiting) nudge(reg.waiting);
+        reg.addEventListener('updatefound', function(){
+          var nw=reg.installing;
+          if(nw) nw.addEventListener('statechange', function(){
+            if(nw.state==='installed' && navigator.serviceWorker.controller) nudge(nw);
+          });
+        });
+        try{ reg.update(); }catch(e){}
+      }).catch(function(){});
+    });
+  }
+
+  // ---- TCU tile math (matches app default basemap: cartocdn dark_all, subdomains a/b/c, no retina) ----
+  var TCU={W:-121.05,E:-119.55,S:37.55,N:38.55};
+  var CARTO_KEY='cb1_3q8f_1_4cd3662a1089d3f737cd8e35'; // must match the key in initMaps()
+  // Leaflet requests @2x tiles on retina screens ({r}), so cache those same URLs
+  var RET=(window.devicePixelRatio>1)?'@2x':'';
+  var STYLES=['https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}'+RET+'.png?key='+CARTO_KEY];
+  var SUBS=['a','b','c'];
+  function lon2x(lon,z){ return Math.floor((lon+180)/360*Math.pow(2,z)); }
+  function lat2y(lat,z){ var r=lat*Math.PI/180; return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,z)); }
+  function tileList(zmin,zmax){
+    var out=[];
+    for(var z=zmin;z<=zmax;z++){
+      var x0=lon2x(TCU.W,z),x1=lon2x(TCU.E,z),y0=lat2y(TCU.N,z),y1=lat2y(TCU.S,z);
+      for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++){
+        STYLES.forEach(function(s){ out.push(s.replace('{s}',SUBS[Math.abs(x+y)%3]).replace('{z}',z).replace('{x}',x).replace('{y}',y)); });
+      }
+    }
+    return out;
+  }
+
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){ setTimeout(addBtn,600); });
+  function addBtn(){
+    if(document.getElementById('cg-omap')) return;
+    var b=document.createElement('button');
+    b.id='cg-omap'; b.textContent='\u2b07 Offline map';
+    b.setAttribute('style','position:fixed;right:12px;bottom:120px;z-index:99998;background:#161c1f;color:#e8ebe6;border:1px solid #2a3439;border-radius:20px;padding:8px 14px;font:600 13px -apple-system,system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.45)');
+    b.onclick=open; document.body.appendChild(b);
+  }
+
+  var ov=null, cancel=false, running=false, zmax=13;
+  function open(){
+    ov=document.createElement('div');
+    ov.setAttribute('style','position:fixed;inset:0;z-index:100000;background:#0e1214;color:#e8ebe6;overflow:auto;-webkit-overflow-scrolling:touch;font:14px/1.5 -apple-system,system-ui,sans-serif;padding:16px');
+    render(); document.body.appendChild(ov);
+  }
+  function close(){ cancel=true; if(ov){ ov.remove(); ov=null; } }
+  function counts(){ return { std: tileList(8,13).length, det: tileList(8,14).length }; }
+  function mb(n){ return Math.round(n*14/1024*10)/10; }
+  function render(){
+    var c=counts();
+    ov.innerHTML=
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      +'<button id="o-x" style="background:#222;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:16px">\u2715</button>'
+      +'<div style="font-weight:700;font-size:16px">Offline map \u2014 TCU</div></div>'
+      +'<div style="color:#8a958f;font-size:13px;margin-bottom:14px">Save the TCU basemap onto this phone so the map still shows with no signal. <b>Do this on wifi.</b> One-time \u2014 it stays until you clear it.</div>'
+      +'<label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:10px;padding:11px;border:1px solid #26302f;border-radius:8px;cursor:pointer"><input type="radio" name="z" value="13" '+(zmax===13?'checked':'')+' style="margin-top:2px"><div><b>Standard</b> \u2014 towns &amp; roads<br><span style="color:#8a958f;font-size:12px">'+c.std+' tiles \u00b7 ~'+mb(c.std)+' MB</span></div></label>'
+      +'<label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:14px;padding:11px;border:1px solid #26302f;border-radius:8px;cursor:pointer"><input type="radio" name="z" value="14" '+(zmax===14?'checked':'')+' style="margin-top:2px"><div><b>Detailed</b> \u2014 street level<br><span style="color:#8a958f;font-size:12px">'+c.det+' tiles \u00b7 ~'+mb(c.det)+' MB</span></div></label>'
+      +'<div style="height:8px;background:#1b2225;border-radius:5px;overflow:hidden;margin:6px 0 4px"><div id="o-bar" style="height:100%;width:0;background:#E5484D;transition:width .2s"></div></div>'
+      +'<div id="o-stat" style="color:#8a958f;font-size:12px;min-height:18px;margin-bottom:12px"></div>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button id="o-go" style="flex:1;background:#E5484D;color:#fff;border:none;border-radius:10px;padding:13px;font:700 14px sans-serif">Download</button>'
+      +'<button id="o-clr" style="background:#161c1f;color:#d3564f;border:1px solid #47201e;border-radius:10px;padding:13px;font:600 13px sans-serif">Clear</button>'
+      +'</div>';
+    ov.querySelector('#o-x').onclick=close;
+    ov.querySelectorAll('input[name=z]').forEach(function(r){ r.onchange=function(){ zmax=parseInt(r.value,10); render(); }; });
+    ov.querySelector('#o-go').onclick=download;
+    ov.querySelector('#o-clr').onclick=clearTiles;
+  }
+  function setStat(t){ var s=ov&&ov.querySelector('#o-stat'); if(s) s.textContent=t; }
+  function setBar(p){ var b=ov&&ov.querySelector('#o-bar'); if(b) b.style.width=(p*100).toFixed(1)+'%'; }
+
+  function download(){
+    if(running) return;
+    if(!('caches' in window)){ setStat('This browser can\u2019t store offline maps.'); return; }
+    running=true; cancel=false;
+    var urls=tileList(8,zmax), total=urls.length, done=0, fail=0, i=0, CONC=8;
+    setStat('Downloading 0 / '+total+' \u2026'); setBar(0);
+    function step(){
+      if(cancel){ setStat('Cancelled at '+done+' / '+total+'.'); running=false; return; }
+      if(i>=urls.length) return;
+      var u=urls[i++];
+      fetch(u,{mode:'no-cors',cache:'no-store'}).catch(function(){fail++;}).then(function(){
+        done++;
+        if(done%15===0||done===total){ setStat('Downloading '+done+' / '+total+(fail?(' ('+fail+' failed)'):'')+' \u2026'); setBar(done/total); }
+        if(done>=total){ setBar(1); setStat('Done \u2014 '+(total-fail)+' tiles saved'+(fail?(', '+fail+' failed \u2014 retry on better signal'):'')+'.'); running=false; return; }
+        step();
+      });
+    }
+    for(var k=0;k<CONC;k++) step();
+  }
+  function clearTiles(){
+    if(!('caches' in window)) return;
+    caches.delete('cg-tiles-v5').then(function(){ setStat('Offline map cleared.'); setBar(0); });
+  }
+})();
+</script>
+<script>
+/* Comm Guide — TCU Unit Reference (battalions, stations, cooperators, facilities, fire env). Source: 2025 TCU Strategic Fire Plan */
+(function(){
+  var BC={'1':'#4CC2FF','2':'#5BD06A','3':'#E0A13A','4':'#C98BF0','5':'#FF7A5C','6':'#34D0C4'};
+  var B={
+   '1':{name:'San Andreas',chief:'Isaac Rushdoony',acres:'224,516',counties:'NW Calaveras / E San Joaquin',elev:'200-2,500 ft',
+     stations:['San Andreas - HQ, 2 engines (Unit HQ & ECC co-located)','Valley Springs - 1 engine (near New Hogan Res.)'],
+     coop:'Calaveras Consolidated, San Andreas & Mokelumne Hill FPDs; EBMUD',
+     comm:'San Andreas, Valley Springs, Mokelumne Hill, Jenny Lind, Fricot City',
+     fire:'VHFHSZ in eastern third. FDRA: Foothills West (lower) / Foothills East (upper).'},
+   '2':{name:'Altaville',chief:'Chris Morse',acres:'278,627',counties:'SW & S-central Calaveras',elev:'100-2,500 ft',
+     stations:['Copperopolis - 1 engine (west)','Altaville - HQ, 2 engines + 1 dozer (center)','Murphys - 1 engine (Hwy 4, east)'],
+     coop:'6 fire districts + Angels City FD. Vallecito Conservation Camp within boundary.',
+     comm:'Angels Camp, Altaville, Copperopolis, Murphys',
+     fire:'~1/2 VHFHSZ / ~1/2 HFHSZ (west & central). Hwy 4 & 49 corridors.'},
+   '3':{name:'West Point',chief:'Steven Hewlett',acres:'175,670',counties:'NE Calaveras',elev:'1,600-6,800 ft',
+     stations:['West Point - HQ, 2 engines','Esperanza - 1 engine (1 mi E of Mountain Ranch)','Hermit Springs - 1 engine (18 mi E of West Point, ~6,000 ft, SPI land)','Sierra Vista Fire Lookout'],
+     coop:'Central Calaveras Fire & Rescue PD (Mountain Ranch, Glencoe, Railroad Flat, Sheep Ranch); West Point FD (West Point, Wilseyville, Lily Valley, Upper Blue Creek)',
+     comm:'West Point, Mountain Ranch, Glencoe, Railroad Flat, Wilseyville, Sheep Ranch',
+     fire:'Entire battalion VHFHSZ.'},
+   '4':{name:'Arnold',chief:'Luke Stephens (4414)',acres:'136,516',counties:'SE Calaveras / NE Tuolumne',elev:'1,400-6,800 ft',
+     stations:['Arnold - Battalion HQ, 3 engines: 4464, 4474, 4494 (2517 Highway 4, Arnold)','Skull Creek - Engine 4454','Blue Mountain Lookout (fire lookout tower)'],
+     coop:'',
+     comm:'Arnold, Avery, Big Trees Village, Camp Connell, Cottage Springs, Dorrington, Forest Meadows, Hathaway Pines',
+     fire:'Majority VHFHSZ (USFS: High). FDRA: Sierra. Hwy 4 Scenic Byway.',
+     roster:{title:'Big Trees Battalion — 2026 Staff Phone List',updated:'7/2/2026',sections:[
+      {station:'ARNOLD',people:[
+       {n:'Luke Stephens',r:'BC',p:'209-419-4414'},
+       {n:'Travis Jones',r:'FC',p:'209-768-2666'},
+       {n:'Austin Porter',r:'FC',p:'209-313-6968'},
+       {n:'Peter Flores',r:'FAE',p:'559-871-3718'},
+       {n:'Justin Eisler',r:'FAE',p:'914-715-4232'},
+       {n:'Garrett Thomas',r:'FAE',p:'760-809-8333'},
+       {n:'Dustin Brennan',r:'FAE',p:'209-768-3878'},
+       {n:'Alejandro Ortiz',r:'FAE',p:'661-244-7750'},
+       {n:'Emmanual Barboza',r:'FF2',p:'209-890-9195'},
+       {n:'Robert Nash',r:'FF2',p:'925-813-9136'},
+       {n:'Joshua Soria',r:'FF2',p:'209-912-8909'},
+       {n:'Rogelio Arias',r:'FF1',p:'209-257-9891'},
+       {n:'Sonny Flosi',r:'FF1',p:'209-770-4943'},
+       {n:'James Fobelli',r:'FF1',p:'650-533-7293'},
+       {n:'Curtis Regan',r:'FF1',p:'530-409-4766'},
+       {n:'Canyon Wass',r:'FF1',p:'209-600-2917'},
+       {n:'Grace Ann Werly',r:'FF1',p:'510-468-1071'}
+      ]},
+      {station:'SKULL CREEK',people:[
+       {n:'Kameron McGowan',r:'FC',p:'916-541-3841'},
+       {n:'Tyler Duncan',r:'FC',p:'209-768-1383'},
+       {n:'Michael Halligan',r:'FF1',p:'209-213-8226'},
+       {n:'Iain Proctor',r:'FF1',p:'209-768-4453'},
+       {n:'Sual Harrelson',r:'FF1',p:'209-770-5477'},
+       {n:'Jesu Sanchez',r:'FF1',p:'714-728-6905'},
+       {n:'Garnica',r:'FF1',p:'209-499-1326'}
+      ]}
+     ]}},
+   '5':{name:'Twain Harte',chief:'Bill Barteau',acres:'147,547',counties:'N Tuolumne',elev:'550-5,100 ft',
+     stations:['Standard - 2 engines: 4475, 4485 (western half, E of Sonora)','Twain Harte - HQ, 2 engines: 4455, 4465 (eastern half)'],
+     coop:'Joint ops w/ Jamestown, Columbia FD, Columbia College FD; TCFD portion within boundary',
+     comm:'Sonora, Standard, Twain Harte, Mi-Wuk Village, Long Barn, Tuolumne, Columbia',
+     fire:'~2/3 VHFHSZ (N, E, S). Hwy 108 corridor.'},
+   '6':{name:'Groveland',chief:'Matt Harrison',acres:'258,910',counties:'SW Tuolumne / E Stanislaus',elev:'250-4,000+ ft',
+     stations:['Groveland - HQ, 2 engines: 4466, 4476 (upper E third)','Blanchard - 1 engine: 4456 (S & W third; Amador-staffed in winter)','Green Springs - 1 engine: 4486 (N & W third)'],
+     coop:'Groveland CSD; Amador agreement w/ Tuolumne County',
+     comm:'Groveland, Big Oak Flat, Pine Mountain Lake, Coulterville',
+     fire:'~2/3 VHFHSZ (E of J59). 2nd-largest battalion; only LRA-to-FRA span.'}
+  };
+  var F=[
+   {n:'TCU ECC - Emergency Command Center',loc:'San Andreas',d:'Command & control dispatch (SRA/LRA/FRA) for Tuolumne, Calaveras, San Joaquin, Stanislaus & Alpine. Batt 9 - Chief Eric Campbell.'},
+   {n:'Columbia Air Attack Base',loc:'Columbia Airport, Tuolumne Co.',d:'Original CAL FIRE air attack base (est. 1958). Columbia Helitack co-located.'},
+   {n:'Motherlode Fire Center',loc:'Downtown Sonora',d:'Home of the Tuolumne-Calaveras Fuels Crew.'},
+   {n:'Baseline Fire Center',loc:'W of Jamestown, SW Tuolumne Co.',d:'Hand crews for initial & extended attack; fuels reduction support.'},
+   {n:'Sierra Conservation Center (SCC)',loc:'~9 mi W of Jamestown',d:'CDCR facility; CAL FIRE-trained inmate hand crews.'},
+   {n:'Vallecito Conservation Camp',loc:'~5 mi from Angels Camp (off Hwy 4)',d:'CAL FIRE + CDCR camp (opened 1958); hand crews.'}
+  ];
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var ov=null;
+  function close(){ if(ov){ ov.remove(); ov=null; } }
+  var RC={BC:['#2e7d46','#fff'],FC:['#c23b3b','#fff'],FAE:['#e6d435','#1a1a1a'],FF2:['#e8912d','#1a1a1a'],FF1:['#2e5fc2','#fff']};
+  function rosterHTML(b){
+    if(!b.roster) return '';
+    var h='<div style="font-weight:700;margin:10px 0 2px">Staff phone list</div>'
+      +'<div style="color:#6f7a75;font-size:11px;margin-bottom:4px">'+esc(b.roster.title)+' &middot; updated '+esc(b.roster.updated)+'</div>';
+    b.roster.sections.forEach(function(sec){
+      h+='<div style="font-weight:800;color:#8a958f;font-size:11px;letter-spacing:.06em;margin:8px 0 3px">'+esc(sec.station)+'</div>';
+      sec.people.forEach(function(pp){
+        var rc=RC[pp.r]||['#3a4449','#e8ebe6'];
+        var tel=pp.p?('<a href="tel:'+esc(pp.p.replace(/[^0-9]/g,''))+'" style="color:#7fb2e8;text-decoration:none;margin-left:auto;font-variant-numeric:tabular-nums">'+esc(pp.p)+'</a>'):'<span style="margin-left:auto;color:#5a655f;font-size:12px">&mdash;</span>';
+        h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #182023">'
+          +'<span style="background:'+rc[0]+';color:'+rc[1]+';font-weight:800;font-size:10px;border-radius:5px;padding:2px 6px;min-width:30px;text-align:center">'+esc(pp.r)+'</span>'
+          +'<span style="color:#c9d1cd">'+esc(pp.n)+'</span>'+tel+'</div>';
+      });
+    });
+    return h;
+  }
+  function battCard(k){
+    var b=B[k], c=BC[k];
+    var st=b.stations.map(function(s){return '<li style="margin:2px 0">'+esc(s)+'</li>';}).join('');
+    var body='<div class="cg-ur-body" style="display:none;padding:2px 13px 11px;border-top:1px solid #202829">'
+      +'<div style="color:#8a958f;font-size:12px;margin:8px 0 4px">'+esc(b.acres)+' ac &middot; '+esc(b.counties)+' &middot; '+esc(b.elev)+'</div>'
+      +'<div style="font-weight:700;margin:7px 0 2px">Stations</div><ul style="margin:0 0 2px 17px;padding:0;color:#c9d1cd">'+st+'</ul>'
+      +(b.coop?('<div style="font-weight:700;margin:7px 0 2px">Cooperators</div><div style="color:#c9d1cd">'+esc(b.coop)+'</div>'):'')
+      +'<div style="font-weight:700;margin:7px 0 2px">Key communities</div><div style="color:#c9d1cd">'+esc(b.comm)+'</div>'
+      +'<div style="font-weight:700;margin:7px 0 2px">Fire environment</div><div style="color:#c9d1cd">'+esc(b.fire)+'</div>'
+      +rosterHTML(b)+'</div>';
+    var card=document.createElement('div');
+    card.setAttribute('style','border:1px solid #2a3439;border-left:3px solid '+c+';border-radius:10px;margin:8px 0;overflow:hidden;background:#0f1416');
+    card.innerHTML='<div class="cg-ur-head" style="padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:8px">'
+      +'<span style="color:'+c+';font-weight:800">Batt '+k+'</span>'
+      +'<span style="font-weight:700">'+esc(b.name)+'</span>'
+      +'<span style="margin-left:auto;color:#8a958f;font-size:12px">'+esc(b.chief)+'</span>'
+      +'<span class="cg-ur-caret" style="color:#8a958f;margin-left:4px">&#9662;</span></div>'+body;
+    var head=card.querySelector('.cg-ur-head'), bd=card.querySelector('.cg-ur-body'), ca=card.querySelector('.cg-ur-caret');
+    head.onclick=function(){ var o=bd.style.display==='none'; bd.style.display=o?'block':'none'; ca.innerHTML=o?'&#9652;':'&#9662;'; };
+    return card;
+  }
+  function open(){
+    close();
+    ov=document.createElement('div');
+    ov.setAttribute('style','position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.62);display:flex;align-items:flex-start;justify-content:center;padding:22px 12px;overflow:auto');
+    ov.onclick=function(e){ if(e.target===ov) close(); };
+    var p=document.createElement('div');
+    p.setAttribute('style','width:100%;max-width:560px;background:#0b1013;border:1px solid #2a3439;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.6);font:400 14px -apple-system,system-ui,sans-serif;color:#e8ebe6;overflow:hidden');
+    var head='<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #202829">'
+      +'<div><div style="font-weight:800;font-size:16px">TCU Unit Reference</div>'
+      +'<div style="color:#8a958f;font-size:11px">Battalions &amp; facilities &middot; 2025 TCU Strategic Fire Plan</div></div>'
+      +'<button id="cg-ur-x" style="margin-left:auto;background:#161c1f;color:#e8ebe6;border:1px solid #2a3439;border-radius:9px;padding:6px 11px;font-size:15px;cursor:pointer">&#10005;</button></div>';
+    var wrap=document.createElement('div'); wrap.setAttribute('style','padding:10px 14px 16px;max-height:80vh;overflow:auto');
+    wrap.innerHTML='<div style="font-weight:800;color:#8a958f;font-size:12px;letter-spacing:.05em;margin:4px 0 0">BATTALIONS</div><div style="color:#6f7a75;font-size:11px;margin-bottom:2px">Tap a battalion to expand</div>';
+    ['1','2','3','4','5','6'].forEach(function(k){ wrap.appendChild(battCard(k)); });
+    var fac=document.createElement('div');
+    fac.innerHTML='<div style="font-weight:800;color:#8a958f;font-size:12px;letter-spacing:.05em;margin:16px 0 4px">UNIT FACILITIES</div>';
+    F.forEach(function(f){
+      var d=document.createElement('div');
+      d.setAttribute('style','border:1px solid #2a3439;border-radius:10px;margin:8px 0;padding:10px 13px;background:#0f1416');
+      d.innerHTML='<div style="font-weight:700">'+esc(f.n)+'</div>'
+        +'<div style="color:#9fb0aa;font-size:12px;margin:1px 0 3px">'+esc(f.loc)+'</div>'
+        +'<div style="color:#c9d1cd">'+esc(f.d)+'</div>';
+      fac.appendChild(d);
+    });
+    wrap.appendChild(fac);
+    p.innerHTML=head; p.appendChild(wrap);
+    ov.appendChild(p); document.body.appendChild(ov);
+    document.getElementById('cg-ur-x').onclick=close;
+  }
+  window.__cgUnitRef=open;
+})();
+</script>
+<script>
+/* Comm Guide — unified menu (Corrections / Offline map / Unit reference / Stations) */
+(function(){
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+  ready(function(){ setTimeout(init,800); });
+  var menu=null;
+  function hideOld(){
+    ['cg-omap'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
+    Array.prototype.slice.call(document.querySelectorAll('div')).forEach(function(d){
+      if(d.textContent==='\u270e edited' && /position:fixed/.test(d.getAttribute('style')||'')) d.style.display='none';
+    });
+  }
+  function init(){
+    if(document.getElementById('cg-menu-btn')) return;
+    hideOld();
+    var b=document.createElement('button');
+    b.id='cg-menu-btn'; b.setAttribute('aria-label','Menu');
+    var bar='display:block;width:18px;height:2px;background:#e8ebe6;margin:3px 0;border-radius:2px';
+    b.innerHTML='<span style="'+bar+'"></span><span style="'+bar+'"></span><span style="'+bar+'"></span>';
+    b.setAttribute('style','position:fixed;right:12px;bottom:78px;z-index:99998;background:#161c1f;border:1px solid #2a3439;border-radius:12px;padding:9px 10px;box-shadow:0 2px 10px rgba(0,0,0,.45);cursor:pointer;display:flex;flex-direction:column;justify-content:center');
+    b.onclick=function(e){ e.stopPropagation(); toggle(); };
+    document.body.appendChild(b);
+    document.addEventListener('click', function(){ if(menu) close(); });
+    window.addEventListener('resize', function(){ if(menu) close(); });
+  }
+  function toggle(){ if(menu) close(); else open(); }
+  function close(){ if(menu){ menu.remove(); menu=null; } }
+  function row(html, sub){
+    var d=document.createElement('div');
+    d.setAttribute('style','padding:13px 15px;border-bottom:1px solid #202829;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap');
+    d.innerHTML=html+(sub?(' <span class="cg-sub" style="margin-left:auto;color:#8a958f;font-size:12px">'+sub+'</span>'):'');
+    return d;
+  }
+  function open(){
+    hideOld();
+    menu=document.createElement('div');
+    menu.setAttribute('style','position:fixed;right:12px;bottom:130px;z-index:99999;background:#0f1416;border:1px solid #2a3439;border-radius:12px;overflow:hidden;min-width:220px;box-shadow:0 8px 28px rgba(0,0,0,.55);font:600 14px -apple-system,system-ui,sans-serif;color:#e8ebe6');
+    menu.onclick=function(e){ e.stopPropagation(); };
+
+    var edited=(window.RADIO&&window.RADIO.__edited)?'edited':'';
+    var rC=row('\u270e Corrections', edited);
+    rC.onclick=function(){ close(); setTimeout(function(){ if(window.__cgOpenCorrections) window.__cgOpenCorrections(); },10); };
+    menu.appendChild(rC);
+
+    var rO=row('\u2b07 Offline map','');
+    rO.onclick=function(){ close(); setTimeout(function(){ var el=document.getElementById('cg-omap'); if(el) el.click(); },10); };
+    menu.appendChild(rO);
+
+    if(window.__cgHome){
+      var rU=row('\u2139 Unit reference','');
+      rU.onclick=function(){ close(); setTimeout(function(){ if(window.__cgUnitRef) window.__cgUnitRef(); },10); };
+      menu.appendChild(rU);
+    }
+
+    (function(){
+      var on=(typeof window.__cgStationsState==='function')?window.__cgStationsState():false;
+      var rS=row('\u25a3 Stations <span style="color:#8a958f;font-weight:400;font-size:12px">Fire stations</span>', on?'on':'off');
+      rS.onclick=function(){
+        var nowOn=(typeof window.__cgStations==='function')?window.__cgStations():false;
+        var s=rS.querySelector('.cg-sub'); if(s) s.textContent=nowOn?'on':'off';
+      };
+      menu.appendChild(rS);
+    })();
+    if(menu.lastChild) menu.lastChild.style.borderBottom='none';
+    document.body.appendChild(menu);
+  }
+})();
+</script>
+</body></html>
