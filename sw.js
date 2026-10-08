@@ -1,10 +1,10 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v19';
+const APP = 'cg-app-v20';
 const TILES = 'cg-tiles-v5';
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
   './leaflet.js', './comm-data.js', './font-latin.woff2', './font-latin-ext.woff2',
   './layers.png', './layers-2x.png', './marker-icon.png',
-  './icon-192.png', './icon-512.png'];
+  './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();

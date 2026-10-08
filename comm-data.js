@@ -447,8 +447,8 @@
       { ch: 69, name: 'FVL TAC', rx: '159.1125', rxT: '156.7', tx: '159.1125', role: 'tac', note: 'Farmersville City tactical' },
       { ch: 8, name: 'CDF A/G 1', rx: '151.2200', rxT: '192.8', tx: '151.2200', role: 'ag', note: 'Air to Ground 1' },
       { ch: 9, name: 'CDF A/G 2', rx: '159.2625', rxT: '192.8', tx: '159.2625', role: 'ag', note: 'Air to Ground 2 — TUU primary A/G' },
-      { ch: 71, name: 'AT 23 RX', rx: '151.3025', rxT: '110.9', tx: '000.0000', role: 'ag', note: 'Air Tactics 23 — receive only' },
-      { ch: 'Z19', name: 'AT 6 RX', rx: '151.3100', rxT: '110.9', tx: '000.0000', role: 'ag', note: 'Air Tactics 6 — used in TUU but NOT in the TUU zone; select Aviation zone 19 ch 19' },
+      { ch: 71, name: 'AT 23 RX', rx: '151.3025', rxT: '110.9', tx: '0.0000', role: 'ag', note: 'Air Tactics 23 — receive only' },
+      { ch: 'Z19', name: 'AT 6 RX', rx: '151.3100', rxT: '110.9', tx: '0.0000', role: 'ag', note: 'Air Tactics 6 — used in TUU but NOT in the TUU zone; select Aviation zone 19 ch 19' },
       { ch: 70, name: 'CALCORD', rx: '156.0750', rxT: '156.7', tx: '156.0750', role: 'interop', note: 'Statewide calling / cooperator talk-around' },
       { ch: 20, name: 'FS SQF FIRE', rx: '170.5500', rxT: 'None', tx: '166.0000', role: 'other', note: 'Sequoia National Forest fire net' },
       { ch: 30, name: 'SEKI CMD 1', rx: '171.7000', rxT: '167.9', tx: '165.6000', role: 'other', note: 'Sequoia & Kings Canyon NP command 1' },
@@ -606,9 +606,9 @@
       { peak: 'Fowler Peak', toneNum: 3, hz: '131.8', lat: 38.02279, lng: -120.59032, desc: 'TCU L-T3 · Angels Camp, Altaville, Copperopolis — Fowler LO atop Bear Mountain, Batt 2.' },
       { peak: 'Peñon Blanco', toneNum: 4, hz: '136.5', lat: 37.73215, lng: -120.26158, desc: 'TCU L-T4 · Lake McClure, Coulterville — SW corner, Batt 6.' },
       { peak: 'Blue Mountain', toneNum: 5, hz: '146.2', lat: 38.34222, lng: -120.36488, desc: 'TCU L-T5 · Arnold, Hwy 4 high country — Batt 4.' },
-      { peak: 'Liberty Hill', toneNum: 6, hz: '156.7', lat: 38.36792, lng: -120.10199, desc: 'TCU L-T6 · Pinecrest, Long Barn — Tuolumne FRA, Batt 4. Jan-23 call plan lists Liberty as TCU T9 — verify.' },
-      { peak: 'Telegraph Hill', toneNum: 7, hz: '167.9', lat: 38.03087, lng: -120.35177, desc: 'TCU L-T7 · Columbia, Sonora — Tuolumne, Batt 5.' },
+            { peak: 'Telegraph Hill', toneNum: 7, hz: '167.9', lat: 38.03087, lng: -120.35177, desc: 'TCU L-T7 · Columbia, Sonora — Tuolumne, Batt 5.' },
       { peak: 'Mt Lewis', toneNum: 8, hz: '103.5', lat: 38.03548, lng: -120.16241, desc: 'TCU L-T8 · Tuolumne, Twain Harte — Batt 5.' },
+      { peak: 'Liberty Hill', toneNum: 9, hz: '100.0', lat: 38.36792, lng: -120.10199, desc: 'TCU L-T9 · Pinecrest, Long Barn — Tuolumne FRA, Batt 4. Matches the TCU tone map (June 2019) and Jan-23 call plan.' },
     ],
     AEU: [
       // Site / tone table from the Camino ECC Radio Operating Plan 2023, Attachment B.
@@ -3559,7 +3559,7 @@
   // Site-specific tone preferences: places where the geographically nearest repeater is
   // NOT the one that works best operationally. When GPS is within radiusKm of the point,
   // the app recommends preferTone and shows a short note. Verified at Skull Creek: Liberty
-  // Hill (T6, ~17.0 km) is nearest but Blue Mountain (T5, ~17.8 km) has better RF coverage.
+  // Hill (T9, ~17.0 km) is nearest but Blue Mountain (T5, ~17.8 km) has better RF coverage.
   const SITE_PREF = [
     { name: 'Skull Creek Station', lat: 38.240639, lng: -120.208366, radiusKm: 6,
       preferTone: '146.2', preferPeak: 'Blue Mountain',
