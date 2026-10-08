@@ -3564,6 +3564,16 @@
     { name: 'Skull Creek Station', lat: 38.240639, lng: -120.208366, radiusKm: 6,
       preferTone: '146.2', preferPeak: 'Blue Mountain',
       note: 'Tone 5 (Blue Mountain) works best from Skull Creek.' },
+    // Murphys → Angels Camp along Hwy 4: Telegraph Hill (T7) is closer but terrain blocks it;
+    // Fowler Peak (T3) is the repeater that works. Crew-verified (E4454, Oct 2026).
+    // Murphys anchor: Utica Power House (EJ facility record 63913, 38.147093 / -120.446396).
+    // Angels Camp anchor: Altaville Station (already in STATIONS data). Radii overlap to cover the corridor.
+    { name: 'Murphys (Utica Powerhouse)', lat: 38.147093, lng: -120.446396, radiusKm: 4,
+      preferTone: '131.8', preferPeak: 'Fowler Peak',
+      note: 'Tone 3 (Fowler Peak) works best from Murphys to Angels Camp on Hwy 4. Telegraph Hill (T7) is closer, but terrain blocks it.' },
+    { name: 'Angels Camp (Altaville)', lat: 38.10627, lng: -120.48890, radiusKm: 4,
+      preferTone: '131.8', preferPeak: 'Fowler Peak',
+      note: 'Tone 3 (Fowler Peak) works best from Murphys to Angels Camp on Hwy 4. Telegraph Hill (T7) is closer, but terrain blocks it.' },
   ];
 
   window.RADIO = { UNITS: U, CESRS, CARTOCAR, COOP, SOURCES, CROSSBOUNDARY, FACILITIES, COMSITES, BATTALIONS, UNIT_NETS, PROCEDURES, ECC, TRAVEL, sraAt, TCU_REPEATERS, TONES, TONE_NUM, COUNTY_UNIT, BAT4, MMU_LOAD, CF_UNITS, STATIONS, STATION_AGENCY, SITE_PREF, BOUNDARY_URL, HOME_Z: 44, LOAD: 'V25A6 · Rev 03/08/25', HOME_LOAD: 'Bat 4 Mobile Setup 2023' };
