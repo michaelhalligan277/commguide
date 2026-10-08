@@ -10,6 +10,10 @@ Live at https://commguide.netlify.app — Netlify publishes this repository auto
 - `sw.js` — service worker (offline launch + map tile cache).
 - `manifest.json`, `icon-192.png`, `icon-512.png` — home-screen install.
 - `netlify.toml`, `_headers` — Netlify settings (no post-processing; `sw.js` and `index.html` never cached).
+- `_redirects` — blocks `/reference/*` from the public site (returns 404).
+- `reference/` — source documents for verifying data. **Not published.**
+  - `CAL_FIRE_Radio_Call_Plan_v2023.1.pdf` — CAL FIRE Statewide Radio Call Plan, Version 2023.1 (173 pp).
+    Note: the app's channel data is the Statewide Load V25A6 Rev 03/08/25, a separate document.
 
 ## Updating
 - **Bump `APP` in `sw.js` (e.g. `cg-app-v18` → `cg-app-v19`) on every change** so installed phones drop the old offline copy.
