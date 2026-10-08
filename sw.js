@@ -4,7 +4,7 @@ const TILES = 'cg-tiles-v5';
 const NET_TIMEOUT_MS = 3000;
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
   './leaflet.js', './comm-data.js', './comm-geo.js',
-  './vendor/react.production.min.js', './vendor/react-dom.production.min.js', './vendor/babel.min.js',
+  './vendor/react.production.min.js', './vendor/react-dom.production.min.js',
   './font-latin.woff2', './font-latin-ext.woff2',
   './layers.png', './layers-2x.png', './marker-icon.png',
   './icon-192.png', './icon-512.png', './icon-512-maskable.png'];

@@ -20,4 +20,4 @@ Live at https://commguide.netlify.app — Netlify publishes this repository auto
 - **Bump `APP` in `sw.js` (e.g. `cg-app-v23` → `cg-app-v24`) on every change** so installed phones drop the old offline copy.
 - Data rule: every frequency, tone, coordinate and identifier must come from a verified source
   (CAL FIRE Statewide Radio Call Plan, FCC ULS, GNIS) or the crew's direct input. Unverified sites stay `null`.
-- React, ReactDOM and Babel are vendored in `vendor/` (no CDN needed). Large geodata (SRA grid, unit boundaries) lives in `comm-geo.js` and loads on demand.
+- React and ReactDOM are vendored in `vendor/` (no CDN needed); `babel.min.js` is only loaded if a JSX x-import is ever used. Large geodata (SRA grid, unit boundaries) lives in `comm-geo.js` and loads on demand.

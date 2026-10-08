@@ -741,10 +741,14 @@ class Component extends DCLogic {
     try{
       const CU=this.D.COUNTY_UNIT||{}, want=Object.keys(CU).filter(k=>CU[k]===this.D.HOME_Z);
       if(!want.length) return;
-      let gj=null;
-      try{ const c=localStorage.getItem('cc_ca_counties_v1'); if(c) gj=JSON.parse(c); }catch(e){}
-      if(!gj){ const r=await fetch(this.D.BOUNDARY_URL); gj=await r.json(); try{localStorage.setItem('cc_ca_counties_v1',JSON.stringify(gj));}catch(e){} }
-      this._homeCounties=(((gj&&gj.features)||[]).map(f=>({name:this._cname(f.properties),geom:f.geometry}))).filter(c=>want.includes((c.name||'').toLowerCase()));
+      if(this.D.HOME_COUNTIES&&this.D.HOME_COUNTIES.length){
+        this._homeCounties=this.D.HOME_COUNTIES.filter(c=>want.includes((c.name||'').toLowerCase()));
+      } else {
+        let gj=null;
+        try{ const c=localStorage.getItem('cc_ca_counties_v1'); if(c) gj=JSON.parse(c); }catch(e){}
+        if(!gj){ const r=await fetch(this.D.BOUNDARY_URL); gj=await r.json(); try{localStorage.setItem('cc_ca_counties_v1',JSON.stringify(gj));}catch(e){} }
+        this._homeCounties=(((gj&&gj.features)||[]).map(f=>({name:this._cname(f.properties),geom:f.geometry}))).filter(c=>want.includes((c.name||'').toLowerCase()));
+      }
       this._drawHomeCounties();
       if(this.state.gps) this._applyPos(this.state.gps.lat,this.state.gps.lng,false);
     }catch(e){}
@@ -1641,13 +1645,36 @@ class Component extends DCLogic {
 /* Comm Guide — offline support: SW registration + TCU basemap downloader */
 (function(){
   // ---- register service worker (fail-safe) + auto-update on new version ----
+  function cgToast(msg, ms, actionLabel, onAction){
+    try{
+      var old=document.getElementById('cg-toast'); if(old) old.remove();
+      var t=document.createElement('div'); t.id='cg-toast';
+      t.setAttribute('role','status'); t.setAttribute('aria-live','polite');
+      t.setAttribute('style','position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:99999;display:flex;align-items:center;gap:12px;background:#161c1f;color:#e8ebe6;border:1px solid #2a3439;border-radius:12px;padding:12px 14px;font:600 14px -apple-system,system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.5)');
+      var s=document.createElement('span'); s.style.flex='1'; s.textContent=msg; t.appendChild(s);
+      if(actionLabel){
+        var b=document.createElement('button'); b.textContent=actionLabel;
+        b.setAttribute('style','background:#2f7d4f;color:#fff;border:0;border-radius:8px;padding:9px 14px;min-height:40px;font:700 14px -apple-system,system-ui,sans-serif');
+        b.onclick=function(){ if(onAction) onAction(); }; t.appendChild(b);
+      }
+      var x=document.createElement('button'); x.textContent='\u2715'; x.setAttribute('aria-label','Dismiss');
+      x.setAttribute('style','background:none;border:0;color:#9aa5a0;min-width:40px;min-height:40px;font-size:16px');
+      x.onclick=function(){ t.remove(); }; t.appendChild(x);
+      document.body.appendChild(t);
+      if(ms) setTimeout(function(){ if(t.parentNode) t.remove(); }, ms);
+    }catch(e){}
+  }
+  var hadController = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
       navigator.serviceWorker.register('./sw.js').then(function(reg){
         // When a new SW takes control (cache bump), reload once so the fresh shell shows.
-        var reloaded=false;
+        // First install: the new SW claims the page, but nothing is stale, so don't reload —
+        // just confirm offline readiness. Later updates: offer a one-tap reload instead of
+        // yanking the screen out from under someone mid-use.
         navigator.serviceWorker.addEventListener('controllerchange', function(){
-          if(reloaded) return; reloaded=true; window.location.reload();
+          if(!hadController){ hadController=true; cgToast('\u2713 Offline ready', 3500); return; }
+          cgToast('Update installed', 0, 'Reload', function(){ window.location.reload(); });
         });
         // Nudge any waiting worker to activate immediately.
         function nudge(w){ if(w) try{ w.postMessage({type:'skipWaiting'}); }catch(e){} }
