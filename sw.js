@@ -1,5 +1,5 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v21';
+const APP = 'cg-app-v22';
 const TILES = 'cg-tiles-v5';
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
   './leaflet.js', './comm-data.js', './font-latin.woff2', './font-latin-ext.woff2',

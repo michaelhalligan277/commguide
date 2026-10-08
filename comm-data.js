@@ -3564,11 +3564,18 @@
     { name: 'Skull Creek Station', lat: 38.240639, lng: -120.208366, radiusKm: 6,
       preferTone: '146.2', preferPeak: 'Blue Mountain',
       note: 'Tone 5 (Blue Mountain) works best from Skull Creek.' },
+    // Hwy 4, Forest Meadows → Murphys: crews run Tone 5 (Blue Mountain) at Forest Meadows and
+    // switch to Tone 3 (Fowler Peak) somewhere between there and Murphys. Switch point is set about
+    // midway (~1.8 km from Forest Meadows). Forest Meadows: 38.167975 / -120.405476 (topoquest place record).
+    // Listed BEFORE the Murphys entry so Tone 3 wins wherever the circles meet.
+    { name: 'Forest Meadows', lat: 38.167975, lng: -120.405476, radiusKm: 1.8,
+      preferTone: '146.2', preferPeak: 'Blue Mountain',
+      note: 'Tone 5 (Blue Mountain) at Forest Meadows. Switch to Tone 3 (Fowler Peak) heading west toward Murphys.' },
     // Murphys → Angels Camp along Hwy 4: Telegraph Hill (T7) is closer but terrain blocks it;
     // Fowler Peak (T3) is the repeater that works. Crew-verified (E4454, Oct 2026).
     // Murphys anchor: Utica Power House (EJ facility record 63913, 38.147093 / -120.446396).
     // Angels Camp anchor: Altaville Station (already in STATIONS data). Radii overlap to cover the corridor.
-    { name: 'Murphys (Utica Powerhouse)', lat: 38.147093, lng: -120.446396, radiusKm: 4,
+    { name: 'Murphys (Utica Powerhouse)', lat: 38.147093, lng: -120.446396, radiusKm: 2.5,
       preferTone: '131.8', preferPeak: 'Fowler Peak',
       note: 'Tone 3 (Fowler Peak) works best from Murphys to Angels Camp on Hwy 4. Telegraph Hill (T7) is closer, but terrain blocks it.' },
     { name: 'Angels Camp (Altaville)', lat: 38.10627, lng: -120.48890, radiusKm: 4,
