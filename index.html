@@ -358,7 +358,7 @@
         </sc-if>
         <sc-if value="{{ coopNone }}" hint-placeholder-val="{{ false }}">
           <div style="background:var(--surf);border:1px dashed var(--bd);border-radius:12px;padding:16px;font-size:12px;line-height:1.6;color:var(--dim);text-align:center">
-            No auto-aid schedule loaded for {{ cu.code }}.<br>Cooperator agreements are currently mapped for TUU (Tulare Unit).
+            No auto-aid schedule loaded for {{ cu.code }}.<br>Cooperator lists are currently loaded for TCU, TUU and BDU.
           </div>
         </sc-if>
         <sc-for list="{{ coopList }}" as="a" hint-placeholder-count="4">
@@ -476,7 +476,7 @@
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:448,&quot;height&quot;:860},&quot;defaultTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;status&quot;,&quot;channels&quot;,&quot;tones&quot;],&quot;default&quot;:&quot;status&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;mapBase&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Dark&quot;,&quot;Terrain&quot;,&quot;Satellite&quot;],&quot;default&quot;:&quot;Dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
 class Component extends DCLogic {
   state = {
-    tab: this.props.defaultTab || 'status', selZ: 44, toneZ: 44, detZ: 44, coopZ: 41, mapZ: null,
+    tab: this.props.defaultTab || 'status', selZ: 44, toneZ: 44, detZ: 44, coopZ: 44, mapZ: null,
     slimHdr: (function(){ try{ return localStorage.getItem('cg_slim_hdr')==='1'; }catch(e){ return false; } })(),
     gps: null, gpsState: 'idle', nearInfo: null, selToneId: 'Fowler Peak', detCounty: null, gpsMsg: '',
   };
