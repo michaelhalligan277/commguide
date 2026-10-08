@@ -476,7 +476,7 @@
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:448,&quot;height&quot;:860},&quot;defaultTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;status&quot;,&quot;channels&quot;,&quot;tones&quot;],&quot;default&quot;:&quot;status&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;mapBase&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Dark&quot;,&quot;Terrain&quot;,&quot;Satellite&quot;],&quot;default&quot;:&quot;Dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
 class Component extends DCLogic {
   state = {
-    tab: this.props.defaultTab || 'status', selZ: 44, toneZ: 44, detZ: 44, coopZ: 44, mapZ: null,
+    tab: (function(){ try{ var t=sessionStorage.getItem('cg_open_tab'); if(t){ sessionStorage.removeItem('cg_open_tab'); return t; } }catch(e){} return null; })() || this.props.defaultTab || 'status', selZ: 44, toneZ: 44, detZ: 44, coopZ: 44, mapZ: null,
     slimHdr: (function(){ try{ return localStorage.getItem('cg_slim_hdr')==='1'; }catch(e){ return false; } })(),
     gps: null, gpsState: 'idle', nearInfo: null, selToneId: 'Fowler Peak', detCounty: null, gpsMsg: '',
   };
@@ -926,11 +926,12 @@ class Component extends DCLogic {
     const _azk=selU.home?'HOME':((selU.code||'').toUpperCase());
     const _az=((D.ADDZ||{})[_azk])||[];
     if(_az.length){
-      groups=groups.concat(_az.map(z=>({label:'ZONE '+z.zone+' · '+String(z.name||'').toUpperCase(),sub:z.sub||'',color:z.color||'#B68CFF',count:(z.channels||[]).length+' ch',
+      groups=groups.concat(_az.map(z=>({label:'ZONE '+z.zone+' · '+String(z.name||'').toUpperCase(),sub:z.sub||'',color:z.color||'#B68CFF',count:(z.channels||[]).length+' ch',inc:!!z.incident,
         channels:(z.channels||[]).map(c=>{const _tf=tfmt(c.rxT);return {ch:c.pos,name:c.name,note:c.note||'',rx:c.rx,tx:c.tx,
           toneLine:_tf.line,toneDisp:(_tf.numLabel!=='—')?_tf.numLabel:((c.rxT&&c.rxT!=='None')?c.rxT:'—'),toneColor:this.toneColor(c.rxT),roleColor:this.ROLE_HEX.other};})})));
     }
 
+    groups=groups.filter(g=>g.inc).concat(groups.filter(g=>!g.inc)); // incident zone first
     // tones
     const tu=this.unit(S.toneZ)||this.home();
     const peaks=D.TONES[tu.code]||[];
@@ -1163,6 +1164,7 @@ class Component extends DCLogic {
     var body=''+
       rowBtn('Stations','Show fire stations on the map', '<span id="cg-stn-pill">'+pill(stationsOn())+'</span>')+
       rowBtn('Report on Conditions','Radio format, traffic priorities, ROC templates','<span style=\"color:#586170;font-size:18px\">\u203a</span>')+
+      rowBtn('Incident \u00b7 ICS-205','Scan the IAP radio plan from a photo \u00b7 saved on this phone','<span style="color:#586170;font-size:18px">\u203a</span>')+
       rowBtn('Corrections', (edited?'Local edits active — repeaters & channels':'Edit repeaters & channels · saved to device'),
         '<span style="color:#586170;font-size:18px">›</span>')+
       '<div style="font:500 10px \'Helvetica Neue\';color:#586170;margin-top:6px;padding:0 2px;line-height:1.5">'+
@@ -1171,9 +1173,19 @@ class Component extends DCLogic {
     var rows=b.querySelectorAll('.cg-row');
     rows[0].onclick=function(){ var on=toggleStations(); var p=document.getElementById('cg-stn-pill'); if(p) p.innerHTML=pill(on); };
     rows[1].onclick=function(){ openProcedures(); };
-    rows[2].onclick=function(){ openCorrections(); };
+    rows[2].onclick=function(){ openIncident(); };
+    rows[3].onclick=function(){ openCorrections(); };
   }
 
+
+  // ---------- incident (ICS-205 photo import) — lazy-loaded ----------
+  function loadJs(src){ return new Promise(function(res,rej){ var s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+  function openIncident(){
+    function go(){ if(window.__cgOpenIncident) window.__cgOpenIncident(); }
+    if(window.CGInc && window.__cgOpenIncident) return go();
+    loadJs('./incident-core.js').then(function(){ return loadJs('./incident.js'); }).then(go)
+      .catch(function(){ alert('Could not load the Incident tool. Open the app once while online, then try again.'); });
+  }
 
   // ---------- report on conditions / radio procedure ----------
   function openProcedures(){
