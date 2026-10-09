@@ -124,7 +124,7 @@
   }
 
   // ---------- one row ----------
-  function cleanText(s) { return String(s || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').replace(/^[\s|_\[\]]+|[\s|_\[\]]+$/g, '').trim(); }
+  function cleanText(s) { return String(s || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').replace(/^(?:\S{0,2}\s*[|\[\]]+\s*)+/, '').replace(/^[\s|_\[\]]+|[\s|_\[\]]+$/g, '').trim(); }
 
   function buildRows(cells, known, learnedMap) {
     // cells: array of {ch,func,name,assigned,rx,rxTone,tx,txTone,mode,notes} raw OCR strings (+ optional conf)
@@ -226,14 +226,116 @@
     return out;
   }
 
+
+  // ---------- ICS-204 pieces ----------
+  function parseIncidentName(text) {
+    var lines = String(text || '').split(/\r?\n/).map(cleanText).filter(Boolean);
+    lines = lines.filter(function (l) { return !/incident\s*name/i.test(l) && !/operations\s*personnel/i.test(l); });
+    return cleanText(lines.join(' ').replace(/^\d\.\s*/, ''));
+  }
+  function parseBranchDiv(text) {
+    var out = { branch: '', division: '', divName: '' }, lines = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean), m;
+    lines.forEach(function (l) {
+      if ((m = l.match(/Page\s*\d+\s*of\s*\d+\s*(.*)$/i))) { out.divName = cleanText(m[1]); return; }
+      if (/branch/i.test(l) || /division/i.test(l)) return;
+      if (out.division) return;
+      var t = l.replace(/[^A-Za-z0-9|\s]/g, ' ').trim();
+      if ((m = t.match(/^([A-Za-z0-9|]{1,3})\s+([A-Za-z0-9]{1,3})$/))) { out.branch = m[1].replace('|', 'I'); out.division = m[2]; }
+      else if ((m = t.match(/^([A-Za-z0-9]{1,2})$/))) out.division = m[1]; // the branch mark was dropped; the letter is the division
+    });
+    return out;
+  }
+  var OPS_LABELS = [['Operations Section Chief', /Operations\s*Sec\w*\s*Chi\w*/i], ['Night Ops', /Night\s*Ops/i], ['Branch Director', /Branch\s*Director/i],
+    ['Branch Safety', /Branch\s*Safety/i], ['Division/Group Supervisor', /Division\s*\/?\s*Group\s*Supervisor/i], ['Air Attack', /Air\s*Attack/i]];
+  function parseOps(text) {
+    var t = String(text || '').replace(/[\r\n]+/g, ' '), hits = [];
+    OPS_LABELS.forEach(function (L) { var m = L[1].exec(t); if (m) hits.push({ label: L[0], at: m.index, end: m.index + m[0].length }); });
+    hits.sort(function (a, b) { return a.at - b.at; });
+    return hits.map(function (h, i) {
+      var v = t.slice(h.end, i + 1 < hits.length ? hits[i + 1].at : t.length).replace(/^[^A-Za-z0-9(]+/, '').replace(/[\s|]+$/, '');
+      return { label: h.label, value: cleanText(v) };
+    }).filter(function (o) { return o.value; });
+  }
+  function parseHoursLoc(raw) {
+    var s = cleanText(raw), m = s.match(/^(\d{3,4})\s*[-–—~]\s*(\d{3,4})\s*(.*)$/);
+    if (m) return { hours: m[1] + '-' + m[2], loc: cleanText(m[3]) };
+    return { hours: '', loc: s };
+  }
+  function fixReq(raw) {
+    var req = cleanText(raw).toUpperCase().replace(/\s+/g, '').replace(/^[-\u2013]+/, ''), fixed = false;
+    if (/^0[0O]*-?\d/.test(req)) { var odd = /^0[0O]+/.test(req); req = 'O' + req.replace(/^[0O]+/, '').replace(/^(?!-)/, '-'); fixed = odd; } // the letter slot is never a digit (a lone 0 -> O is routine)
+    else if (/^[A-Z]\d/.test(req)) { req = req[0] + '-' + req.slice(1); fixed = true; }                        // missing hyphen
+    return { v: req, fixed: fixed };
+  }
+  function alnum(s) { return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+  function altsOf(win, alts, norm) { // readings that really differ from the winner (punctuation-only differences don't count)
+    var w = norm(win), out = [];
+    (alts || []).forEach(function (a) { var t = cleanText(a); if (t && norm(t) !== w && out.indexOf(t) < 0) out.push(t); });
+    return out;
+  }
+  function buildResource(c) { // c: raw strings {id,als,leader,pers,req,hl|hours,loc} (+ idAlts, leaderAlts, reqAlts)
+    var hl = c.hl != null ? parseHoursLoc(c.hl) : { hours: cleanText(c.hours), loc: cleanText(c.loc) };
+    var fr = fixReq(c.req);
+    var r = { id: cleanText(c.id), als: !!c.als, leader: cleanText(c.leader).replace(/^[^A-Za-z]+/, ''), personnel: cleanText(c.pers).replace(/[^0-9]/g, ''),
+      request: fr.v, hours: hl.hours, loc: cleanText(hl.loc).replace(/[^A-Za-z0-9)]+$/, ''), flags: [], alts: {} };
+    r.alts.id = altsOf(r.id, c.idAlts, alnum);
+    r.alts.leader = altsOf(r.leader, c.leaderAlts, alnum);
+    r.alts.request = altsOf(r.request, (c.reqAlts || []).map(function (a) { return fixReq(a).v; }).filter(function (a) { return /^[A-Z]-\d{1,6}$/.test(a); }), alnum);
+    if (r.alts.id.length) r.flags.push('id-disagree');
+    if (r.alts.leader.length) r.flags.push('leader-disagree');
+    if (r.alts.request.length) r.flags.push('request-disagree');
+    if (!r.personnel || parseInt(r.personnel, 10) > 99) r.flags.push('personnel');
+    if (!/^[A-Z]-\d{1,6}$/.test(r.request)) r.flags.push('request'); else if (fr.fixed) r.flags.push('request-fixed');
+    if (!/^\d{4}-\d{4}$/.test(r.hours)) r.flags.push('hours');
+    return r;
+  }
+  // Request-number letter tells the kind of resource (NWCG convention): E equipment, C crew, O overhead, A aircraft, S supplies.
+  var RTYPE = { E: 'Engines & equipment', C: 'Crews', O: 'Overhead', A: 'Aircraft', S: 'Supplies' };
+  function resType(r) { var m = String(r.request || '').match(/^([A-Z])/); return m && RTYPE[m[1]] ? m[1] : '?'; }
+  function groupRes(list) {
+    var order = ['O', 'C', 'E', 'A', 'S', '?'], g = {};
+    list.forEach(function (r) { (g[resType(r)] = g[resType(r)] || []).push(r); });
+    return order.filter(function (k) { return g[k]; }).map(function (k) {
+      var n = g[k].reduce(function (a, r) { return a + (parseInt(r.personnel, 10) || 0); }, 0);
+      return { key: k, title: RTYPE[k] || 'Other', items: g[k], people: n };
+    });
+  }
+  function totalPeople(list) { return list.reduce(function (a, r) { return a + (parseInt(r.personnel, 10) || 0); }, 0); }
+  function parseFoot204(text) {
+    var t = String(text || ''), out = { prepared: '', position: '', date: '', time: '', count: '' }, m;
+    if ((m = t.match(/Name:\s*([^\n]*)/i))) {
+      var nm = cleanText(m[1].split(/Signature|Date\/?Time/i)[0]), mm = nm.match(/^(.*?)\s+([A-Z]{2,6})$/);
+      if (mm) { out.prepared = cleanText(mm[1]); out.position = mm[2]; } else out.prepared = nm;
+    }
+    if ((m = t.match(/Date\s*\/?\s*Time:?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(\d{3,4})?/i))) { out.date = m[1]; out.time = m[2] || ''; }
+    if ((m = t.match(/Personnel\s*Count:?\s*(\d{1,5})/i))) out.count = m[1];
+    return out;
+  }
+  function sameIncident(a, b) {
+    var x = String(a || '').toLowerCase().replace(/[^a-z0-9]/g, ''), y = String(b || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!x || !y) return true;
+    return x === y || x.indexOf(y) >= 0 || y.indexOf(x) >= 0 || x.slice(0, 5) === y.slice(0, 5);
+  }
+  // 204 channel vs the same-named channel on the 205: report any difference, never merge.
+  function cross205(row, rows205) {
+    var k = normName(row.name), hit = null;
+    (rows205 || []).forEach(function (r) { if (!hit && normName(r.name) === k) hit = r; });
+    if (!hit || !row.rx) return null;
+    var same = hit.rx === row.rx && (!row.tx || !hit.tx || hit.tx === row.tx) && (hit.rxTone || 'None') === (row.rxTone || 'None') && (hit.txTone || 'None') === (row.txTone || 'None');
+    if (same) return null;
+    return hit.rx + (hit.rxTone && hit.rxTone !== 'None' ? ' ' + hit.rxTone : '') + ' / ' + (hit.tx || hit.rx) + (hit.txTone && hit.txTone !== 'None' ? ' ' + hit.txTone : '');
+  }
+
   // ---------- zone for the app's existing ADDZ feature ----------
-  function buildZone(meta, rows) {
-    var name = [meta.incident, meta.zone].filter(Boolean).join(' · ') || 'Incident';
+  function buildZone(meta, rows, opt) {
+    opt = opt || {};
+    var is204 = opt.kind === 'ics204', src = is204 ? 'ICS-204' : 'ICS-205';
+    var name = is204 ? [meta.incident, 'Div ' + [meta.division, meta.divName].filter(Boolean).join(' ')].filter(Boolean).join(' · ') : ([meta.incident, meta.zone].filter(Boolean).join(' · ') || 'Incident');
     var op = '';
-    if (meta.dateFrom) op = 'Op period ' + meta.dateFrom + (meta.timeFrom ? ' ' + meta.timeFrom : '') + (meta.dateTo ? ' to ' + meta.dateTo + (meta.timeTo ? ' ' + meta.timeTo : '') : '') + ' · from ICS-205';
-    else op = 'From ICS-205';
+    if (meta.dateFrom) op = 'Op period ' + meta.dateFrom + (meta.timeFrom ? ' ' + meta.timeFrom : '') + (meta.dateTo ? ' to ' + meta.dateTo + (meta.timeTo ? ' ' + meta.timeTo : '') : '') + ' · from ' + src;
+    else op = 'From ' + src;
     return {
-      zone: 'INC', name: name, sub: op, color: '#FF8A3D', incident: true,
+      zone: is204 ? 'DIV' : 'INC', name: name, sub: op, color: is204 ? '#FFC53D' : '#FF8A3D', incident: true, incKind: opt.kind || 'ics205', divKey: opt.divKey || '',
       channels: rows.filter(function (r) { return r.rx || r.tx; }).map(function (r) {
         var note = [r.func, r.assigned, r.notes].filter(Boolean).join(' · ');
         if (r.txTone && r.txTone !== r.rxTone) note += (note ? ' · ' : '') + 'TX tone ' + r.txTone;
@@ -245,7 +347,9 @@
   }
 
   var api = { CTCSS: CTCSS, COLS: COLS, parseFreq: parseFreq, freqProblems: freqProblems, parseToneRaw: parseToneRaw, learnToneMap: learnToneMap,
-    resolveTone: resolveTone, buildKnown: buildKnown, buildRows: buildRows, parseHeader: parseHeader, parseFooter: parseFooter, buildZone: buildZone, normName: normName };
+    resolveTone: resolveTone, buildKnown: buildKnown, buildRows: buildRows, parseHeader: parseHeader, parseFooter: parseFooter, buildZone: buildZone, normName: normName,
+    parseIncidentName: parseIncidentName, parseBranchDiv: parseBranchDiv, parseOps: parseOps, parseHoursLoc: parseHoursLoc, buildResource: buildResource,
+    groupRes: groupRes, totalPeople: totalPeople, parseFoot204: parseFoot204, sameIncident: sameIncident, cross205: cross205, cleanText: cleanText };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.CGInc = api;
 })(typeof window !== 'undefined' ? window : globalThis);
