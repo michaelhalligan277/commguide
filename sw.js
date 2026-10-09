@@ -1,10 +1,9 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v24';
-const OCR = 'cg-ocr-v1'; // incident photo reader (large, immutable) — survives app updates
+const APP = 'cg-app-v23';
 const TILES = 'cg-tiles-v5';
 const NET_TIMEOUT_MS = 3000;
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
-  './leaflet.js', './comm-data.js', './comm-geo.js', './incident-core.js', './incident.js',
+  './leaflet.js', './comm-data.js', './comm-geo.js',
   './vendor/react.production.min.js', './vendor/react-dom.production.min.js',
   './font-latin.woff2', './font-latin-ext.woff2',
   './layers.png', './layers-2x.png', './marker-icon.png',
@@ -21,7 +20,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== APP && k !== TILES && k !== OCR).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => k !== APP && k !== TILES).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
@@ -58,18 +57,6 @@ self.addEventListener('fetch', e => {
 
   let sameOrigin = false;
   try { sameOrigin = new URL(url).origin === self.location.origin; } catch (e2) {}
-
-  // Incident photo reader files: cache-first (they never change for a given version)
-  if (sameOrigin && url.indexOf('/vendor/ocr/') >= 0) {
-    e.respondWith((async () => {
-      const hit = await caches.match(req);
-      if (hit) return hit;
-      const res = await fetch(req);
-      if (res && res.ok) (await caches.open(OCR)).put(req, res.clone());
-      return res;
-    })());
-    return;
-  }
 
   // App shell / same-origin: network-first when the signal is good, but never wait
   // long on a weak connection — after NET_TIMEOUT_MS fall back to the cached copy
