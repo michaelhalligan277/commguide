@@ -1937,7 +1937,7 @@ class Component extends DCLogic {
 })();
 </script>
 <script>
-/* Comm Guide — unified menu (Corrections / Offline map / Unit reference / Stations) */
+/* Comm Guide — unified menu (Corrections / Offline map / Unit reference / Incident / Stations) */
 (function(){
   function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
   ready(function(){ setTimeout(init,800); });
@@ -1960,6 +1960,13 @@ class Component extends DCLogic {
     document.body.appendChild(b);
     document.addEventListener('click', function(){ if(menu) close(); });
     window.addEventListener('resize', function(){ if(menu) close(); });
+  }
+  function loadJs(src){ return new Promise(function(res,rej){ var e=document.createElement('script'); e.src=src; e.onload=res; e.onerror=rej; document.head.appendChild(e); }); }
+  function openIncidentTool(){
+    function go(){ if(window.__cgOpenIncident) window.__cgOpenIncident(); }
+    if(window.CGInc && window.__cgOpenIncident) return go();
+    loadJs('./incident-core.js').then(function(){ return loadJs('./incident.js'); }).then(go)
+      .catch(function(){ alert('Could not load the Incident tool. Open the app once while online, then try again.'); });
   }
   function toggle(){ if(menu) close(); else open(); }
   function close(){ if(menu){ menu.remove(); menu=null; } }
@@ -1989,6 +1996,10 @@ class Component extends DCLogic {
       rU.onclick=function(){ close(); setTimeout(function(){ if(window.__cgUnitRef) window.__cgUnitRef(); },10); };
       menu.appendChild(rU);
     }
+
+    var rI=row('\u2616 Incident <span style="color:#8a958f;font-weight:400;font-size:12px">ICS-205 / 204</span>','');
+    rI.onclick=function(){ close(); setTimeout(openIncidentTool,10); };
+    menu.appendChild(rI);
 
     (function(){
       var on=(typeof window.__cgStationsState==='function')?window.__cgStationsState():false;
