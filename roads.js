@@ -213,6 +213,7 @@
   function hashHue(k){ var h=0; for(var i=0;i<k.length;i++) h=(h*31+k.charCodeAt(i))>>>0; return (h*137.508)%360; }
   function autoColor(k){ return 'hsl('+hashHue(k).toFixed(0)+',85%,60%)'; }
   function edit(k){ return store.edits[k]||(window.CG_ROADS&&window.CG_ROADS[k])||null; }
+  function restricted(k){ var d=window.CG_ROADS&&window.CG_ROADS[k]; return (d&&d.restricted)?d:null; }
   function colorOf(k){ var e=edit(k); return (e&&e.color)||autoColor(k); }
   function isCrew(k){ var e=edit(k); return !!(e&&(e.star||e.slang||e.cond||e.note)); }
   function roadTitle(k){
@@ -257,6 +258,7 @@
       if(!inView) continue;
       shown++;
       var rec=layersByKey[k]||(layersByKey[k]={casings:[],lines:[]});
+      if(restricted(k)){ var rg=L.polyline(lls,{renderer:renderer,interactive:false,color:'#FF3DCB',weight:17,opacity:0.34,lineCap:'round',lineJoin:'round'}).addTo(group); rec.casings.push(rg); }
       var cs=casingFor(k);
       if(cs){ var c=L.polyline(lls,Object.assign({renderer:renderer,interactive:false},cs)).addTo(group); rec.casings.push(c); }
       var ln=L.polyline(lls,Object.assign({renderer:renderer,interactive:true},styleFor(k))).addTo(group);
@@ -379,6 +381,8 @@
     var sheet=ui.sheet; sheet.style.display='flex'; setMenuBtn(false);
     var crew='';
     if(slangs.length) crew+='<div style="font:700 15px/1.3 \'Helvetica Neue\';color:#FFD23F;margin-top:8px">“'+esc(slangs.join('” · “'))+'”</div>';
+    var rs=restricted(k);
+    if(rs) crew+='<div style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;border:1px solid #FF3DCB;border-radius:14px;padding:4px 10px;font:700 11px \'Helvetica Neue\';color:#FFB3EC">\u26D4 RESTRICTED ROAD \u2013 CAL FIRE has access</div>';
     if(cd.k) crew+='<div style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;border:1px solid '+cd.col+';border-radius:14px;padding:4px 10px;font:700 11px \'Helvetica Neue\';color:#ECEEF1"><span style="width:8px;height:8px;border-radius:50%;background:'+cd.col+'"></span>'+esc(cd.label)+'</div>';
     if(e.note) crew+='<div style="margin-top:8px;background:#14181C;border:1px solid #2A3439;border-radius:10px;padding:8px 10px;font:500 13px/1.4 \'Helvetica Neue\';color:#ECEEF1">'+esc(e.note)+'</div>';
     if(!crew) crew='<div style="margin-top:8px;font:500 12px \'Helvetica Neue\';color:#6E7781">No crew info yet — tap Edit to add a slang name, condition or note.</div>';
