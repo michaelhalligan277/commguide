@@ -212,7 +212,7 @@
   function roadKey(s){ return (s.id||('~'+s.n)||('~'+s.o)).toString().toUpperCase(); }
   function hashHue(k){ var h=0; for(var i=0;i<k.length;i++) h=(h*31+k.charCodeAt(i))>>>0; return (h*137.508)%360; }
   function autoColor(k){ return 'hsl('+hashHue(k).toFixed(0)+',85%,60%)'; }
-  function edit(k){ return store.edits[k]||null; }
+  function edit(k){ return store.edits[k]||(window.CG_ROADS&&window.CG_ROADS[k])||null; }
   function colorOf(k){ var e=edit(k); return (e&&e.color)||autoColor(k); }
   function isCrew(k){ var e=edit(k); return !!(e&&(e.star||e.slang||e.cond||e.note)); }
   function roadTitle(k){
@@ -537,6 +537,11 @@
   var KINDS={
     gate:{label:'GATE',color:'#46C9B4',svg:GATE_SVG,src:'Gaia GPS waypoint'},
     hydrant:{label:'WATER \u00b7 HYDRANT',color:'#4C8DFF',svg:svgOf('#4C8DFF','<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"></path>'),src:'Gaia GPS waypoint'},
+    heli:{label:'HELISPOT',color:'#FF8FD0',svg:svgOf('#FF8FD0','<circle cx="12" cy="12" r="9"></circle><path d="M9 7v10M15 7v10M9 12h6"></path>')},
+    view:{label:'VIEWPOINT',color:'#FFC53D',svg:svgOf('#FFC53D','<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle>')},
+    cabin:{label:'CABIN',color:'#7FD36B',svg:svgOf('#7FD36B','<path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10M10 20v-5h4v5"></path>')},
+    water:{label:'WATER',color:'#4C8DFF',svg:svgOf('#4C8DFF','<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"></path>')},
+    warn:{label:'WARNING',color:'#E5484D',svg:svgOf('#E5484D','<path d="M12 3l10 18H2L12 3z"></path><path d="M12 10v5M12 18v.5"></path>')},
     camp:{label:'CAMP',color:'#7FD36B',svg:svgOf('#7FD36B','<path d="M3 20L12 4l9 16H3z"></path><path d="M12 4v16M9 20l3-6 3 6"></path>'),src:'Gaia GPS waypoint'}
   };
   function kindOf(pt){ return KINDS[pt.kind]||{label:'MAP POINT',color:'#46C9B4',svg:PIN_SVG}; }

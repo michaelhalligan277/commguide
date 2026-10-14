@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2021-07-21T19:28:44Z</time>
+  </metadata>
+  <wpt lat="38.226345" lon="-120.180563">
+    <ele>1591.0</ele>
+    <time>2021-07-21T19:28:44Z</time>
+    <name>Viewpoint</name>
+    <sym>lighthouse-24</sym>
+  </wpt>
+</gpx>

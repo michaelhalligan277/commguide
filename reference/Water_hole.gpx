@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2026-10-14T15:18:46Z</time>
+  </metadata>
+  <wpt lat="38.229508" lon="-120.185443">
+    <ele>1461.1</ele>
+    <time>2026-10-14T15:18:46Z</time>
+    <name>Water hole</name>
+    <sym>blue-pin-down</sym>
+  </wpt>
+</gpx>
