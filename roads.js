@@ -365,6 +365,14 @@
     var rec=layersByKey[k]; if(!rec) return;
     rec.lines.forEach(function(l){ l.setStyle(styleFor(k)); l.bringToFront(); });
   }
+  // fit bounds, but never zoom out past MIN_ZOOM (below that roads are not drawn, so the road would "disappear")
+  function fitKeep(bb,maxZ,bottom){
+    var z=map.getBoundsZoom(bb,false,window.L.point(60,30+bottom));
+    if(z<MIN_ZOOM){
+      var c=bb.getCenter(), off=map.getSize().y*0.18;
+      var p=map.project(c,MIN_ZOOM); p.y+=off; map.setView(map.unproject(p,MIN_ZOOM),MIN_ZOOM);
+    } else map.fitBounds(bb,{padding:[30,30],paddingBottomRight:[30,bottom],maxZoom:maxZ||18});
+  }
   function select(k){
     var prev=selKey; selKey=k; focusRoute=null;
     if(prev&&prev!==k) draw(); else draw();
@@ -415,7 +423,7 @@
       '</div>';
     sheet.querySelector('#rd-x').onclick=closeSheet;
     sheet.querySelector('#rd-edit').onclick=function(){ openSheet(k); };
-    map.fitBounds(L_bounds(arr),{padding:[30,30],maxZoom:14,paddingBottomRight:[30,280]});
+    fitKeep(L_bounds(arr),14,280);
   }
 
   function openSheet(k){
@@ -613,7 +621,7 @@
         '<button id="rt-fit" style="background:#4C8DFF;border:none;border-radius:16px;padding:9px 20px;font:700 12px \'Helvetica Neue\';color:#fff;cursor:pointer">Zoom to route</button>'+
       '</div>';
     sheet.querySelector('#rt-x').onclick=closeSheet;
-    sheet.querySelector('#rt-fit').onclick=function(){ map.fitBounds(window.L.latLngBounds(r.pts.map(function(pt){ return [pt[1],pt[0]]; })),{padding:[30,30],paddingBottomRight:[30,220]}); };
+    sheet.querySelector('#rt-fit').onclick=function(){ fitKeep(window.L.latLngBounds(r.pts.map(function(pt){ return [pt[1],pt[0]]; })),null,220); };
     var d=sheet.querySelector('#rt-del'); if(d) d.onclick=function(){ if(confirm('Remove "'+r.name+'" from this phone?')){ imported=imported.filter(function(x){ return x.id!==r.id; }); saveImported(); drawRoutes(); closeSheet(); toast('Route removed'); } };
   }
   function importGpx(file){
