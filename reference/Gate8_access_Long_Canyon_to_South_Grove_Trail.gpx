@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2026-10-07T17:51:11Z</time>
+  </metadata>
+  <rte>
+    <name>Long Canyon to South Grove Trail, Tuolumne County, CA, USA</name>
+<rtept lat="38.220422" lon="-120.256070">
+<ele>1416.7</ele>
+<name></name>
+</rtept>
+<rtept lat="38.220642" lon="-120.256269">
+<ele>1413.0</ele>
+</rtept>
+<rtept lat="38.220862" lon="-120.256468">
+<ele>1413.6</ele>
+</rtept>
+<rtept lat="38.221081" lon="-120.256668">
+<ele>1416.6</ele>
+</rtept>
+<rtept lat="38.221301" lon="-120.256867">
+<ele>1420.6</ele>
+</rtept>
+<rtept lat="38.221521" lon="-120.257066">
+<ele>1425.3</ele>
+</rtept>
+<rtept lat="38.221661" lon="-120.257194">
+<ele>1428.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.221661" lon="-120.257194">
+<ele>1428.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.221901" lon="-120.257351">
+<ele>1432.9</ele>
+</rtept>
+<rtept lat="38.222141" lon="-120.257508">
+<ele>1437.8</ele>
+</rtept>
+<rtept lat="38.222380" lon="-120.257665">
+<ele>1441.2</ele>
+</rtept>
+<rtept lat="38.222620" lon="-120.257823">
+<ele>1444.6</ele>
+</rtept>
+<rtept lat="38.222860" lon="-120.257980">
+<ele>1448.0</ele>
+</rtept>
+<rtept lat="38.223100" lon="-120.258137">
+<ele>1450.7</ele>
+</rtept>
+<rtept lat="38.223340" lon="-120.258295">
+<ele>1453.2</ele>
+</rtept>
+<rtept lat="38.223512" lon="-120.258408">
+<ele>1455.4</ele>
+<name></name>
+</rtept>
+<rtept lat="38.223704" lon="-120.258208">
+<ele>1459.2</ele>
+</rtept>
+<rtept lat="38.223762" lon="-120.258299">
+<ele>1460.0</ele>
+</rtept>
+<rtept lat="38.224132" lon="-120.258667">
+<ele>1454.2</ele>
+</rtept>
+<rtept lat="38.224318" lon="-120.258788">
+<ele>1451.3</ele>
+</rtept>
+<rtept lat="38.224541" lon="-120.258908">
+<ele>1448.4</ele>
+</rtept>
+<rtept lat="38.224707" lon="-120.258940">
+<ele>1446.8</ele>
+</rtept>
+<rtept lat="38.224799" lon="-120.258941">
+<ele>1446.0</ele>
+</rtept>
+<rtept lat="38.224890" lon="-120.258929">
+<ele>1445.4</ele>
+</rtept>
+<rtept lat="38.225115" lon="-120.258857">
+<ele>1445.4</ele>
+</rtept>
+<rtept lat="38.225112" lon="-120.258864">
+<ele>1445.4</ele>
+</rtept>
+<rtept lat="38.226770" lon="-120.258334">
+<ele>1432.6</ele>
+</rtept>
+<rtept lat="38.227044" lon="-120.258253">
+<ele>1439.1</ele>
+</rtept>
+<rtept lat="38.227122" lon="-120.258236">
+<ele>1440.6</ele>
+</rtept>
+<rtept lat="38.227124" lon="-120.258232">
+<ele>1440.7</ele>
+</rtept>
+<rtept lat="38.227154" lon="-120.258226">
+<ele>1441.2</ele>
+</rtept>
+<rtept lat="38.227265" lon="-120.258237">
+<ele>1443.0</ele>
+</rtept>
+<rtept lat="38.227397" lon="-120.258309">
+<ele>1445.6</ele>
+</rtept>
+<rtept lat="38.227468" lon="-120.258384">
+<ele>1446.8</ele>
+</rtept>
+<rtept lat="38.227698" lon="-120.258724">
+<ele>1449.8</ele>
+</rtept>
+<rtept lat="38.228171" lon="-120.259384">
+<ele>1451.2</ele>
+</rtept>
+<rtept lat="38.228194" lon="-120.259432">
+<ele>1451.1</ele>
+</rtept>
+<rtept lat="38.228192" lon="-120.259432">
+<ele>1451.1</ele>
+</rtept>
+<rtept lat="38.228227" lon="-120.259503">
+<ele>1450.9</ele>
+</rtept>
+<rtept lat="38.228274" lon="-120.259658">
+<ele>1450.1</ele>
+</rtept>
+<rtept lat="38.228293" lon="-120.259823">
+<ele>1449.9</ele>
+</rtept>
+<rtept lat="38.228286" lon="-120.259988">
+<ele>1450.3</ele>
+</rtept>
+<rtept lat="38.228224" lon="-120.260272">
+<ele>1452.1</ele>
+</rtept>
+<rtept lat="38.228180" lon="-120.260592">
+<ele>1454.0</ele>
+</rtept>
+<rtept lat="38.228217" lon="-120.261017">
+<ele>1455.8</ele>
+</rtept>
+<rtept lat="38.228227" lon="-120.261206">
+<ele>1456.6</ele>
+</rtept>
+<rtept lat="38.228251" lon="-120.261268">
+<ele>1457.1</ele>
+</rtept>
+<rtept lat="38.228306" lon="-120.261319">
+<ele>1457.9</ele>
+</rtept>
+<rtept lat="38.228373" lon="-120.261328">
+<ele>1458.6</ele>
+</rtept>
+<rtept lat="38.229141" lon="-120.261032">
+<ele>1461.2</ele>
+</rtept>
+<rtept lat="38.229250" lon="-120.260971">
+<ele>1461.6</ele>
+</rtept>
+<rtept lat="38.229354" lon="-120.260895">
+<ele>1461.7</ele>
+</rtept>
+<rtept lat="38.229452" lon="-120.260807">
+<ele>1462.1</ele>
+</rtept>
+<rtept lat="38.230014" lon="-120.260110">
+<ele>1466.4</ele>
+</rtept>
+<rtept lat="38.230016" lon="-120.260112">
+<ele>1466.5</ele>
+</rtept>
+<rtept lat="38.230394" lon="-120.259643">
+<ele>1471.6</ele>
+</rtept>
+<rtept lat="38.230537" lon="-120.259532">
+<ele>1473.3</ele>
+</rtept>
+<rtept lat="38.230673" lon="-120.259465">
+<ele>1474.8</ele>
+</rtept>
+<rtept lat="38.230838" lon="-120.259406">
+<ele>1477.0</ele>
+</rtept>
+<rtept lat="38.232377" lon="-120.259025">
+<ele>1494.2</ele>
+</rtept>
+<rtept lat="38.232570" lon="-120.258938">
+<ele>1497.0</ele>
+<name></name>
+</rtept>
+<rtept lat="38.232570" lon="-120.258938">
+<ele>1497.0</ele>
+<name></name>
+</rtept>
+<rtept lat="38.232568" lon="-120.258936">
+<ele>1497.0</ele>
+</rtept>
+<rtept lat="38.232568" lon="-120.258936">
+<ele>1497.0</ele>
+</rtept>
+<rtept lat="38.232729" lon="-120.258814">
+<ele>1499.2</ele>
+</rtept>
+<rtept lat="38.233158" lon="-120.258454">
+<ele>1506.1</ele>
+</rtept>
+<rtept lat="38.233515" lon="-120.258138">
+<ele>1510.3</ele>
+</rtept>
+<rtept lat="38.233819" lon="-120.257918">
+<ele>1513.1</ele>
+</rtept>
+<rtept lat="38.234366" lon="-120.257560">
+<ele>1516.0</ele>
+</rtept>
+<rtept lat="38.234396" lon="-120.257413">
+<ele>1516.4</ele>
+</rtept>
+  </rte>
+</gpx>

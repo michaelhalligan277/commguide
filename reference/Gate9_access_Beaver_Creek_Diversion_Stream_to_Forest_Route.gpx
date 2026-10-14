@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2026-10-07T17:51:39Z</time>
+  </metadata>
+  <rte>
+    <name>Beaver Creek Diversion Stream to Forest Route, Tuolumne County, CA, USA</name>
+<rtept lat="38.233936" lon="-120.273144">
+<ele>1404.4</ele>
+</rtept>
+<rtept lat="38.233978" lon="-120.273137">
+<ele>1404.4</ele>
+</rtept>
+<rtept lat="38.234041" lon="-120.273100">
+<ele>1404.9</ele>
+</rtept>
+<rtept lat="38.234130" lon="-120.273003">
+<ele>1406.3</ele>
+</rtept>
+<rtept lat="38.234345" lon="-120.272783">
+<ele>1410.0</ele>
+</rtept>
+<rtept lat="38.234501" lon="-120.272708">
+<ele>1412.4</ele>
+</rtept>
+<rtept lat="38.234614" lon="-120.272719">
+<ele>1412.8</ele>
+</rtept>
+<rtept lat="38.234770" lon="-120.272762">
+<ele>1413.4</ele>
+</rtept>
+<rtept lat="38.234935" lon="-120.272837">
+<ele>1412.9</ele>
+</rtept>
+<rtept lat="38.235112" lon="-120.272960">
+<ele>1411.2</ele>
+</rtept>
+<rtept lat="38.235314" lon="-120.273052">
+<ele>1409.7</ele>
+</rtept>
+<rtept lat="38.235441" lon="-120.273064">
+<ele>1409.8</ele>
+</rtept>
+<rtept lat="38.235440" lon="-120.273064">
+<ele>1409.8</ele>
+</rtept>
+<rtept lat="38.235481" lon="-120.273068">
+<ele>1409.7</ele>
+</rtept>
+<rtept lat="38.235680" lon="-120.273041">
+<ele>1410.4</ele>
+</rtept>
+<rtept lat="38.235932" lon="-120.272950">
+<ele>1410.6</ele>
+</rtept>
+<rtept lat="38.236164" lon="-120.272907">
+<ele>1408.8</ele>
+</rtept>
+<rtept lat="38.236446" lon="-120.272880">
+<ele>1404.4</ele>
+</rtept>
+<rtept lat="38.237112" lon="-120.272746">
+<ele>1405.1</ele>
+</rtept>
+<rtept lat="38.237298" lon="-120.272681">
+<ele>1407.1</ele>
+</rtept>
+<rtept lat="38.237354" lon="-120.272649">
+<ele>1407.8</ele>
+</rtept>
+<rtept lat="38.237313" lon="-120.272528">
+<ele>1410.7</ele>
+<name></name>
+</rtept>
+<rtept lat="38.237184" lon="-120.272227">
+<ele>1416.8</ele>
+</rtept>
+<rtept lat="38.237054" lon="-120.271926">
+<ele>1421.7</ele>
+</rtept>
+<rtept lat="38.236925" lon="-120.271624">
+<ele>1427.1</ele>
+</rtept>
+<rtept lat="38.236795" lon="-120.271323">
+<ele>1431.5</ele>
+</rtept>
+<rtept lat="38.236666" lon="-120.271022">
+<ele>1436.0</ele>
+</rtept>
+<rtept lat="38.236537" lon="-120.270720">
+<ele>1439.7</ele>
+</rtept>
+<rtept lat="38.236407" lon="-120.270419">
+<ele>1441.9</ele>
+</rtept>
+<rtept lat="38.236278" lon="-120.270117">
+<ele>1443.8</ele>
+</rtept>
+<rtept lat="38.236148" lon="-120.269816">
+<ele>1444.5</ele>
+</rtept>
+<rtept lat="38.236019" lon="-120.269515">
+<ele>1444.7</ele>
+</rtept>
+<rtept lat="38.235925" lon="-120.269296">
+<ele>1444.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.235925" lon="-120.269296">
+<ele>1444.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.235879" lon="-120.268958">
+<ele>1441.2</ele>
+</rtept>
+<rtept lat="38.235833" lon="-120.268620">
+<ele>1440.5</ele>
+</rtept>
+<rtept lat="38.235786" lon="-120.268281">
+<ele>1441.8</ele>
+</rtept>
+<rtept lat="38.235740" lon="-120.267943">
+<ele>1443.7</ele>
+</rtept>
+<rtept lat="38.235694" lon="-120.267604">
+<ele>1445.0</ele>
+</rtept>
+<rtept lat="38.235648" lon="-120.267266">
+<ele>1446.2</ele>
+</rtept>
+<rtept lat="38.235602" lon="-120.266928">
+<ele>1448.9</ele>
+</rtept>
+<rtept lat="38.235555" lon="-120.266589">
+<ele>1454.6</ele>
+</rtept>
+<rtept lat="38.235509" lon="-120.266251">
+<ele>1461.0</ele>
+</rtept>
+<rtept lat="38.235463" lon="-120.265912">
+<ele>1465.9</ele>
+</rtept>
+<rtept lat="38.235457" lon="-120.265869">
+<ele>1466.4</ele>
+<name></name>
+</rtept>
+  </rte>
+</gpx>

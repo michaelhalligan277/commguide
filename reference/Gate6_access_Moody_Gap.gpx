@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2026-10-07T17:49:39Z</time>
+  </metadata>
+  <rte>
+    <name>Moody Gap, Tuolumne County, CA, USA</name>
+<rtept lat="38.239913" lon="-120.228302">
+<ele>1508.7</ele>
+<name></name>
+</rtept>
+<rtept lat="38.240080" lon="-120.228571">
+<ele>1515.4</ele>
+</rtept>
+<rtept lat="38.240247" lon="-120.228841">
+<ele>1521.9</ele>
+</rtept>
+<rtept lat="38.240415" lon="-120.229110">
+<ele>1526.8</ele>
+</rtept>
+<rtept lat="38.240582" lon="-120.229380">
+<ele>1528.5</ele>
+</rtept>
+<rtept lat="38.240749" lon="-120.229649">
+<ele>1529.6</ele>
+</rtept>
+<rtept lat="38.240917" lon="-120.229919">
+<ele>1529.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.240918" lon="-120.229921">
+<ele>1529.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.240918" lon="-120.229921">
+<ele>1529.3</ele>
+<name></name>
+</rtept>
+<rtept lat="38.240861" lon="-120.230256">
+<ele>1525.5</ele>
+</rtept>
+<rtept lat="38.240803" lon="-120.230592">
+<ele>1527.1</ele>
+</rtept>
+<rtept lat="38.240746" lon="-120.230928">
+<ele>1533.0</ele>
+</rtept>
+<rtept lat="38.240689" lon="-120.231264">
+<ele>1539.2</ele>
+</rtept>
+<rtept lat="38.240632" lon="-120.231599">
+<ele>1543.7</ele>
+</rtept>
+<rtept lat="38.240575" lon="-120.231935">
+<ele>1545.6</ele>
+</rtept>
+<rtept lat="38.240517" lon="-120.232271">
+<ele>1545.9</ele>
+</rtept>
+<rtept lat="38.240460" lon="-120.232606">
+<ele>1546.9</ele>
+</rtept>
+<rtept lat="38.240446" lon="-120.232689">
+<ele>1547.0</ele>
+<name></name>
+</rtept>
+<rtept lat="38.240446" lon="-120.232689">
+<ele>1547.0</ele>
+<name></name>
+</rtept>
+<rtept lat="38.240522" lon="-120.233018">
+<ele>1550.0</ele>
+</rtept>
+<rtept lat="38.240598" lon="-120.233348">
+<ele>1553.8</ele>
+</rtept>
+<rtept lat="38.240675" lon="-120.233677">
+<ele>1557.6</ele>
+</rtept>
+<rtept lat="38.240751" lon="-120.234007">
+<ele>1560.9</ele>
+</rtept>
+<rtept lat="38.240827" lon="-120.234336">
+<ele>1563.2</ele>
+</rtept>
+<rtept lat="38.240903" lon="-120.234666">
+<ele>1564.8</ele>
+</rtept>
+<rtept lat="38.240979" lon="-120.234995">
+<ele>1567.2</ele>
+</rtept>
+<rtept lat="38.241055" lon="-120.235325">
+<ele>1570.5</ele>
+</rtept>
+<rtept lat="38.241132" lon="-120.235654">
+<ele>1573.4</ele>
+</rtept>
+<rtept lat="38.241208" lon="-120.235984">
+<ele>1577.7</ele>
+</rtept>
+<rtept lat="38.241284" lon="-120.236314">
+<ele>1584.1</ele>
+</rtept>
+<rtept lat="38.241360" lon="-120.236643">
+<ele>1588.6</ele>
+</rtept>
+<rtept lat="38.241400" lon="-120.236814">
+<ele>1589.6</ele>
+<name></name>
+</rtept>
+  </rte>
+</gpx>

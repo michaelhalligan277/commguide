@@ -497,7 +497,7 @@
   }
   function syncRouteLabels(){
     if(!map||!routeLabels) return;
-    var on=routesOn&&map.getZoom()>=11;
+    var on=routesOn&&map.getZoom()>=12;
     if(on&&!map.hasLayer(routeLabels)) map.addLayer(routeLabels);
     if(!on&&map.hasLayer(routeLabels)) map.removeLayer(routeLabels);
     if(pointGroup){ var pon=routesOn&&map.getZoom()>=11; if(pon&&!map.hasLayer(pointGroup)) map.addLayer(pointGroup); if(!pon&&map.hasLayer(pointGroup)) map.removeLayer(pointGroup); }
