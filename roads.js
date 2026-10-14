@@ -78,8 +78,42 @@
     if(x1<BB[0]||x0>BB[2]||y1<BB[1]||y0>BB[3]){ s.pc=[]; return; }
     s.pc=clipPaths(s.p);
   }
+  // Battalion rule: a road is shown WHOLE if any part of it is inside the boundary (roads that merely branch off it
+  // outside the boundary are not). Only pieces connected end-to-end to the inside part count, so a same-numbered road
+  // elsewhere is ignored.
+  var incl={}, inclDirty=true, TOL=0.0004, GRID=0.0005;
+  function ends(s){ var e=[]; for(var a=0;a<s.p.length;a++){ var pa=s.p[a]; if(pa.length){ e.push(pa[0]); e.push(pa[pa.length-1]); } } return e; }
+  function computeIncl(){
+    inclDirty=false; incl={}; if(!BATT) return;
+    var byKey={};
+    Object.keys(segs).forEach(function(o){ var sg=segs[o]; if(!sg.pc&&BATT) clipSeg(sg); (byKey[sg.k]||(byKey[sg.k]=[])).push(sg); });
+    Object.keys(byKey).forEach(function(k){
+      var arr=byKey[k], seeds=arr.filter(function(sg){ return sg.pc&&sg.pc.length; });
+      if(!seeds.length) return;
+      seeds.forEach(function(sg){ incl[sg.o]=true; });
+      if(seeds.length===arr.length) return;
+      var grid={};
+      function gk(x,y){ return Math.floor(x/GRID)+':'+Math.floor(y/GRID); }
+      arr.forEach(function(sg){ ends(sg).forEach(function(pt){ var g=gk(pt[0],pt[1]); (grid[g]||(grid[g]=[])).push(sg); }); });
+      var queue=seeds.slice();
+      while(queue.length){
+        var cur=queue.pop();
+        ends(cur).forEach(function(pt){
+          var gx=Math.floor(pt[0]/GRID), gy=Math.floor(pt[1]/GRID);
+          for(var dx=-1;dx<=1;dx++) for(var dy=-1;dy<=1;dy++){
+            var l=grid[(gx+dx)+':'+(gy+dy)]; if(!l) continue;
+            l.forEach(function(n){
+              if(incl[n.o]) return;
+              var hit=ends(n).some(function(q){ return Math.abs(q[0]-pt[0])<=TOL && Math.abs(q[1]-pt[1])<=TOL; });
+              if(hit){ incl[n.o]=true; queue.push(n); }
+            });
+          }
+        });
+      }
+    });
+  }
   function pathsOf(s){
-    if(battOn && !battFailed){ if(!BATT) return []; if(!s.pc) clipSeg(s); return s.pc; }
+    if(battOn && !battFailed){ if(!BATT) return []; if(inclDirty) computeIncl(); return incl[s.o]? s.p : []; }
     return s.p;
   }
   function cellTouches(x0,y0,x1,y1){          // does this fetch cell overlap the boundary?
@@ -134,12 +168,11 @@
     return fetch(url).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
       .catch(function(){ return jsonp(url); });
   }
-  function fetchCell(cx,cy){
-    var x0=cx*CELL, y0=cy*CELL, out=[];
+  function fetchQuery(extra){
+    var out=[];
     function page(off){
-      var url=SVC+'?'+qs({where:'1=1',geometry:[x0,y0,x0+CELL,y0+CELL].join(','),geometryType:'esriGeometryEnvelope',inSR:4326,
-        spatialRel:'esriSpatialRelIntersects',outFields:FIELDS,returnGeometry:'true',outSR:4326,geometryPrecision:5,
-        resultOffset:off,resultRecordCount:1000,f:'json'});
+      var url=SVC+'?'+qs(Object.assign({where:'1=1',outFields:FIELDS,returnGeometry:'true',outSR:4326,geometryPrecision:5,
+        resultOffset:off,resultRecordCount:1000,f:'json'},extra));
       return getJson(url).then(function(d){
         if(d&&d.error) throw new Error(d.error.message||'service error');
         var fs=(d&&d.features)||[];
@@ -153,6 +186,15 @@
     }
     return page(0);
   }
+  function envQ(x0,y0,x1,y1){ return {geometry:[x0,y0,x1,y1].join(','),geometryType:'esriGeometryEnvelope',inSR:4326,spatialRel:'esriSpatialRelIntersects'}; }
+  function fetchCell(cx,cy){ return fetchQuery(envQ(cx*CELL,cy*CELL,(cx+1)*CELL,(cy+1)*CELL)); }
+  // full length of numbered roads (they run past the boundary), searched within a buffer around the battalion
+  var EXT_BUF=0.25;
+  function sqlStr(id){ return "'"+String(id).replace(/'/g,"''")+"'"; }
+  function fetchExt(ids){
+    return fetchQuery(Object.assign({where:'id IN ('+ids.map(sqlStr).join(',')+')'},envQ(BB[0]-EXT_BUF,BB[1]-EXT_BUF,BB[2]+EXT_BUF,BB[3]+EXT_BUF)));
+  }
+  function strip(list){ return list.map(function(s){ return {o:s.o,id:s.id,n:s.n,s:s.s,m:s.m,r:s.r,c:s.c,l:s.l,p:s.p}; }); }
 
   // ---------- state ----------
   var map=null, root=null, ui={}, renderer=null, group=null, labelGroup=null, meDot=null;
@@ -236,6 +278,7 @@
   }
   function ingest(list){
     for(var i=0;i<list.length;i++){ var s=list[i]; s.k=roadKey(s); if(BATT) clipSeg(s); segs[s.o]=s; }
+    inclDirty=true;
   }
   function loadCell(c,force){
     var key=c[0]+':'+c[1];
@@ -246,7 +289,7 @@
       inflight++; setStatus('Loading roads…');
       return fetchCell(c[0],c[1]).then(function(list){
         ingest(list); errMsg='';
-        return dbPut(key,{t:Date.now(),f:list}).then(function(){ return true; });
+        return dbPut(key,{t:Date.now(),f:strip(list)}).then(function(){ return true; });
       }).catch(function(e){
         delete cellsSeen[key];
         errMsg=(hit&&hit.f)? '' : 'Can’t reach USFS road service — showing saved areas only';
@@ -255,13 +298,37 @@
       }).then(function(r){ inflight--; return r; });
     });
   }
+  var extDone={};
+  function ensureExt(){
+    if(!battActive()) return Promise.resolve();
+    var ids={};
+    Object.keys(segs).forEach(function(o){ var sg=segs[o]; if(!sg.pc&&BATT) clipSeg(sg); if(sg.id&&sg.pc&&sg.pc.length) ids[sg.id]=true; });
+    var todo=Object.keys(ids).filter(function(id){ return !extDone[id]; });
+    if(!todo.length) return Promise.resolve();
+    todo.forEach(function(id){ extDone[id]=true; });
+    var chain=Promise.resolve();
+    for(var i=0;i<todo.length;i+=20) (function(batch){ chain=chain.then(function(){ return extBatch(batch); }); })(todo.slice(i,i+20));
+    return chain;
+  }
+  function extBatch(ids){
+    return Promise.all(ids.map(function(id){ return dbGet('x:'+id); })).then(function(hits){
+      var missing=[]; hits.forEach(function(h,i){ if(h&&h.f) ingest(h.f); else missing.push(ids[i]); });
+      if(!missing.length) return;
+      inflight++; setStatus('Loading full road lengths\u2026');
+      return fetchExt(missing).then(function(list){
+        ingest(list);
+        var by={}; missing.forEach(function(id){ by[id]=[]; }); list.forEach(function(sg){ if(by[sg.id]) by[sg.id].push(sg); });
+        return Promise.all(missing.map(function(id){ return dbPut('x:'+id,{t:Date.now(),f:strip(by[id])}); }));
+      }).catch(function(){ missing.forEach(function(id){ delete extDone[id]; }); }).then(function(){ inflight--; });
+    });
+  }
   function loadView(force){
     if(!map||map.getZoom()<MIN_ZOOM){ draw(); return Promise.resolve(); }
     var cs=cellsInView();
     if(cs.length>MAX_CELLS_VIEW){ setStatus('Zoom in a bit more to load roads'); draw(); return Promise.resolve(); }
     var changed=false, chain=Promise.resolve();
     cs.forEach(function(c){ chain=chain.then(function(){ return loadCell(c,force); }).then(function(ch){ if(ch){ changed=true; draw(); } }); });
-    return chain.then(function(){ draw(); refreshCount(); });
+    return chain.then(function(){ draw(); return ensureExt(); }).then(function(){ draw(); refreshCount(); });
   }
   function downloadArea(){
     var cs=cellsInView(); if(!cs.length) return;
@@ -269,7 +336,7 @@
     var n=0, bad=0, chain=Promise.resolve();
     toast('Saving '+cs.length+' map cells…');
     cs.forEach(function(c){ chain=chain.then(function(){ return loadCell(c,false); }).then(function(ok){ if(ok) n++; else bad++; setStatus('Saved '+n+'/'+cs.length+(bad?' ('+bad+' failed)':'')); }); });
-    chain.then(function(){ draw(); refreshCount(); toast(bad? 'Saved '+n+' cells, '+bad+' failed — check signal and retry' : 'Saved '+n+' cells for offline use'); });
+    chain.then(function(){ return ensureExt(); }).then(function(){ draw(); refreshCount(); toast(bad? 'Saved '+n+' cells, '+bad+' failed — check signal and retry' : 'Saved '+n+' cells for offline use'); });
   }
   function refreshCount(){ dbCount().then(function(n){ if(ui.cached) ui.cached.textContent=n+' cells saved offline'; }); }
 
@@ -457,6 +524,7 @@
     show:function(){ if(!built) build(); else setTimeout(function(){ map.invalidateSize(); loadView(false); },60); },
     _map:function(){ return map; },
     _segs:function(){ return segs; },
+    _incl:function(){ if(inclDirty) computeIncl(); return incl; },
     _debug:function(){ return {segs:Object.keys(segs).length, edits:store.edits}; }
   };
   // if the tab was already opened while this file was loading

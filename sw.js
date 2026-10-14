@@ -1,5 +1,5 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v30';
+const APP = 'cg-app-v31';
 const OCR = 'cg-ocr-v1'; // incident photo reader (large, immutable) — survives app updates
 const TILES = 'cg-tiles-v5';
 const NET_TIMEOUT_MS = 3000;
