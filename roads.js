@@ -483,7 +483,7 @@
   try{ var _ri=JSON.parse(localStorage.getItem(RKEY)||'null'); if(_ri&&_ri.routes) imported=_ri.routes; }catch(e){}
   function saveImported(){ try{ localStorage.setItem(RKEY,JSON.stringify({v:1,routes:imported})); return true; }catch(e){ return false; } }
   function allRoutes(){
-    var b=(window.CG_ROUTES||[]).map(function(r){ return {id:r.id,name:r.name,pts:r.pts,src:'bundled'}; });
+    var b=(window.CG_ROUTES||[]).map(function(r){ return {id:r.id,name:r.name,pts:r.pts,note:r.note||'',dest:r.dest||null,src:'bundled'}; });
     return b.concat(imported.map(function(r){ return {id:r.id,name:r.name,pts:r.pts,src:'phone'}; }));
   }
   function routeMiles(pts){
@@ -509,6 +509,15 @@
         var core=L.polyline(ll,{renderer:renderer,interactive:true,color:'#FFC53D',weight:3.5,opacity:0.95,lineCap:'round',lineJoin:'round'});
         [glow,core].forEach(function(l){ l.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openRouteInfo(r); }); routeGroup.addLayer(l); });
         glow.bringToBack(); core.bringToBack(); glow.bringToBack();
+        if(r.dest&&r.dest.at){
+          var tower='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21l3-11M17 21l-3-11M8.5 15.5h7M9.5 10h5"></path><path d="M8 10V7.5h8V10"></path><path d="M12 7.5V4.5M9 4.5l3-1.5 3 1.5"></path></svg>';
+          var dm=L.marker([r.dest.at[1],r.dest.at[0]],{interactive:true,keyboard:false,icon:L.divIcon({className:'',iconSize:[0,0],
+            html:'<div style="transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto;cursor:pointer">'+
+              '<div style="white-space:nowrap;font:700 10px \'Helvetica Neue\';color:#FFC53D;background:rgba(10,12,16,.92);border:1px solid #FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5)">'+esc(r.dest.name)+'</div>'+
+              '<div style="width:30px;height:30px;border-radius:50%;background:rgba(10,12,16,.95);border:2px solid #FFC53D;box-shadow:0 0 10px #FFC53D99;display:flex;align-items:center;justify-content:center">'+tower+'</div></div>'})});
+          dm.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openRouteInfo(r); });
+          routeGroup.addLayer(dm);
+        }
         var mid=ll[Math.floor(ll.length/2)];
         L.marker(mid,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],
           html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';letter-spacing:.04em;color:#1A1300;background:#FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none">★ '+esc(r.name.length>32?r.name.slice(0,31)+'…':r.name)+'</div>'})}).addTo(routeLabels);
@@ -527,7 +536,7 @@
         '<div style="font:700 17px/1.2 \'Helvetica Neue\';color:#ECEEF1;margin-top:3px">'+esc(r.name)+'</div></div>'+
         '<button id="rt-x" style="background:none;border:none;color:#9AA3AE;font-size:24px;line-height:1;cursor:pointer">×</button>'+
       '</div>'+
-      '<div style="margin-top:10px">'+infoRow('Length','~'+mi.toFixed(1)+' mi')+infoRow('Source',r.src==='bundled'?'Built into Comm Guide (Gaia GPS track)':'Added on this phone from a GPX file')+'</div>'+
+      '<div style="margin-top:10px">'+infoRow('Destination',r.dest?r.dest.name:'')+infoRow('Note',r.note||'')+infoRow('Length','~'+mi.toFixed(1)+' mi')+infoRow('Source',r.src==='bundled'?'Built into Comm Guide (Gaia GPS track)':'Added on this phone from a GPX file')+'</div>'+
       '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'+
         (r.src==='phone'?'<button id="rt-del" style="background:#14181C;border:1px solid #2A3439;border-radius:16px;padding:8px 14px;font:600 12px \'Helvetica Neue\';color:#E5484D;cursor:pointer">Remove</button>':'')+
         '<button id="rt-fit" style="background:#4C8DFF;border:none;border-radius:16px;padding:9px 20px;font:700 12px \'Helvetica Neue\';color:#fff;cursor:pointer">Zoom to route</button>'+
