@@ -542,6 +542,7 @@
     cabin:{label:'CABIN',color:'#7FD36B',svg:svgOf('#7FD36B','<path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10M10 20v-5h4v5"></path>')},
     water:{label:'WATER',color:'#4C8DFF',svg:svgOf('#4C8DFF','<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"></path>')},
     warn:{label:'WARNING',color:'#E5484D',svg:svgOf('#E5484D','<path d="M12 3l10 18H2L12 3z"></path><path d="M12 10v5M12 18v.5"></path>')},
+    station:{label:'FIRE STATION',color:'#FF5A4D',svg:svgOf('#FF5A4D','<path d="M3 21V9l9-6 9 6v12"></path><path d="M3 21h18M9 21v-6h6v6M12 7v3M10.5 8.5h3"></path>')},
     camp:{label:'CAMP',color:'#7FD36B',svg:svgOf('#7FD36B','<path d="M3 20L12 4l9 16H3z"></path><path d="M12 4v16M9 20l3-6 3 6"></path>'),src:'Gaia GPS waypoint'}
   };
   function kindOf(pt){ return KINDS[pt.kind]||{label:'MAP POINT',color:'#46C9B4',svg:PIN_SVG}; }
