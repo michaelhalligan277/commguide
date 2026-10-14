@@ -360,7 +360,7 @@
   function refreshCount(){ dbCount().then(function(n){ if(ui.cached) ui.cached.textContent=n+' cells saved offline'; }); }
 
   // ---------- selection + editor sheet ----------
-  function onRoadTap(ev){ if(ev&&ev.originalEvent){ try{ window.L.DomEvent.stopPropagation(ev); }catch(e){} } openInfo(ev.target._ck); }
+  function onRoadTap(ev){ if(ev&&ev.originalEvent){ try{ window.L.DomEvent.stopPropagation(ev); }catch(e){} } openInfo(ev.target._ck, ev.latlng); }
   function restyle(k){
     var rec=layersByKey[k]; if(!rec) return;
     rec.lines.forEach(function(l){ l.setStyle(styleFor(k)); l.bringToFront(); });
@@ -390,7 +390,7 @@
   function infoRow(l,v){ return v? '<div style="display:flex;gap:10px;padding:6px 0;border-top:1px solid #1C2226"><div style="width:108px;flex-shrink:0;font:600 9px/1.5 \'Helvetica Neue\';letter-spacing:.08em;color:#7A828C">'+esc(l.toUpperCase())+'</div><div style="flex:1;min-width:0;font:500 13px/1.35 \'Helvetica Neue\';color:#ECEEF1">'+esc(v)+'</div></div>' : ''; }
 
   // Tap a road -> read-only info card (crew info + USFS data). Edit button opens the editor.
-  function openInfo(k){
+  function openInfo(k,tapLL){
     select(k);
     var arr=segInfo(k); if(!arr.length) return;
     var t=roadTitle(k), e=edit(k)||{}, col=colorOf(k), cd=cond(e.cond||'');
@@ -423,7 +423,11 @@
       '</div>';
     sheet.querySelector('#rd-x').onclick=closeSheet;
     sheet.querySelector('#rd-edit').onclick=function(){ openSheet(k); };
-    fitKeep(L_bounds(arr),14,280);
+    // keep the view where the user is looking; only nudge the map if the card would cover the tapped spot
+    if(tapLL){
+      var sz=map.getSize(), pt=map.latLngToContainerPoint(tapLL), shH=ui.sheet.offsetHeight||300, lim=sz.y-shH-30;
+      if(pt.y>lim) map.panBy([0,pt.y-Math.max(90,lim/2)],{animate:true});
+    }
   }
 
   function openSheet(k){
