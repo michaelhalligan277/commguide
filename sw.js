@@ -1,10 +1,10 @@
 /* Comm Guide service worker — offline launch + basemap tile cache */
-const APP = 'cg-app-v27';
+const APP = 'cg-app-v28';
 const OCR = 'cg-ocr-v1'; // incident photo reader (large, immutable) — survives app updates
 const TILES = 'cg-tiles-v5';
 const NET_TIMEOUT_MS = 3000;
 const SHELL = ['./', './index.html', './manifest.json', './dc-runtime.js',
-  './leaflet.js', './comm-data.js', './comm-geo.js', './incident-core.js', './incident.js',
+  './leaflet.js', './comm-data.js', './comm-geo.js', './incident-core.js', './incident.js', './roads.js',
   './vendor/react.production.min.js', './vendor/react-dom.production.min.js',
   './font-latin.woff2', './font-latin-ext.woff2',
   './layers.png', './layers-2x.png', './marker-icon.png',
@@ -37,6 +37,9 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = req.url;
+
+  // USFS road service: live data, cached by roads.js itself in IndexedDB — never serve a stale copy from here
+  if (/\/\/apps\.fs\.usda\.gov\//.test(url)) return;
 
   // Map tiles: cache-first, subdomain-normalized key, opaque responses OK
   if (isTile(url)) {

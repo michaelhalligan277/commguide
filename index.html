@@ -451,6 +451,11 @@
       </div>
     </div>
 
+    <!-- ░░░ ROADS ░░░ (built by roads.js on first open) -->
+    <div id="panel-roads" style="height:100%;display:none;flex-direction:column">
+      <div id="roads-root" style="flex:1;min-height:0;position:relative"></div>
+    </div>
+
   </div>
 
   <!-- TAB BAR -->
@@ -470,6 +475,10 @@
     <button onclick="{{ tabCoop }}" style="flex:1;background:none;border:none;cursor:pointer;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px">
       <span style="color:{{ tabCoopColor }};line-height:0;display:flex"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 13.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"></path><path d="M17 13a2.7 2.7 0 1 0 0-5.4"></path><path d="M2.5 20.2c.6-2.8 3-4.5 6-4.5s5.4 1.7 6 4.5"></path><path d="M16.2 15.9c2.3.4 3.9 1.9 4.4 4.3"></path></svg></span>
       <span style="font:600 10px 'Helvetica Neue';letter-spacing:.03em;color:{{ tabCoopColor }}">Coop</span>
+    </button>
+    <button onclick="{{ tabRoads }}" style="flex:1;background:none;border:none;cursor:pointer;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="color:{{ tabRoadsColor }};line-height:0;display:flex"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L5 21"></path><path d="M15 3l4 18"></path><path d="M12 5v2.5M12 11v2.5M12 17v2.5"></path></svg></span>
+      <span style="font:600 10px 'Helvetica Neue';letter-spacing:.03em;color:{{ tabRoadsColor }}">Roads</span>
     </button>
   </div>
 
@@ -535,6 +544,7 @@ class Component extends DCLogic {
       Satellite:{u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',a:ATTR_ESRI}
     }[this.props.mapBase||'Dark'];
     const tiles=()=>L.tileLayer(cfg.u,{maxZoom:18,attribution:cfg.a});
+    window.__cgTileLayer=tiles; // reused by the Roads tab (roads.js)
     // required credit line, styled to sit quietly on the dark map
     if(!document.getElementById('cg-attr-css')){
       const st=document.createElement('style'); st.id='cg-attr-css';
@@ -835,9 +845,18 @@ class Component extends DCLogic {
 
   // ── nav ──
   _show(tab){
-    ['status','channels','tones','coop'].forEach(t=>{const el=document.getElementById('panel-'+t);if(el)el.style.display=(t===tab)?'flex':'none';});
+    { const mb=document.getElementById('cg-menu-btn'); if(mb) mb.style.display=''; } // Roads edit sheet hides it; always restore on tab change
+    ['status','channels','tones','coop','roads'].forEach(t=>{const el=document.getElementById('panel-'+t);if(el)el.style.display=(t===tab)?'flex':'none';});
     this.setState({tab});
     setTimeout(()=>{ if(tab==='status'&&this.sMap)this.sMap.invalidateSize(); if(tab==='tones'&&this.tMap)this.tMap.invalidateSize(); },80);
+    if(tab==='roads'){
+      // roads.js is lazy-loaded the first time the tab opens (cached by the service worker afterwards)
+      const go=()=>{ if(window.__cgRoads) window.__cgRoads.show(); };
+      if(window.__cgRoads) go();
+      else { const s=document.createElement('script'); s.src='./roads.js'; s.onload=go;
+        s.onerror=()=>{ const r=document.getElementById('roads-root'); if(r) r.innerHTML='<div style="padding:24px;font:500 13px \'Helvetica Neue\';color:#9AA3AE">Could not load the Roads map. Open the app once while online, then try again.</div>'; };
+        document.head.appendChild(s); }
+    }
   }
 
   renderVals(){
@@ -856,6 +875,7 @@ class Component extends DCLogic {
         xbList:[],xbHas:false,srcList:[],
         coopChips:[],coopList:[],coopHas:false,coopNone:false,coopIntro:'',cu:{code:'',name:'',zoneLabel:''},
         tabStatus:()=>{},tabCh:()=>{},tabTone:()=>{},tabCoop:()=>{},locate:()=>{},goChannels:()=>{},
+        tabRoads:()=>{},tabRoadsColor:dim,
         tabStatusColor:'var(--blue)',tabChColor:dim,tabToneColor:dim,tabCoopColor:dim};
     }
 
@@ -1053,6 +1073,7 @@ class Component extends DCLogic {
       tabChColor:tc('channels')?'var(--blue)':dim,
       tabToneColor:tc('tones')?'var(--blue)':dim,
       tabCoopColor:tc('coop')?'var(--blue)':dim,
+      tabRoads:()=>this._show('roads'),tabRoadsColor:tc('roads')?'var(--blue)':dim,
     };
   }
 }

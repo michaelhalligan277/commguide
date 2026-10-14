@@ -10,6 +10,7 @@ Live at https://commguide.netlify.app — Netlify publishes this repository auto
 - `dc-runtime.js`, `leaflet.js`, fonts, map marker images — app/runtime assets.
 - `incident-core.js`, `incident.js` — Incident (ICS-205 / ICS-204) photo import: validation logic and the scan/review/division screens. Opened from the map menu.
 - `vendor/ocr/` — Tesseract.js reader (about 11 MB), cached separately on the phone (`cg-ocr-v1`) so app updates don't re-download it.
+- `roads.js` — Roads tab (lazy-loaded): USFS forest roads, one colour per road, crew slang names / condition / notes. See below.
 - `sw.js` — service worker (offline launch + map tile cache).
 - `manifest.json`, `icon-192.png`, `icon-512.png` — home-screen install.
 - `netlify.toml`, `_headers` — Netlify settings (no post-processing; `sw.js` and `index.html` never cached).
@@ -35,3 +36,10 @@ checks tones/bands/known channels, and never changes a frequency by itself (sugg
 - Storage: `cg_incident_v1` = `{meta, rows (205), divs:[…], savedAt}`; zones live in `cg_overrides_v1.ADDZ.HOME`.
 - A sheet for a different incident than the one saved asks before replacing everything. IAP forms are marked CUI — confirm
   storing them on a personal phone is allowed.
+
+## Roads tab
+Live USFS National Forest System Roads (EDW_RoadBasic_01, layer 0) drawn on the map at zoom 11+. Each road gets its own stable colour
+(or one you pick). Tap a road to set **slang name(s)**, **condition** (good / rough / 4WD / snow / washout / gated), a note, colour and a ★ crew-road flag.
+- Road geometry and official attributes are never typed in — they come from the USFS service and are cached per 0.05° cell in IndexedDB (`cg_roads_db`). **Save area offline** pre-fetches what's on screen.
+- Crew edits live in `localStorage` `cg_roads_v1`, keyed by USFS road ID, on that phone only. **Export** shares a JSON file; **Import** merges it (newest edit per road wins).
+- `sw.js` deliberately does not cache `apps.fs.usda.gov` requests (roads.js manages its own cache).
