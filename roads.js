@@ -34,6 +34,64 @@
 
   // Display form of a USFS road number: drop leading zeros ("05N03" -> "5N03"). The stored key stays the official ID.
   function fmtId(id){ return (id||'').toString().replace(/^0+(?=\d)/,''); }
+  // ---------- battalion boundary (user-supplied GPX -> battalion.js, ring of [lng,lat]) ----------
+  var BATT=null, battFailed=false, BB=null;   // BB = ring bbox [minx,miny,maxx,maxy]
+  var battOn=true; try{ battOn=localStorage.getItem('cg_roads_batt')!=='0'; }catch(e){}
+  function battActive(){ return battOn && !!BATT; }
+  function pip(x,y){ var r=BATT, c=false; for(var i=0,j=r.length-1;i<r.length;j=i++){ var xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1]; if(((yi>y)!==(yj>y)) && (x<(xj-xi)*(y-yi)/(yj-yi)+xi)) c=!c; } return c; }
+  function segX(ax,ay,bx,by,cx,cy,dx,dy){   // AB x CD -> t along AB (0..1) or null
+    var rx=bx-ax, ry=by-ay, sx=dx-cx, sy=dy-cy, den=rx*sy-ry*sx; if(!den) return null;
+    var t=((cx-ax)*sy-(cy-ay)*sx)/den, u=((cx-ax)*ry-(cy-ay)*rx)/den;
+    return (t>=0&&t<=1&&u>=0&&u<=1)? t : null;
+  }
+  function edgeCross(p,q,entering){  // boundary crossing point on p->q (nearest to the inside end)
+    var best=null, r=BATT;
+    for(var i=0;i<r.length-1;i++){
+      var t=segX(p[0],p[1],q[0],q[1],r[i][0],r[i][1],r[i+1][0],r[i+1][1]);
+      if(t!==null && (best===null || (entering? t>best : t<best))) best=t;
+    }
+    if(best===null) return entering? q : p;
+    return [p[0]+(q[0]-p[0])*best, p[1]+(q[1]-p[1])*best];
+  }
+  function clipPaths(paths){                  // keep only the parts of each path inside the boundary
+    var out=[];
+    for(var a=0;a<paths.length;a++){
+      var path=paths[a], run=null, prevIn=false, prev=null;
+      for(var i=0;i<path.length;i++){
+        var pt=path[i], inn=pip(pt[0],pt[1]);
+        if(inn){
+          if(!run){ run=[]; if(prev) run.push(edgeCross(prev,pt,true)); }
+          run.push(pt);
+        } else if(run){
+          run.push(edgeCross(prev,pt,false)); if(run.length>1) out.push(run); run=null;
+        }
+        prev=pt; prevIn=inn;
+      }
+      if(run && run.length>1) out.push(run);
+    }
+    return out;
+  }
+  function clipSeg(s){
+    if(!BATT){ s.pc=null; return; }
+    var x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+    for(var a=0;a<s.p.length;a++) for(var i=0;i<s.p[a].length;i++){ var pt=s.p[a][i]; if(pt[0]<x0)x0=pt[0]; if(pt[0]>x1)x1=pt[0]; if(pt[1]<y0)y0=pt[1]; if(pt[1]>y1)y1=pt[1]; }
+    if(x1<BB[0]||x0>BB[2]||y1<BB[1]||y0>BB[3]){ s.pc=[]; return; }
+    s.pc=clipPaths(s.p);
+  }
+  function pathsOf(s){
+    if(battOn && !battFailed){ if(!BATT) return []; if(!s.pc) clipSeg(s); return s.pc; }
+    return s.p;
+  }
+  function cellTouches(x0,y0,x1,y1){          // does this fetch cell overlap the boundary?
+    if(!battActive()) return true;
+    if(x1<BB[0]||x0>BB[2]||y1<BB[1]||y0>BB[3]) return false;
+    var r=BATT, i;
+    for(i=0;i<r.length;i++) if(r[i][0]>=x0&&r[i][0]<=x1&&r[i][1]>=y0&&r[i][1]<=y1) return true;
+    if(pip(x0,y0)||pip(x1,y0)||pip(x0,y1)||pip(x1,y1)) return true;
+    var cs=[[x0,y0,x1,y0],[x1,y0,x1,y1],[x1,y1,x0,y1],[x0,y1,x0,y0]];
+    for(i=0;i<r.length-1;i++) for(var k=0;k<4;k++) if(segX(cs[k][0],cs[k][1],cs[k][2],cs[k][3],r[i][0],r[i][1],r[i+1][0],r[i+1][1])!==null) return true;
+    return false;
+  }
   function esc(s){ return (''+(s==null?'':s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ---------- crew edits (localStorage) ----------
@@ -141,9 +199,10 @@
     for(var i=0;i<order.length;i++){
       var s=segs[order[i]], k=s.k;
       if(!matches(k,s)) continue;
+      var P=pathsOf(s); if(!P.length) continue;
       var lls=[]; var inView=false;
-      for(var j=0;j<s.p.length;j++){
-        var path=s.p[j], ll=[];
+      for(var j=0;j<P.length;j++){
+        var path=P[j], ll=[];
         for(var q=0;q<path.length;q++){ var y=path[q][1], x=path[q][0]; ll.push([y,x]); if(!inView&&b.contains([y,x])) inView=true; }
         lls.push(ll);
       }
@@ -172,11 +231,11 @@
   function cellsInView(){
     var b=map.getBounds(), out=[];
     var x0=Math.floor(b.getWest()/CELL), x1=Math.floor(b.getEast()/CELL), y0=Math.floor(b.getSouth()/CELL), y1=Math.floor(b.getNorth()/CELL);
-    for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++) out.push([x,y]);
+    for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++) if(cellTouches(x*CELL,y*CELL,(x+1)*CELL,(y+1)*CELL)) out.push([x,y]);
     return out;
   }
   function ingest(list){
-    for(var i=0;i<list.length;i++){ var s=list[i]; s.k=roadKey(s); segs[s.o]=s; }
+    for(var i=0;i<list.length;i++){ var s=list[i]; s.k=roadKey(s); if(BATT) clipSeg(s); segs[s.o]=s; }
   }
   function loadCell(c,force){
     var key=c[0]+':'+c[1];
@@ -224,7 +283,7 @@
     var prev=selKey; selKey=k;
     if(prev&&prev!==k) draw(); else draw();
   }
-  function segInfo(k){ var arr=[]; for(var o in segs) if(segs[o].k===k) arr.push(segs[o]); return arr; }
+  function segInfo(k){ var arr=[]; for(var o in segs) if(segs[o].k===k && pathsOf(segs[o]).length) arr.push(segs[o]); return arr; }
   function uniq(a){ var m={},o=[]; a.forEach(function(x){ if(x&&!m[x]){ m[x]=1; o.push(x); } }); return o; }
 
   function openSheet(k){
@@ -292,7 +351,7 @@
   }
   function L_bounds(arr){
     var L=window.L, b=null;
-    arr.forEach(function(s){ s.p.forEach(function(path){ path.forEach(function(pt){ var ll=L.latLng(pt[1],pt[0]); b=b?b.extend(ll):L.latLngBounds(ll,ll); }); }); });
+    arr.forEach(function(s){ pathsOf(s).forEach(function(path){ path.forEach(function(pt){ var ll=L.latLng(pt[1],pt[0]); b=b?b.extend(ll):L.latLngBounds(ll,ll); }); }); });
     return b;
   }
   function setMenuBtn(on){ var b=document.getElementById('cg-menu-btn'); if(b) b.style.display=on?'':'none'; }
@@ -345,7 +404,7 @@
       '<div id="rd-map" style="position:absolute;inset:0;z-index:0"></div>'+
       '<div style="position:absolute;left:10px;right:10px;top:10px;z-index:700;display:flex;flex-direction:column;gap:7px;pointer-events:none">'+
         '<input id="rd-q" type="search" placeholder="Search road #, name or slang" autocomplete="off" style="pointer-events:auto;width:100%;box-sizing:border-box;background:rgba(10,12,16,.9);backdrop-filter:blur(8px);border:1px solid #2A3439;border-radius:12px;padding:10px 12px;font:500 14px \'Helvetica Neue\';color:#ECEEF1">'+
-        '<div style="display:flex;gap:6px;overflow-x:auto;pointer-events:auto" class="hscroll">'+chip('rd-f','All roads')+chip('rd-loc','◎ Me')+chip('rd-dl','Save area offline')+chip('rd-ex','Export')+chip('rd-im','Import')+'</div>'+
+        '<div style="display:flex;gap:6px;overflow-x:auto;pointer-events:auto" class="hscroll">'+chip('rd-b',battOn?'\u25e7 Battalion only':'\u25eb Include outside')+chip('rd-f','All roads')+chip('rd-loc','◎ Me')+chip('rd-dl','Save area offline')+chip('rd-ex','Export')+chip('rd-im','Import')+'</div>'+
         '<div style="align-self:flex-start;background:rgba(10,12,16,.8);border:1px solid #2A3439;border-radius:10px;padding:4px 9px;font:500 10px \'Helvetica Neue\';color:#9AA3AE"><span id="rd-st">Loading…</span> · <span id="rd-cached"></span></div>'+
       '</div>'+
       '<div id="rd-toast" style="position:absolute;left:50%;transform:translateX(-50%);top:118px;z-index:900;background:rgba(10,12,16,.94);border:1px solid #2A3439;border-radius:14px;padding:7px 13px;font:600 11px \'Helvetica Neue\';color:#ECEEF1;opacity:0;transition:opacity .25s;pointer-events:none;max-width:86%;text-align:center"></div>'+
@@ -364,7 +423,17 @@
     map.on('click',function(){ if(selKey) closeSheet(); });
     root.querySelector('#rd-q').oninput=function(){ query=this.value.trim().toLowerCase(); draw(); };
     root.querySelector('#rd-f').onclick=function(){ filterMode=filterMode==='all'?'crew':'all'; this.textContent=filterMode==='all'?'All roads':'★ Crew roads only'; draw(); };
+    root.querySelector('#rd-b').onclick=function(){
+      if(battFailed){ toast('Battalion boundary file did not load'); return; }
+      battOn=!battOn; try{ localStorage.setItem('cg_roads_batt',battOn?'1':'0'); }catch(e){}
+      this.textContent=battOn?'\u25e7 Battalion only':'\u25eb Include outside';
+      if(selKey) closeSheet(); loadView(false);
+    };
     root.querySelector('#rd-loc').onclick=locate;
+    (function(){ var sc=document.createElement('script'); sc.src='./battalion.js';
+      sc.onload=function(){ initBatt(); };
+      sc.onerror=function(){ battFailed=true; toast('Battalion boundary not loaded \u2014 showing all roads'); draw(); };
+      document.head.appendChild(sc); })();
     root.querySelector('#rd-dl').onclick=downloadArea;
     root.querySelector('#rd-ex').onclick=exportEdits;
     root.querySelector('#rd-im').onclick=function(){ root.querySelector('#rd-file').click(); };
@@ -373,9 +442,21 @@
     setTimeout(function(){ map.invalidateSize(); loadView(false); },60);
   }
 
+  function initBatt(){
+    var b=window.CG_BATT; if(!b||!b.ring||b.ring.length<4){ battFailed=true; draw(); return; }
+    BATT=b.ring; BB=[1e9,1e9,-1e9,-1e9];
+    BATT.forEach(function(pt){ if(pt[0]<BB[0])BB[0]=pt[0]; if(pt[0]>BB[2])BB[2]=pt[0]; if(pt[1]<BB[1])BB[1]=pt[1]; if(pt[1]>BB[3])BB[3]=pt[1]; });
+    Object.keys(segs).forEach(function(o){ clipSeg(segs[o]); });
+    if(map){
+      window.L.polyline(BATT.map(function(pt){ return [pt[1],pt[0]]; }),{renderer:renderer,color:'#ECEEF1',weight:2,opacity:0.75,dashArray:'7 6',interactive:false}).addTo(map);
+    }
+    loadView(false);
+  }
+
   window.__cgRoads={
     show:function(){ if(!built) build(); else setTimeout(function(){ map.invalidateSize(); loadView(false); },60); },
     _map:function(){ return map; },
+    _segs:function(){ return segs; },
     _debug:function(){ return {segs:Object.keys(segs).length, edits:store.edits}; }
   };
   // if the tab was already opened while this file was loading
