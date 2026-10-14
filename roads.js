@@ -533,26 +533,35 @@
   }
   var GATE_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#46C9B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5M20 21V5"></path><path d="M4 9h16M4 15h16M4 9l16 6"></path></svg>';
   var PIN_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#46C9B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10a6 6 0 1 1 12 0c0 4.4-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>';
+  function svgOf(c,p){ return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
+  var KINDS={
+    gate:{label:'GATE',color:'#46C9B4',svg:GATE_SVG,src:'Gaia GPS waypoint'},
+    hydrant:{label:'WATER \u00b7 HYDRANT',color:'#4C8DFF',svg:svgOf('#4C8DFF','<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"></path>'),src:'Gaia GPS waypoint'},
+    camp:{label:'CAMP',color:'#7FD36B',svg:svgOf('#7FD36B','<path d="M3 20L12 4l9 16H3z"></path><path d="M12 4v16M9 20l3-6 3 6"></path>'),src:'Gaia GPS waypoint'}
+  };
+  function kindOf(pt){ return KINDS[pt.kind]||{label:'MAP POINT',color:'#46C9B4',svg:PIN_SVG}; }
   function drawPoints(){
     var L=window.L;
     allPoints().forEach(function(pt){
       if(!pt.at) return;
+      var K=kindOf(pt);
       var m=L.marker([pt.at[1],pt.at[0]],{interactive:true,keyboard:false,icon:L.divIcon({className:'',iconSize:[0,0],
         html:'<div style="position:relative;pointer-events:auto;cursor:pointer">'+
-          '<div style="position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;background:rgba(10,12,16,.95);border:2px solid #46C9B4;box-shadow:0 0 8px #46C9B488;display:flex;align-items:center;justify-content:center">'+(pt.kind==='gate'?GATE_SVG:PIN_SVG)+'</div>'+
-          '<div style="position:absolute;left:0;top:17px;transform:translateX(-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';color:#46C9B4;background:rgba(10,12,16,.92);border:1px solid #46C9B4;border-radius:8px;padding:1px 7px">'+esc(pt.name)+'</div></div>'})});
+          '<div style="position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;background:rgba(10,12,16,.95);border:2px solid '+K.color+';box-shadow:0 0 8px '+K.color+'88;display:flex;align-items:center;justify-content:center">'+K.svg+'</div>'+
+          '<div style="position:absolute;left:0;top:17px;transform:translateX(-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';color:'+K.color+';background:rgba(10,12,16,.92);border:1px solid '+K.color+';border-radius:8px;padding:1px 7px">'+esc(pt.name)+'</div></div>'})});
       m.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openPointInfo(pt); });
       pointGroup.addLayer(m);
     });
   }
   function openPointInfo(pt){
     if(selKey){ selKey=null; draw(); }
+    var K=kindOf(pt);
     var sheet=ui.sheet; sheet.style.display='flex'; setMenuBtn(false);
     var ft=pt.ele!=null&&pt.ele!==''? Math.round(pt.ele*3.28084).toLocaleString()+' ft (from GPX)' : '';
     sheet.innerHTML=
       '<div style="display:flex;align-items:flex-start;gap:10px">'+
-        '<div style="width:12px;height:38px;border-radius:6px;background:#46C9B4;flex-shrink:0;box-shadow:0 0 10px #46C9B499"></div>'+
-        '<div style="flex:1;min-width:0"><div style="font:700 10px \'Helvetica Neue\';letter-spacing:.12em;color:#46C9B4">'+(pt.kind==='gate'?'GATE':'MAP POINT')+'</div>'+
+        '<div style="width:12px;height:38px;border-radius:6px;background:'+K.color+';flex-shrink:0;box-shadow:0 0 10px '+K.color+'99"></div>'+
+        '<div style="flex:1;min-width:0"><div style="font:700 10px \'Helvetica Neue\';letter-spacing:.12em;color:'+K.color+'">'+K.label+'</div>'+
         '<div style="font:700 19px/1.2 \'Helvetica Neue\';color:#ECEEF1;margin-top:3px">'+esc(pt.name)+'</div></div>'+
         '<button id="pt-x" style="background:none;border:none;color:#9AA3AE;font-size:24px;line-height:1;cursor:pointer">\u00d7</button>'+
       '</div>'+

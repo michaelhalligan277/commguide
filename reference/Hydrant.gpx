@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2026-10-14T16:37:24Z</time>
+  </metadata>
+  <wpt lat="38.215997" lon="-120.146898">
+    <ele>1459.5</ele>
+    <time>2026-10-14T16:37:24Z</time>
+    <name>Hydrant</name>
+    <sym>blue-pin-down</sym>
+  </wpt>
+</gpx>
