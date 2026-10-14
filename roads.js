@@ -487,7 +487,7 @@
   try{ var _ri=JSON.parse(localStorage.getItem(RKEY)||'null'); if(_ri&&_ri.routes) imported=_ri.routes; if(_ri&&_ri.points) importedPts=_ri.points; }catch(e){}
   function saveImported(){ try{ localStorage.setItem(RKEY,JSON.stringify({v:1,routes:imported,points:importedPts})); return true; }catch(e){ return false; } }
   function allRoutes(){
-    var b=(window.CG_ROUTES||[]).map(function(r){ return {id:r.id,name:r.name,pts:r.pts,note:r.note||'',dest:r.dest||null,src:'bundled'}; });
+    var b=(window.CG_ROUTES||[]).map(function(r){ return {id:r.id,name:r.name,pts:r.pts,note:r.note||'',dest:r.dest||null,restricted:!!r.restricted,src:'bundled'}; });
     return b.concat(imported.map(function(r){ return {id:r.id,name:r.name,pts:r.pts,src:'phone'}; }));
   }
   function allPoints(){
@@ -515,6 +515,7 @@
       allRoutes().forEach(function(r){
         if(!r.pts||r.pts.length<2) return;
         var ll=r.pts.map(function(pt){ return [pt[1],pt[0]]; });
+        if(r.restricted){ var rh=L.polyline(ll,{renderer:renderer,interactive:false,color:'#FF3DCB',weight:30,opacity:0.30,lineCap:'round',lineJoin:'round'}); routeGroup.addLayer(rh); rh.bringToBack(); }
         var glow=L.polyline(ll,{renderer:renderer,interactive:true,color:'#FFC53D',weight:18,opacity:0.30,lineCap:'round',lineJoin:'round'});
         var core=L.polyline(ll,{renderer:renderer,interactive:true,color:'#FFC53D',weight:3.5,opacity:0.95,lineCap:'round',lineJoin:'round'});
         [glow,core].forEach(function(l){ l.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openRouteInfo(r); }); routeGroup.addLayer(l); });
@@ -530,7 +531,7 @@
         }
         var mid=ll[Math.floor(ll.length/2)];
         L.marker(mid,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],
-          html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';letter-spacing:.04em;color:#1A1300;background:#FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none">★ '+esc(r.name.length>32?r.name.slice(0,31)+'…':r.name)+'</div>'})}).addTo(routeLabels);
+          html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';letter-spacing:.04em;color:#1A1300;background:#FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none">'+(r.restricted?'\u26D4 ':'★ ')+esc(r.name.length>32?r.name.slice(0,31)+'…':r.name)+'</div>'})}).addTo(routeLabels);
       });
     }
     syncRouteLabels();
@@ -591,7 +592,7 @@
     sheet.innerHTML=
       '<div style="display:flex;align-items:flex-start;gap:10px">'+
         '<div style="width:12px;height:38px;border-radius:6px;background:#FFC53D;flex-shrink:0;box-shadow:0 0 10px #FFC53D99"></div>'+
-        '<div style="flex:1;min-width:0"><div style="font:700 10px \'Helvetica Neue\';letter-spacing:.12em;color:#FFC53D">★ MAIN ROUTE</div>'+
+        '<div style="flex:1;min-width:0"><div style="font:700 10px \'Helvetica Neue\';letter-spacing:.12em;color:#FFC53D">'+(r.restricted?'\u26D4 RESTRICTED \u2013 ':'')+'★ MAIN ROUTE</div>'+
         '<div style="font:700 17px/1.2 \'Helvetica Neue\';color:#ECEEF1;margin-top:3px">'+esc(r.name)+'</div></div>'+
         '<button id="rt-x" style="background:none;border:none;color:#9AA3AE;font-size:24px;line-height:1;cursor:pointer">×</button>'+
       '</div>'+
