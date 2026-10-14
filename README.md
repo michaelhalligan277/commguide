@@ -11,6 +11,7 @@ Live at https://commguide.netlify.app — Netlify publishes this repository auto
 - `incident-core.js`, `incident.js` — Incident (ICS-205 / ICS-204) photo import: validation logic and the scan/review/division screens. Opened from the map menu.
 - `vendor/ocr/` — Tesseract.js reader (about 11 MB), cached separately on the phone (`cg-ocr-v1`) so app updates don't re-download it.
 - `roads.js` — Roads tab (lazy-loaded): USFS forest roads, one colour per road, crew slang names / condition / notes. See below.
+- `routes.js` — main routes the crew uses constantly (from `reference/*.gpx`), drawn as a gold halo beneath the roads with a ★ MAIN ROUTE label. Roads > **Import** also accepts a `.gpx` to add routes on that phone only (included in Export).
 - `battalion.js` — battalion boundary ring (from `reference/Battalion_Boundary.gpx`, Gaia GPS export); Roads tab clips roads to it.
 - `sw.js` — service worker (offline launch + map tile cache).
 - `manifest.json`, `icon-192.png`, `icon-512.png` — home-screen install.
@@ -45,3 +46,4 @@ Live USFS National Forest System Roads (EDW_RoadBasic_01, layer 0) drawn on the 
 - Crew edits live in `localStorage` `cg_roads_v1`, keyed by USFS road ID, on that phone only. **Export** shares a JSON file; **Import** merges it (newest edit per road wins).
 - `sw.js` deliberately does not cache `apps.fs.usda.gov` requests (roads.js manages its own cache).
 - Battalion rule (toggle **Battalion only / Include outside**): a road is shown whole, including the part past the boundary, if any part of it is inside. Roads that only branch off it outside the boundary are not shown. Only pieces connected end-to-end to the inside part count. Full lengths are fetched by road number (`x:<id>` in the same IndexedDB). The boundary is drawn as a dashed white line. To change the boundary, re-export the GPX, replace `reference/Battalion_Boundary.gpx`, and regenerate `battalion.js` (closed ring of `[lng,lat]`).
+- Tap a road for an info card (crew slang / condition / note plus USFS surface, maintenance level, status, jurisdiction, maintainer, county, length); **Edit** opens the editor. Tap a main route for its name and length.
