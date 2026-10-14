@@ -493,7 +493,7 @@
   }
   function syncRouteLabels(){
     if(!map||!routeLabels) return;
-    var on=routesOn&&map.getZoom()>=9;
+    var on=routesOn&&map.getZoom()>=11;
     if(on&&!map.hasLayer(routeLabels)) map.addLayer(routeLabels);
     if(!on&&map.hasLayer(routeLabels)) map.removeLayer(routeLabels);
   }
@@ -511,7 +511,7 @@
         glow.bringToBack(); core.bringToBack(); glow.bringToBack();
         var mid=ll[Math.floor(ll.length/2)];
         L.marker(mid,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],
-          html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';letter-spacing:.04em;color:#1A1300;background:#FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none">★ MAIN ROUTE · '+esc(r.name.length>34?r.name.slice(0,33)+'…':r.name)+'</div>'})}).addTo(routeLabels);
+          html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';letter-spacing:.04em;color:#1A1300;background:#FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none">★ '+esc(r.name.length>32?r.name.slice(0,31)+'…':r.name)+'</div>'})}).addTo(routeLabels);
       });
     }
     syncRouteLabels();
