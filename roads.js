@@ -207,7 +207,7 @@
   var segs={};            // objectid -> segment (merged across cells)
   var cellsSeen={};       // cell key -> true (loaded into memory)
   var layersByKey={};     // roadKey -> {casings:[], lines:[]}
-  var inflight=0, errMsg='', filterMode='all', query='', selKey=null, built=false, moveT=null;
+  var inflight=0, errMsg='', filterMode='all', query='', selKey=null, focusRoute=null, built=false, moveT=null;
 
   function roadKey(s){ return (s.id||('~'+s.n)||('~'+s.o)).toString().toUpperCase(); }
   function hashHue(k){ var h=0; for(var i=0;i<k.length;i++) h=(h*31+k.charCodeAt(i))>>>0; return (h*137.508)%360; }
@@ -258,12 +258,14 @@
       if(!inView) continue;
       shown++;
       var rec=layersByKey[k]||(layersByKey[k]={casings:[],lines:[]});
-      if(restricted(k)){ var rg=L.polyline(lls,{renderer:renderer,interactive:false,color:'#FF3DCB',weight:17,opacity:0.34,lineCap:'round',lineJoin:'round'}).addTo(group); rec.casings.push(rg); }
-      var cs=casingFor(k);
+      if(restricted(k)&&!((selKey&&k!==selKey)||(focusRoute&&!selKey))){ var rg=L.polyline(lls,{renderer:renderer,interactive:false,color:'#FF3DCB',weight:17,opacity:0.34,lineCap:'round',lineJoin:'round'}).addTo(group); rec.casings.push(rg); }
+      var dim=(selKey&&k!==selKey)||(focusRoute&&!selKey);
+      var cs=dim?null:casingFor(k);
       if(cs){ var c=L.polyline(lls,Object.assign({renderer:renderer,interactive:false},cs)).addTo(group); rec.casings.push(c); }
-      var ln=L.polyline(lls,Object.assign({renderer:renderer,interactive:true},styleFor(k))).addTo(group);
+      var st=styleFor(k); if(dim){ st.opacity=0.14; st.weight=2; }
+      var ln=L.polyline(lls,Object.assign({renderer:renderer,interactive:true},st)).addTo(group);
       ln._ck=k; ln.on('click',onRoadTap); rec.lines.push(ln);
-      if(z>=LABEL_ZOOM && !labeled[k] && nLabels<70){
+      if(z>=LABEL_ZOOM && !labeled[k] && nLabels<70 && !dim){
         var mid=lls[0][Math.floor(lls[0].length/2)]; if(!mid||!b.contains(mid)) continue;
         labeled[k]=1; nLabels++;
         var e=edit(k), txt=(e&&e.slang)? e.slang.split(',')[0].trim() : (fmtId(s.id)||s.n);
@@ -273,7 +275,16 @@
         }
       }
     }
+    applyDim();
     setStatus(shown? (shown+' road segments'+(inflight?' · loading…':'')) : (inflight?'Loading roads…':(errMsg||'No roads in view')));
+  }
+  function applyDim(){
+    if(!routeGroup) return;
+    routeGroup.eachLayer(function(l){
+      if(!l.setStyle||l._bo==null) return;
+      var d=!!selKey||(focusRoute&&l._rid!==focusRoute);
+      l.setStyle({opacity:d?l._bo*0.18:l._bo});
+    });
   }
   function setStatus(t){ if(ui.status) ui.status.textContent=t; }
 
@@ -355,7 +366,7 @@
     rec.lines.forEach(function(l){ l.setStyle(styleFor(k)); l.bringToFront(); });
   }
   function select(k){
-    var prev=selKey; selKey=k;
+    var prev=selKey; selKey=k; focusRoute=null;
     if(prev&&prev!==k) draw(); else draw();
   }
   function segInfo(k){ var arr=[]; for(var o in segs) if(segs[o].k===k && pathsOf(segs[o]).length) arr.push(segs[o]); return arr; }
@@ -475,7 +486,7 @@
     return b;
   }
   function setMenuBtn(on){ var b=document.getElementById('cg-menu-btn'); if(b) b.style.display=on?'':'none'; }
-  function closeSheet(){ ui.sheet.style.display='none'; ui.sheet.innerHTML=''; selKey=null; setMenuBtn(true); draw(); }
+  function closeSheet(){ ui.sheet.style.display='none'; ui.sheet.innerHTML=''; selKey=null; focusRoute=null; setMenuBtn(true); draw(); }
 
   // ---------- toolbar: search, filter, locate, area save, export/import ----------
   var toastT=null;
@@ -515,10 +526,10 @@
       allRoutes().forEach(function(r){
         if(!r.pts||r.pts.length<2) return;
         var ll=r.pts.map(function(pt){ return [pt[1],pt[0]]; });
-        if(r.restricted){ var rh=L.polyline(ll,{renderer:renderer,interactive:false,color:'#FF3DCB',weight:30,opacity:0.30,lineCap:'round',lineJoin:'round'}); routeGroup.addLayer(rh); rh.bringToBack(); }
+        if(r.restricted){ var rh=L.polyline(ll,{renderer:renderer,interactive:false,color:'#FF3DCB',weight:30,opacity:0.30,lineCap:'round',lineJoin:'round'}); rh._rid=r.id; rh._bo=rh.options.opacity; routeGroup.addLayer(rh); rh.bringToBack(); }
         var glow=L.polyline(ll,{renderer:renderer,interactive:true,color:'#FFC53D',weight:18,opacity:0.30,lineCap:'round',lineJoin:'round'});
         var core=L.polyline(ll,{renderer:renderer,interactive:true,color:'#FFC53D',weight:3.5,opacity:0.95,lineCap:'round',lineJoin:'round'});
-        [glow,core].forEach(function(l){ l.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openRouteInfo(r); }); routeGroup.addLayer(l); });
+        [glow,core].forEach(function(l){ l._rid=r.id; l._bo=l.options.opacity; l.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openRouteInfo(r); }); routeGroup.addLayer(l); });
         glow.bringToBack(); core.bringToBack(); glow.bringToBack();
         if(r.dest&&r.dest.at){
           var tower='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21l3-11M17 21l-3-11M8.5 15.5h7M9.5 10h5"></path><path d="M8 10V7.5h8V10"></path><path d="M12 7.5V4.5M9 4.5l3-1.5 3 1.5"></path></svg>';
@@ -534,7 +545,7 @@
           html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';letter-spacing:.04em;color:#1A1300;background:#FFC53D;border-radius:9px;padding:2px 8px;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none">'+(r.restricted?'\u26D4 ':'★ ')+esc(r.name.length>32?r.name.slice(0,31)+'…':r.name)+'</div>'})}).addTo(routeLabels);
       });
     }
-    syncRouteLabels();
+    syncRouteLabels(); applyDim();
   }
   var GATE_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#46C9B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5M20 21V5"></path><path d="M4 9h16M4 15h16M4 9l16 6"></path></svg>';
   var PIN_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#46C9B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10a6 6 0 1 1 12 0c0 4.4-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>';
@@ -565,7 +576,7 @@
     });
   }
   function openPointInfo(pt){
-    if(selKey){ selKey=null; draw(); }
+    if(selKey||focusRoute){ selKey=null; focusRoute=null; draw(); }
     var K=kindOf(pt);
     var sheet=ui.sheet; sheet.style.display='flex'; setMenuBtn(false);
     var ft=pt.ele!=null&&pt.ele!==''? Math.round(pt.ele*3.28084).toLocaleString()+' ft (from GPX)' : '';
@@ -586,7 +597,7 @@
     var d=sheet.querySelector('#pt-del'); if(d) d.onclick=function(){ if(confirm('Remove "'+pt.name+'" from this phone?')){ importedPts=importedPts.filter(function(x){ return x.id!==pt.id; }); saveImported(); drawRoutes(); closeSheet(); toast('Removed'); } };
   }
   function openRouteInfo(r){
-    if(selKey) { selKey=null; draw(); }
+    selKey=null; focusRoute=r.id; draw();
     var sheet=ui.sheet; sheet.style.display='flex'; setMenuBtn(false);
     var mi=routeMiles(r.pts);
     sheet.innerHTML=
