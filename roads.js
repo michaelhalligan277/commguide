@@ -32,6 +32,8 @@
 
   var SWATCHES=['#FF5C5C','#FF9A3D','#FFD23F','#8BE04E','#2ED3A0','#2EC8F0','#4C8DFF','#9B7BFF','#E36BFF','#FF6BB5','#C9A27A','#E8EDF2'];
 
+  // Display form of a USFS road number: drop leading zeros ("05N03" -> "5N03"). The stored key stays the official ID.
+  function fmtId(id){ return (id||'').toString().replace(/^0+(?=\d)/,''); }
   function esc(s){ return (''+(s==null?'':s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ---------- crew edits (localStorage) ----------
@@ -126,7 +128,7 @@
   function matches(k,s){
     if(filterMode==='crew' && !isCrew(k)) return false;
     if(!query) return true;
-    var e=edit(k), hay=(k+' '+(s.n||'')+' '+(e&&e.slang||'')+' '+(e&&e.note||'')).toLowerCase();
+    var e=edit(k), hay=(k+' '+fmtId(k)+' '+(s.n||'')+' '+(e&&e.slang||'')+' '+(e&&e.note||'')).toLowerCase();
     return hay.indexOf(query)>=0;
   }
   function draw(){
@@ -155,7 +157,7 @@
       if(z>=LABEL_ZOOM && !labeled[k] && nLabels<70){
         var mid=lls[0][Math.floor(lls[0].length/2)]; if(!mid||!b.contains(mid)) continue;
         labeled[k]=1; nLabels++;
-        var e=edit(k), txt=(e&&e.slang)? e.slang.split(',')[0].trim() : (s.id||s.n);
+        var e=edit(k), txt=(e&&e.slang)? e.slang.split(',')[0].trim() : (fmtId(s.id)||s.n);
         if(txt){
           L.marker(mid,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],
             html:'<div style="transform:translate(-50%,-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';color:#fff;background:rgba(10,12,16,.78);border:1px solid '+colorOf(k)+';border-radius:8px;padding:1px 5px;pointer-events:none">'+esc(txt)+'</div>'})}).addTo(labelGroup);
@@ -240,7 +242,7 @@
     sheet.innerHTML=
       '<div style="display:flex;align-items:flex-start;gap:10px">'+
         '<div style="width:12px;height:36px;border-radius:6px;background:'+curCol+';flex-shrink:0" id="rd-sw"></div>'+
-        '<div style="flex:1;min-width:0"><div style="font:700 17px/1.15 \'Helvetica Neue\';color:#ECEEF1">'+esc(t.id||'Unnumbered road')+'</div>'+
+        '<div style="flex:1;min-width:0"><div style="font:700 17px/1.15 \'Helvetica Neue\';color:#ECEEF1">'+esc(fmtId(t.id)||'Unnumbered road')+'</div>'+
         '<div style="font:500 12px \'Helvetica Neue\';color:#9AA3AE;margin-top:2px">'+esc(t.name||'(no USFS name)')+'</div></div>'+
         '<button id="rd-star" style="background:none;border:none;font-size:24px;line-height:1;cursor:pointer;color:'+(e.star?'#FFD23F':'#56606B')+'">'+(e.star?'★':'☆')+'</button>'+
         '<button id="rd-x" style="background:none;border:none;color:#9AA3AE;font-size:24px;line-height:1;cursor:pointer">×</button>'+
@@ -285,7 +287,7 @@
       else toast('Saved on this phone');
       closeSheet();
     };
-    sheet.querySelector('#rd-reset').onclick=function(){ if(confirm('Clear all crew edits for '+(t.id||'this road')+'?')){ delete store.edits[k]; saveStore(); toast('Cleared'); closeSheet(); } };
+    sheet.querySelector('#rd-reset').onclick=function(){ if(confirm('Clear all crew edits for '+(fmtId(t.id)||'this road')+'?')){ delete store.edits[k]; saveStore(); toast('Cleared'); closeSheet(); } };
     map.fitBounds(L_bounds(arr),{padding:[40,40],maxZoom:14,paddingBottomRight:[40,300]});
   }
   function L_bounds(arr){
