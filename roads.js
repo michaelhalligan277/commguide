@@ -478,13 +478,17 @@
   function toast(t){ ui.toast.textContent=t; ui.toast.style.opacity='1'; clearTimeout(toastT); toastT=setTimeout(function(){ ui.toast.style.opacity='0'; },2600); }
 
   // ---------- main routes: bundled (routes.js) + added on this phone from GPX ----------
-  var RKEY='cg_routes_v1', routesOn=true, routeGroup=null, routeLabels=null, imported=[];
+  var RKEY='cg_routes_v1', routesOn=true, routeGroup=null, routeLabels=null, pointGroup=null, imported=[], importedPts=[];
   try{ routesOn=localStorage.getItem('cg_routes_on')!=='0'; }catch(e){}
-  try{ var _ri=JSON.parse(localStorage.getItem(RKEY)||'null'); if(_ri&&_ri.routes) imported=_ri.routes; }catch(e){}
-  function saveImported(){ try{ localStorage.setItem(RKEY,JSON.stringify({v:1,routes:imported})); return true; }catch(e){ return false; } }
+  try{ var _ri=JSON.parse(localStorage.getItem(RKEY)||'null'); if(_ri&&_ri.routes) imported=_ri.routes; if(_ri&&_ri.points) importedPts=_ri.points; }catch(e){}
+  function saveImported(){ try{ localStorage.setItem(RKEY,JSON.stringify({v:1,routes:imported,points:importedPts})); return true; }catch(e){ return false; } }
   function allRoutes(){
     var b=(window.CG_ROUTES||[]).map(function(r){ return {id:r.id,name:r.name,pts:r.pts,note:r.note||'',dest:r.dest||null,src:'bundled'}; });
     return b.concat(imported.map(function(r){ return {id:r.id,name:r.name,pts:r.pts,src:'phone'}; }));
+  }
+  function allPoints(){
+    var b=(window.CG_POINTS||[]).map(function(p){ return {id:p.id,name:p.name,kind:p.kind||'point',at:p.at,ele:p.ele,note:p.note||'',src:'bundled'}; });
+    return b.concat(importedPts.map(function(p){ return {id:p.id,name:p.name,kind:p.kind||'point',at:p.at,ele:p.ele,note:p.note||'',src:'phone'}; }));
   }
   function routeMiles(pts){
     var R=3958.8,pp=Math.PI/180,m=0;
@@ -496,12 +500,14 @@
     var on=routesOn&&map.getZoom()>=11;
     if(on&&!map.hasLayer(routeLabels)) map.addLayer(routeLabels);
     if(!on&&map.hasLayer(routeLabels)) map.removeLayer(routeLabels);
+    if(pointGroup){ var pon=routesOn&&map.getZoom()>=11; if(pon&&!map.hasLayer(pointGroup)) map.addLayer(pointGroup); if(!pon&&map.hasLayer(pointGroup)) map.removeLayer(pointGroup); }
   }
   function drawRoutes(){
     if(!map||!routeGroup) return;
-    routeGroup.clearLayers(); routeLabels.clearLayers();
+    routeGroup.clearLayers(); routeLabels.clearLayers(); pointGroup.clearLayers();
     if(routesOn){
       var L=window.L;
+      drawPoints();
       allRoutes().forEach(function(r){
         if(!r.pts||r.pts.length<2) return;
         var ll=r.pts.map(function(pt){ return [pt[1],pt[0]]; });
@@ -524,6 +530,40 @@
       });
     }
     syncRouteLabels();
+  }
+  var GATE_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#46C9B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5M20 21V5"></path><path d="M4 9h16M4 15h16M4 9l16 6"></path></svg>';
+  var PIN_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#46C9B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10a6 6 0 1 1 12 0c0 4.4-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>';
+  function drawPoints(){
+    var L=window.L;
+    allPoints().forEach(function(pt){
+      if(!pt.at) return;
+      var m=L.marker([pt.at[1],pt.at[0]],{interactive:true,keyboard:false,icon:L.divIcon({className:'',iconSize:[0,0],
+        html:'<div style="position:relative;pointer-events:auto;cursor:pointer">'+
+          '<div style="position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;background:rgba(10,12,16,.95);border:2px solid #46C9B4;box-shadow:0 0 8px #46C9B488;display:flex;align-items:center;justify-content:center">'+(pt.kind==='gate'?GATE_SVG:PIN_SVG)+'</div>'+
+          '<div style="position:absolute;left:0;top:17px;transform:translateX(-50%);white-space:nowrap;font:700 10px \'Helvetica Neue\';color:#46C9B4;background:rgba(10,12,16,.92);border:1px solid #46C9B4;border-radius:8px;padding:1px 7px">'+esc(pt.name)+'</div></div>'})});
+      m.on('click',function(ev){ try{ L.DomEvent.stopPropagation(ev); }catch(e){} openPointInfo(pt); });
+      pointGroup.addLayer(m);
+    });
+  }
+  function openPointInfo(pt){
+    if(selKey){ selKey=null; draw(); }
+    var sheet=ui.sheet; sheet.style.display='flex'; setMenuBtn(false);
+    var ft=pt.ele!=null&&pt.ele!==''? Math.round(pt.ele*3.28084).toLocaleString()+' ft (from GPX)' : '';
+    sheet.innerHTML=
+      '<div style="display:flex;align-items:flex-start;gap:10px">'+
+        '<div style="width:12px;height:38px;border-radius:6px;background:#46C9B4;flex-shrink:0;box-shadow:0 0 10px #46C9B499"></div>'+
+        '<div style="flex:1;min-width:0"><div style="font:700 10px \'Helvetica Neue\';letter-spacing:.12em;color:#46C9B4">'+(pt.kind==='gate'?'GATE':'MAP POINT')+'</div>'+
+        '<div style="font:700 19px/1.2 \'Helvetica Neue\';color:#ECEEF1;margin-top:3px">'+esc(pt.name)+'</div></div>'+
+        '<button id="pt-x" style="background:none;border:none;color:#9AA3AE;font-size:24px;line-height:1;cursor:pointer">\u00d7</button>'+
+      '</div>'+
+      '<div style="margin-top:10px">'+infoRow('Note',pt.note||'')+infoRow('Elevation',ft)+infoRow('Coordinates',pt.at[1].toFixed(5)+', '+pt.at[0].toFixed(5))+infoRow('Source',pt.src==='bundled'?'Built into Comm Guide (Gaia GPS waypoint)':'Added on this phone from a GPX file')+'</div>'+
+      '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'+
+        (pt.src==='phone'?'<button id="pt-del" style="background:#14181C;border:1px solid #2A3439;border-radius:16px;padding:8px 14px;font:600 12px \'Helvetica Neue\';color:#E5484D;cursor:pointer">Remove</button>':'')+
+        '<button id="pt-fit" style="background:#4C8DFF;border:none;border-radius:16px;padding:9px 20px;font:700 12px \'Helvetica Neue\';color:#fff;cursor:pointer">Zoom to</button>'+
+      '</div>';
+    sheet.querySelector('#pt-x').onclick=closeSheet;
+    sheet.querySelector('#pt-fit').onclick=function(){ map.setView([pt.at[1],pt.at[0]],15); };
+    var d=sheet.querySelector('#pt-del'); if(d) d.onclick=function(){ if(confirm('Remove "'+pt.name+'" from this phone?')){ importedPts=importedPts.filter(function(x){ return x.id!==pt.id; }); saveImported(); drawRoutes(); closeSheet(); toast('Removed'); } };
   }
   function openRouteInfo(r){
     if(selKey) { selKey=null; draw(); }
@@ -557,25 +597,31 @@
         for(i=0;i<trks.length;i++) made.push({name:nm(trks[i],file.name.replace(/\.gpx$/i,'')),pts:grab(trks[i].getElementsByTagName('trkpt'))});
         if(!made.length){ var rtes=doc.getElementsByTagName('rte'); for(i=0;i<rtes.length;i++) made.push({name:nm(rtes[i],file.name.replace(/\.gpx$/i,'')),pts:grab(rtes[i].getElementsByTagName('rtept'))}); }
         made=made.filter(function(r){ return r.pts.length>1; });
-        if(!made.length){ toast('No track or route found in that GPX'); return; }
+        var wpts=doc.getElementsByTagName('wpt'), madePts=[];
+        for(i=0;i<wpts.length;i++){ var wl=parseFloat(wpts[i].getAttribute('lat')), wo=parseFloat(wpts[i].getAttribute('lon')); if(!isFinite(wl)||!isFinite(wo)) continue;
+          var ee=wpts[i].getElementsByTagName('ele')[0]; madePts.push({id:'p'+Date.now().toString(36)+i,name:nm(wpts[i],'Point'),kind:'point',at:[+wo.toFixed(6),+wl.toFixed(6)],ele:ee?parseFloat(ee.textContent):null}); }
+        if(!made.length&&!madePts.length){ toast('No track, route or waypoint found in that GPX'); return; }
+        madePts.forEach(function(pt){ importedPts=importedPts.filter(function(x){ return x.name!==pt.name; }); importedPts.push(pt); });
         made.forEach(function(r,n){
           if(r.pts.length>6000){ var step=Math.ceil(r.pts.length/6000); r.pts=r.pts.filter(function(_,x){ return x%step===0||x===r.pts.length-1; }); }
           r.id='u'+Date.now().toString(36)+n; r.name=nice(r.name)||r.name;
           imported=imported.filter(function(x){ return x.name!==r.name; }); imported.push(r);
         });
         if(!saveImported()){ toast('Could not save — phone storage is full or blocked'); return; }
+        var addedTxt=[made.length?made.length+' main route'+(made.length===1?'':'s'):'',madePts.length?madePts.length+' point'+(madePts.length===1?'':'s'):''].filter(Boolean).join(' + ');
         if(!routesOn){ routesOn=true; try{ localStorage.setItem('cg_routes_on','1'); }catch(e){} var c=root.querySelector('#rd-r'); if(c) c.textContent='★ Main routes'; }
         drawRoutes();
-        map.fitBounds(window.L.latLngBounds(made[0].pts.map(function(pt){ return [pt[1],pt[0]]; })),{padding:[30,30]});
-        toast('Added '+made.length+' main route'+(made.length===1?'':'s')+' on this phone');
+        var fitPts=made.length? made[0].pts : madePts.map(function(pt){ return pt.at; });
+        if(fitPts.length>1) map.fitBounds(window.L.latLngBounds(fitPts.map(function(pt){ return [pt[1],pt[0]]; })),{padding:[30,30]}); else map.setView([fitPts[0][1],fitPts[0][0]],14);
+        toast('Added '+addedTxt+' on this phone');
       }catch(e){ toast('Couldn’t read that GPX file'); }
     };
     fr.readAsText(file);
   }
 
   function exportEdits(){
-    var n=Object.keys(store.edits).length, txt=JSON.stringify({v:1,edits:store.edits,routes:imported},null,1);
-    if(!n&&!imported.length){ toast('Nothing to export yet'); return; }
+    var n=Object.keys(store.edits).length, txt=JSON.stringify({v:1,edits:store.edits,routes:imported,points:importedPts},null,1);
+    if(!n&&!imported.length&&!importedPts.length){ toast('Nothing to export yet'); return; }
     var name='commguide-roads-'+new Date().toISOString().slice(0,10)+'.json';
     try{
       var file=new File([txt],name,{type:'application/json'});
@@ -588,10 +634,11 @@
     var fr=new FileReader();
     fr.onload=function(){
       try{
-        var o=JSON.parse(fr.result); if(!o||(!o.edits&&!o.routes)) throw 0;
+        var o=JSON.parse(fr.result); if(!o||(!o.edits&&!o.routes&&!o.points)) throw 0;
         var n=0, kept=0;
         (o.routes||[]).forEach(function(r){ if(r&&r.pts&&r.name&&!imported.some(function(x){ return x.id===r.id||x.name===r.name; })){ imported.push({id:r.id||('u'+Date.now().toString(36)+imported.length),name:r.name,pts:r.pts}); n++; } });
-        if((o.routes||[]).length){ saveImported(); drawRoutes(); }
+        (o.points||[]).forEach(function(pt){ if(pt&&pt.at&&pt.name&&!importedPts.some(function(x){ return x.id===pt.id||x.name===pt.name; })){ importedPts.push({id:pt.id||('p'+Date.now().toString(36)+importedPts.length),name:pt.name,kind:pt.kind||'point',at:pt.at,ele:pt.ele,note:pt.note||''}); n++; } });
+        if((o.routes||[]).length||(o.points||[]).length){ saveImported(); drawRoutes(); }
         Object.keys(o.edits||{}).forEach(function(k){ var inc=o.edits[k], cur=store.edits[k];
           if(!cur||(inc.ts||0)>(cur.ts||0)){ store.edits[k]=inc; n++; } else kept++; });
         saveStore(); draw();
@@ -632,7 +679,7 @@
     else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
     map.attributionControl.addAttribution('Roads: USDA Forest Service');
     renderer=L.canvas({padding:0.3,tolerance:10});
-    routeGroup=L.layerGroup().addTo(map); routeLabels=L.layerGroup().addTo(map);
+    routeGroup=L.layerGroup().addTo(map); routeLabels=L.layerGroup().addTo(map); pointGroup=L.layerGroup().addTo(map);
     group=L.layerGroup().addTo(map); labelGroup=L.layerGroup().addTo(map);
     map.on('zoomend',syncRouteLabels);
     map.on('moveend',function(){ clearTimeout(moveT); moveT=setTimeout(function(){ loadView(false); },250); });
@@ -681,6 +728,7 @@
     _map:function(){ return map; },
     _segs:function(){ return segs; },
     _routes:function(){ return allRoutes(); },
+    _points:function(){ return allPoints(); },
     _routeLayers:function(){ return routeGroup? routeGroup.getLayers().length : -1; },
     _incl:function(){ if(inclDirty) computeIncl(); return incl; },
     _debug:function(){ return {segs:Object.keys(segs).length, edits:store.edits}; }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <time>2026-10-07T17:42:01Z</time>
+  </metadata>
+  <wpt lat="38.238043" lon="-120.241512">
+    <ele>1576.8</ele>
+    <time>2026-10-07T17:42:01Z</time>
+    <name>Gate 7</name>
+    <sym>green-pin</sym>
+  </wpt>
+</gpx>
