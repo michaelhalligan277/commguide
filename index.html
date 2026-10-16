@@ -388,6 +388,12 @@
                 </sc-for>
               </div>
             </div>
+            <div style="padding:9px 13px;border-top:1px solid var(--bd);display:{{ a.engDisplay }}">
+              <div style="font:600 9px/1 'Helvetica Neue';letter-spacing:.1em;color:var(--amber)">ENGINES &amp; EQUIPMENT</div>
+              <sc-for list="{{ a.eng }}" as="e" hint-placeholder-count="2">
+                <div style="font-size:12px;line-height:1.45;color:var(--tx);margin-top:6px">{{ e.t }}</div>
+              </sc-for>
+            </div>
             <div style="padding:9px 13px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5;color:var(--dim);display:{{ a.noteDisplay }}">{{ a.note }}</div>
           </div>
         </sc-for>
@@ -974,7 +980,13 @@ class Component extends DCLogic {
     const coopList=(_cd?_cd.agencies:[]).map(a=>{
       const meta=[a.callsign?('call "'+a.callsign+'"'):'',a.chans].filter(Boolean).join(' · ');
       const has=(a.we&&a.we.length)||(a.they&&a.they.length);
+      // engine numbers come from the same STATIONS records the map toggle uses
+      const eng=(a.stns||[]).map(n=>{
+        const s=(D.STATIONS||[]).find(x=>x.name===n);
+        return (s&&s.equip&&s.equip!=='—')?{t:s.name+' — '+s.equip}:null;
+      }).filter(Boolean);
       return {name:a.name,tag:a.tag,color:_ctag(a.tag),
+        eng,engDisplay:eng.length?'block':'none',
         meta,metaDisplay:meta?'block':'none',
         giveDisplay:has?'flex':'none',
         we:(a.we||[]).map(t=>({t})),they:(a.they||[]).map(t=>({t})),
@@ -1870,12 +1882,12 @@ class Component extends DCLogic {
      ]}},
    '5':{name:'Twain Harte',chief:'Bill Barteau',acres:'147,547',counties:'N Tuolumne',elev:'550-5,100 ft',
      stations:['Standard - 2 engines: 4475, 4485 (western half, E of Sonora)','Twain Harte - HQ, 2 engines: 4455, 4465 (eastern half)'],
-     coop:'Joint ops w/ Jamestown, Columbia FD, Columbia College FD; TCFD portion within boundary',
+     coop:'Joint ops w/ Jamestown (Sta 76: E761, E766, WT768), Columbia FD (Sta 79: E791, BS795, E796), Columbia College FD; TCFD portion within boundary (station engines in Coop tab)',
      comm:'Sonora, Standard, Twain Harte, Mi-Wuk Village, Long Barn, Tuolumne, Columbia',
      fire:'~2/3 VHFHSZ (N, E, S). Hwy 108 corridor.'},
    '6':{name:'Groveland',chief:'Matt Harrison',acres:'258,910',counties:'SW Tuolumne / E Stanislaus',elev:'250-4,000+ ft',
      stations:['Groveland - HQ, 2 engines: 4466, 4476 (upper E third)','Blanchard - 1 engine: 4456 (S & W third; Amador-staffed in winter)','Green Springs - 1 engine: 4486 (N & W third)'],
-     coop:'Groveland CSD; Amador agreement w/ Tuolumne County',
+     coop:'Groveland CSD (Sta 78: E781, E631); Amador agreement w/ Tuolumne County',
      comm:'Groveland, Big Oak Flat, Pine Mountain Lake, Coulterville',
      fire:'~2/3 VHFHSZ (E of J59). 2nd-largest battalion; only LRA-to-FRA span.'}
   };
