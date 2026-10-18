@@ -196,13 +196,33 @@
     return cur.length > best.length ? cur : best;
   }
   // ICS-204: the communications table (9 cells across) and the resource table (7 or 8 across) above it.
+  // A region the ruling does not enclose (printed text touching the lines): build a cell for it from two edge lines.
+  function quadCell(w, h, xa, xb, ytA, ytB, ybA, ybB) {
+    xa = Math.max(0, Math.round(xa)); xb = Math.min(w - 1, Math.round(xb));
+    var ww = xb - xa + 1, k, top = new Int16Array(ww), bot = new Int16Array(ww), y0 = h, y1 = 0;
+    for (k = 0; k < ww; k++) {
+      var f = ww > 1 ? k / (ww - 1) : 0; top[k] = Math.max(0, Math.round(ytA + (ytB - ytA) * f)); bot[k] = Math.min(h - 1, Math.round(ybA + (ybB - ybA) * f));
+      if (top[k] < y0) y0 = top[k]; if (bot[k] > y1) y1 = bot[k];
+    }
+    var hh = y1 - y0 + 1, sl = new Int16Array(hh), sr = new Int16Array(hh); for (k = 0; k < hh; k++) { sl[k] = xa; sr[k] = xb; }
+    return { id: -2, area: ww * hh, x0: xa, x1: xb, y0: y0, y1: y1, cy: (y0 + y1) / 2, sl: sl, sr: sr, st: top, sb: bot, synth: true };
+  }
   function find204c(bin, w, h) { return find204g(bin, w, h, 1) || find204g(bin, w, h, 2); }
   function find204g(bin, w, h, g) {
     var cells = labelCells(bin, w, h, g), rows = chainRows(cells);
     var comm = contiguous(sameWidth(rows.filter(function (r) { return r.length === 9; })));
     if (comm.length < 2) return null;
-    var top = comm[0], cand = rows.filter(function (r) { return (r.length === 8 || r.length === 7) && r.cy < top.cy - 20; });
-    var n8 = cand.filter(function (r) { return r.length === 8; }).length, n7 = cand.length - n8, len = n8 >= n7 ? 8 : 7;
+    var top = comm[0], cand = rows.filter(function (r) { return (r.length >= 6 && r.length <= 8) && r.cy < top.cy - 20; });
+    var n8 = cand.filter(function (r) { return r.length === 8; }).length, n7 = cand.filter(function (r) { return r.length === 7; }).length, len = n8 >= n7 ? 8 : 7;
+    // rows whose first (identifier) cell is not enclosed — the ruling or the printed text leaks it into the margin — get one made up
+    var full = cand.filter(function (r) { return r.length === len; }), idw = full.length ? full.map(function (r) { return r[0].x1 - r[0].x0; }).sort(function (a, b) { return a - b; })[full.length >> 1] : 0;
+    if (idw) cand.forEach(function (r) {
+      if (r.length !== len - 1) return;
+      var f = r[0], x1 = f.x0 - 4, x0 = Math.max(0, x1 - idw), hh = f.y1 - f.y0 + 1, ww = x1 - x0 + 1, k;
+      var sl = new Int16Array(hh), sr = new Int16Array(hh), st = new Int16Array(ww), sb = new Int16Array(ww);
+      for (k = 0; k < hh; k++) { sl[k] = x0; sr[k] = x1; } for (k = 0; k < ww; k++) { st[k] = f.y0; sb[k] = f.y1; }
+      r.unshift({ id: -1, area: ww * hh, x0: x0, x1: x1, y0: f.y0, y1: f.y1, cy: f.cy, sl: sl, sr: sr, st: st, sb: sb, synth: true });
+    });
     var res = contiguous(sameWidth(cand.filter(function (r) { return r.length === len; })));
     if (res.length < 4) return null;
     var xL = Math.min.apply(null, comm.concat(res).map(function (r) { return r[0].x0; })), xR = Math.max.apply(null, comm.concat(res).map(function (r) { return r[r.length - 1].x1; }));
@@ -215,7 +235,12 @@
     var topCells = cells.filter(function (c) { return !inRows[c.id] && inX(c) && c.y1 <= resTop + 6 && area(c) > 1200; }).sort(function (a, b) { return a.y0 - b.y0 || a.x0 - b.x0; });
     var mid = cells.filter(function (c) { return !inRows[c.id] && inX(c) && c.y0 >= resBottom - 6 && c.y1 <= commTop + 6 && (c.x1 - c.x0) >= 0.6 * (xR - xL) && (c.y1 - c.y0) >= 0.02 * h; }).sort(function (a, b) { return a.y0 - b.y0; });
     var foot = cells.filter(function (c) { return !inRows[c.id] && inX(c) && c.y0 >= commBottom - 4 && area(c) > 1500; }).sort(function (a, b) { return Math.round(a.y0 / 30) - Math.round(b.y0 / 30) || a.x0 - b.x0; });
-    return { cells: cells, comm: comm, res: res, resLen: len, xL: xL, xR: xR, topCells: topCells, mid: mid, foot: foot };
+    // the footer (prepared by / date / personnel count) is plain text under the channel table: take the band below it, tilted like the table
+    var lc = comm[comm.length - 1], c0 = lc[0], cN = lc[lc.length - 1], avg = function (a) { var t = 0; for (var q = 0; q < a.length; q++) t += a[q]; return t / a.length; };
+    var yA = avg(c0.sb) + 3, yB = avg(cN.sb) + 3, pitch = (comm[comm.length - 1].cy - comm[0].cy) / Math.max(1, comm.length - 1), fh = Math.min(5.4 * pitch, h - 3 - Math.max(yA, yB));
+    var footBox = fh > 1.5 * pitch ? quadCell(w, h, c0.x0, cN.x1, yA, yB, yA + fh, yB + fh) : null;
+    var footLow = fh > 1.5 * pitch ? quadCell(w, h, c0.x0, cN.x1, yA + fh * 0.42, yB + fh * 0.42, yA + fh, yB + fh) : null;
+    return { cells: cells, comm: comm, res: res, resLen: len, xL: xL, xR: xR, topCells: topCells, mid: mid, foot: foot, footBox: footBox, footLow: footLow };
   }
 
   // Prepare one cell for OCR: crop, upscale, flatten light background/watermark, add white margin.
@@ -685,26 +710,45 @@
 
   function read204Cells(worker, A, progress) {
     var work = A.cv, G = A.G, bin = A.bin, F = A.c204, out = { type: '204', texts: {}, res: [], cells: [] };
-    function ocrCell(cell) {
-      return worker.setParameters({ tessedit_pageseg_mode: '6', tessedit_char_whitelist: '' }).then(function () {
+    function ocrCell(cell, psm) {
+      return worker.setParameters({ tessedit_pageseg_mode: psm || '6', tessedit_char_whitelist: '' }).then(function () {
         var cv = prepCellShape(work, bin, G.w, cell); if (!cv) return '';
         return worker.recognize(cv).then(function (r) { cv.width = cv.height = 0; return (r.data.text || '').trim(); });
       });
     }
-    function ocrAll(list) { var texts = []; return list.reduce(function (p, c) { return p.then(function () { return ocrCell(c).then(function (t) { texts.push(t); }); }); }, Promise.resolve()).then(function () { return texts; }); }
+    function ocrAll(list, psm) { var texts = []; return list.reduce(function (p, c) { return p.then(function () { return ocrCell(c, psm).then(function (t) { texts.push(t); }); }); }, Promise.resolve()).then(function () { return texts; }); }
     var seq = Promise.resolve();
     // 1) header boxes: sort them out by what they say, so the box layout does not matter
     seq = seq.then(function () {
       progress('Reading the header…', 0.22);
       return ocrAll(F.topCells).then(function (tx) {
-        var T = F.topCells.map(function (c, i) { return { c: c, t: tx[i] }; }), used = {}, inc = '', op = null, ops = [];
-        T.forEach(function (o, i) { if (!inc && /incid\w*\s*n\w*e/i.test(o.t)) { inc = o.t; used[i] = 1; } });
-        T.forEach(function (o, i) { if (!op && /operat\w*\s*per\w*|date\s*from|time\s*from/i.test(o.t)) { op = o; used[i] = 1; } });
+        var T = F.topCells.map(function (c, i) { return { c: c, t: tx[i] }; }), used = {}, inc = '', op = null, ops = [], br = [];
+        var below = function (lab, wide) { // the unused cell(s) right under a label cell
+          return T.filter(function (o, i) { return !used[i] && o !== lab && o.c.x0 >= lab.c.x0 - 14 && o.c.x1 <= lab.c.x1 + (wide || 14) && o.c.y0 >= lab.c.y1 - 14 && o.c.y0 < lab.c.y1 + 140 && /[A-Za-z0-9]/.test(o.t); }).sort(function (p, q) { return p.c.y0 - q.c.y0; });
+        };
+        var li = -1;
+        T.forEach(function (o, i) { if (li < 0 && /incid\w*\s*n\w*e/i.test(o.t)) li = i; });
+        if (li >= 0) { used[li] = 1; inc = T[li].t; var v = below(T[li]); if (v.length) { inc += '\n' + v[0].t; used[T.indexOf(v[0])] = 1; } }
+        T.forEach(function (o, i) { if (!op && !used[i] && /date\s*from|time\s*from/i.test(o.t)) { op = o; used[i] = 1; } });
+        T.forEach(function (o, i) { if (!used[i] && /operat\w*\s*per\w*/i.test(o.t) && !/personnel\s*:?\s*$/i.test(o.t.split('\n')[0]) ) { used[i] = 1; } });
+        var bl = -1; T.forEach(function (o, i) { if (bl < 0 && !used[i] && /branch/i.test(o.t) && /division/i.test(o.t)) bl = i; });
+        if (bl >= 0) { used[bl] = 1; br = below(T[bl], 30); br.forEach(function (o) { used[T.indexOf(o)] = 1; }); }
         T.forEach(function (o, i) { if (!used[i] && /operations\s*personnel|section\s*chief|night\s*ops|branch\s*safety|air\s*attack|branch\s*director|group\s*supervisor/i.test(o.t)) { ops.push(o); used[i] = 1; } });
-        var br = T.filter(function (o, i) { // everything to the right of the operational-period box, in its band
-          return !used[i] && op && o.c.x0 >= op.c.x1 - 12 && o.c.y0 >= op.c.y0 - 14 && o.c.y1 <= op.c.y1 + 14 && /[A-Za-z0-9]/.test(o.t);
-        });
-        out.texts.incident = inc; out.texts.op = op ? op.t : ''; out.texts.ops = ops.sort(function (p, q) { return p.c.x0 - q.c.x0; }).map(function (o) { return o.t; }).join('\n'); out.texts.branch = br.map(function (o) { return o.t; }).join('\n');
+        // the names beside the section chief / director / supervisor labels sit in a block the ruling does not close: read it as a made-up cell
+        var lab4 = T.filter(function (o) { return /operations\s*personnel/i.test(o.t); })[0], night = T.filter(function (o) { return /night\s*ops|branch\s*safety|air\s*attack/i.test(o.t); }).sort(function (p, q) { return p.c.x0 - q.c.x0; })[0];
+        var hasChief = ops.some(function (o) { return /section\s*chief|branch\s*director/i.test(o.t); });
+        if (!hasChief && lab4 && night && night.c.x0 - lab4.c.x0 > 100) {
+          var m4 = edgeSlope(lab4.c.sb), yb = 0, q4; for (q4 = 0; q4 < lab4.c.sb.length; q4++) yb += lab4.c.sb[q4]; yb = yb / lab4.c.sb.length + 2;
+          var xm = (lab4.c.x0 + lab4.c.x1) / 2, xa = lab4.c.x0, xb = night.c.x0 - 4, hgt = Math.max(60, night.c.y1 - lab4.c.y1 + 6);
+          var bc = quadCell(G.w, G.h, xa, xb, yb + m4 * (xa - xm), yb + m4 * (xb - xm), yb + hgt + m4 * (xa - xm), yb + hgt + m4 * (xb - xm));
+          return ocrCell(bc).then(function (t4) { ops.unshift({ c: bc, t: t4 }); fin(); });
+        }
+        fin();
+        function fin() {
+          if (window.__cgDbg) out.dbg = T.map(function (o) { return [o.c.x0, o.c.y0, o.c.x1 - o.c.x0, o.c.y1 - o.c.y0, o.t]; }).concat(ops.filter(function (o) { return o.c.synth; }).map(function (o) { return ['synthOps', o.t]; }));
+          out.texts.incident = inc; out.texts.op = op ? op.t : ''; out.texts.branch = br.map(function (o) { return o.t; }).join('\n');
+          out.texts.ops = ops.sort(function (p, q) { return p.c.x0 - q.c.x0 || p.c.y0 - q.c.y0; }).map(function (o) { return o.t; }).join('\n');
+        }
       });
     });
     // 2) resources: ruled rows of 7 or 8 cells
@@ -715,7 +759,7 @@
       var cfgBy = { id: [7, '', 1], leader: [7, ''], pers: [7, '0123456789+/-', 0, [8, 10]], req: [7, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-', 1], hl: [7, ''], hours: [7, '0123456789-'], loc: [7, ''] };
       var cfg = keys.map(function (k) { return cfgBy[k] || null; }), rr = data.map(function () { return {}; });
       data.forEach(function (row, i) { rr[i].als = cellInk(bin, G.w, row[1]) > 0.012; });
-      return readCells(worker, work, G, bin, null, null, keys, cfg, rr, progress, 0.3, 0.6, 'Reading the resources…', null, data, function (r, c) { return prepCellShape(work, bin, G.w, data[r][c]); }).then(function () { out.res = rr; });
+      return readCells(worker, work, G, bin, null, null, keys, cfg, rr, progress, 0.3, 0.6, 'Reading the resources…', null, data, function (r, c) { return prepCellShape(work, bin, G.w, data[r][c]); }).then(function () { out.res = rr.filter(function (r) { return ['id', 'leader', 'pers', 'req', 'hl', 'hours', 'loc'].some(function (k) { return r[k] && String(r[k]).replace(/[^A-Za-z0-9]/g, ''); }); }); });
     });
     // 3) work assignments / special instructions: the two big boxes between the tables
     seq = seq.then(function () {
@@ -732,7 +776,14 @@
       });
     });
     // 5) footer
-    seq = seq.then(function () { progress('Reading the footer…', 0.94); return ocrAll(F.foot).then(function (tx) { out.texts.foot = tx.join('\n'); }); });
+    seq = seq.then(function () {
+      progress('Reading the footer…', 0.94); var parts = [];
+      var step = function (cell, psm) { return function () { return cell ? ocrCell(cell, psm).then(function (t) { parts.push(t); }) : null; }; };
+      return Promise.resolve().then(step(F.footBox, '11')).then(step(F.footLow, '6')).then(step(F.footLow, '11')).then(step(F.footBox, '6')).then(function () { return ocrAll(F.foot); }).then(function (tx) {
+        if (window.__cgDbg) out.dbgFoot = parts.concat(tx).map(function (t) { return [t]; });
+        out.texts.foot = parts.concat(tx).join('\n');
+      });
+    });
     return seq.then(function () { return out; });
   }
 
@@ -1242,6 +1293,6 @@
   }
 
   // test hook (headless tests call the pipeline directly)
-  window.__cgIncident = { readFreqShapes: readFreqShapes, open: home, scanImage: scanImage, prepCellShape: prepCellShape, find205: find205, labelCells: labelCells, chainRows: chainRows, analyze: analyze, vsegs: vsegs, hsegs: hsegs, find204: find204, binarize: binarize, grayOf: grayOf, loadToCanvas: loadToCanvas, detectGrid: detectGrid, state: state, setKnown: function (k) { known = k; } };
+  window.__cgIncident = {quadCell: quadCell,  readFreqShapes: readFreqShapes, open: home, scanImage: scanImage, prepCellShape: prepCellShape, find205: find205, labelCells: labelCells, chainRows: chainRows, analyze: analyze, vsegs: vsegs, hsegs: hsegs, find204: find204, binarize: binarize, grayOf: grayOf, loadToCanvas: loadToCanvas, detectGrid: detectGrid, state: state, setKnown: function (k) { known = k; } };
   window.__cgOpenIncident = home;
 })();

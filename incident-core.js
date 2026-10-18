@@ -279,14 +279,14 @@
     return out;
   }
   var OPS_LABELS = [['Operations Section Chief', /Operations\s*Se\w*\s*Ch\w*/i], ['Night Ops', /Night\s*Ops/i], ['Branch Director', /Branch\s*D\w*r/i],
-    ['Branch Safety', /Branch\s*Safety/i], ['Division/Group Supervisor', /Div\w*\s*\/?\s*Gr\w*\s*Sup\w*/i], ['Air Attack', /Air\s*Attack/i]];
+    ['Branch Safety', /\w*[ae]nch\s*Safety/i], ['Division/Group Supervisor', /D\w{2,9}\s*\/?\s*Gr\w*\s*Sup\w*|Gr\w*p\s*Supervisor/i], ['Air Attack', /Air\s*Attack/i]];
   function parseOps(text) {
     var t = String(text || '').replace(/[\r\n]+/g, ' '), hits = [];
     OPS_LABELS.forEach(function (L) { var m = L[1].exec(t); if (m) hits.push({ label: L[0], at: m.index, end: m.index + m[0].length }); });
     hits.sort(function (a, b) { return a.at - b.at; });
     return hits.map(function (h, i) {
       var v = t.slice(h.end, i + 1 < hits.length ? hits[i + 1].at : t.length).replace(/^[^A-Za-z0-9(]+/, '').replace(/[\s|]+$/, '');
-      return { label: h.label, value: cleanText(v) };
+      return { label: h.label, value: cleanText(v).replace(/\s+[A-Z]$/, '') };
     }).filter(function (o) { return o.value; });
   }
   function parseHoursLoc(raw) {
@@ -335,12 +335,19 @@
   }
   function totalPeople(list) { return list.reduce(function (a, r) { return a + (parseInt(r.personnel, 10) || 0); }, 0); }
   function parseFoot204(text) {
-    var t = String(text || ''), out = { prepared: '', position: '', date: '', time: '', count: '' }, m;
-    if ((m = t.match(/Name:\s*([^\n]*)/i))) {
-      var nm = cleanText(m[1].split(/Signature|Date\/?Time/i)[0]), mm = nm.match(/^(.*?)\s+([A-Z]{2,6})$/);
-      if (mm) { out.prepared = cleanText(mm[1]); out.position = mm[2]; } else out.prepared = nm;
+    var t = String(text || '').replace(/\s+/g, ' '), out = { prepared: '', position: '', date: '', time: '', count: '' }, m;
+    var L = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean), ni = -1, k;
+    for (k = 0; k < L.length && ni < 0; k++) if (/Name:/i.test(L[k])) ni = k;
+    if (ni >= 0) {
+      var v = L[ni].replace(/^.*?Name:\s*/i, ''), nx = ni + 1;
+      if (!v && L[nx]) v = L[nx++];
+      v = cleanText(v.split(/Signature|Date\s*\/?\s*T\w*me|Personnel\s*Count|ICS\s*204/i)[0]);
+      var mm = v.match(/^(.*?)\s+([A-Z]{2,6})$/);
+      if (mm) { out.prepared = cleanText(mm[1]); out.position = mm[2]; }
+      else { out.prepared = v; if (L[nx] && /^[A-Z]{2,6}$/.test(L[nx])) out.position = L[nx]; }
+      if (/^enter\s*name$/i.test(out.prepared)) out.prepared = '';
     }
-    if ((m = t.match(/Date\s*\/?\s*Time:?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(\d{3,4})?/i))) { out.date = m[1]; out.time = m[2] || ''; }
+    if ((m = t.match(/Date\s*\/?\s*T\w*me:?\s*(\d{1,2}\s*\/\s*\d{1,2}\s*\/\s*\d{2,4})\s*(\d{3,4})?/i))) { out.date = m[1].replace(/\s+/g, ''); out.time = m[2] || ''; }
     if ((m = t.match(/Personnel\s*Count:?\s*(\d{1,5})/i))) out.count = m[1];
     return out;
   }
