@@ -47,3 +47,8 @@ Live USFS National Forest System Roads (EDW_RoadBasic_01, layer 0) drawn on the 
 - `sw.js` deliberately does not cache `apps.fs.usda.gov` requests (roads.js manages its own cache).
 - Battalion rule (toggle **Battalion only / Include outside**): a road is shown whole, including the part past the boundary, if any part of it is inside. Roads that only branch off it outside the boundary are not shown. Only pieces connected end-to-end to the inside part count. Full lengths are fetched by road number (`x:<id>` in the same IndexedDB). The boundary is drawn as a dashed white line. To change the boundary, re-export the GPX, replace `reference/Battalion_Boundary.gpx`, and regenerate `battalion.js` (closed ring of `[lng,lat]`).
 - Tap a road for an info card (crew slang / condition / note plus USFS surface, maintenance level, status, jurisdiction, maintainer, county, length); **Edit** opens the editor. Tap a main route for its name and length.
+
+## Incident reader (ICS-205 / 204) — how detection works
+- Cells are found by flood-filling the enclosed white areas of the page (works on curved/tilted booklet photos), then joined into rows: 205 = rows of 10 cells, 204 comm table = 9, resource table = 7–8.
+- Each cell is whitened outside its borders, contrast-normalised, straightened, upscaled and OCR'd with adaptive voting. Frequencies get an independent digit-shape check; disagreements are flagged, never auto-applied.
+- Everything runs on-device. IAP forms are CUI — verify against the printed page.

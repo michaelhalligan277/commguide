@@ -104,7 +104,180 @@
     return { rows: rows, cols: vl };
   }
 
+  // ---- cell finder for curved / tilted pages -------------------------------------------------
+  // A page photographed in a booklet has wavy ruled lines, so straight-line projections fail. Instead find every
+  // white region that is enclosed by ruling (a table cell), then join cells that touch left-to-right into rows.
+  function labelCells(bin, w, h, grow) {
+    var n = w * h, free = new Uint8Array(n), i, x, y, g = grow || 1;
+    for (y = g; y < h - g; y++) {
+      var o = y * w;
+      for (x = g; x < w - g; x++) {
+        i = o + x; var on = bin[i] || bin[i - 1] || bin[i + 1] || bin[i - w] || bin[i + w];
+        if (!on && g > 1) on = bin[i - 2] || bin[i + 2] || bin[i - 2 * w] || bin[i + 2 * w];
+        free[i] = on ? 0 : 1;
+      }
+    }
+    var lab = new Int32Array(n), stack = new Int32Array(n), cells = [], id = 0, p, q, px, py;
+    for (i = 0; i < n; i++) {
+      if (!free[i] || lab[i]) continue;
+      id++; var sp = 0, area = 0, x0 = w, x1 = 0, y0 = h, y1 = 0, border = false;
+      stack[sp++] = i; lab[i] = id;
+      while (sp) {
+        p = stack[--sp]; area++; py = (p / w) | 0; px = p - py * w;
+        if (px < x0) x0 = px; if (px > x1) x1 = px; if (py < y0) y0 = py; if (py > y1) y1 = py;
+        if (px <= 1 || py <= 1 || px >= w - 2 || py >= h - 2) border = true;
+        if (px > 0 && free[q = p - 1] && !lab[q]) { lab[q] = id; stack[sp++] = q; }
+        if (px < w - 1 && free[q = p + 1] && !lab[q]) { lab[q] = id; stack[sp++] = q; }
+        if (py > 0 && free[q = p - w] && !lab[q]) { lab[q] = id; stack[sp++] = q; }
+        if (py < h - 1 && free[q = p + w] && !lab[q]) { lab[q] = id; stack[sp++] = q; }
+      }
+      var bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+      if (border || bw < 14 || bh < 12 || bh > 0.25 * h || bw > 0.985 * w || area / (bw * bh) < 0.4) continue;
+      cells.push({ id: id, area: area, x0: x0, x1: x1, y0: y0, y1: y1, cy: (y0 + y1) / 2, sl: null, sr: null });
+    }
+    // per-row left/right edge of each cell: lets a crop ignore neighbours' ink on a tilted or bowed cell
+    cells.forEach(function (c) {
+      var hh = c.y1 - c.y0 + 1, ww = c.x1 - c.x0 + 1; c.sl = new Int16Array(hh); c.sr = new Int16Array(hh); c.st = new Int16Array(ww); c.sb = new Int16Array(ww);
+      for (var yy = c.y0; yy <= c.y1; yy++) {
+        var a = -1, b = -1, off = yy * w;
+        for (var xx = c.x0; xx <= c.x1; xx++) if (lab[off + xx] === c.id) { if (a < 0) a = xx; b = xx; }
+        c.sl[yy - c.y0] = a < 0 ? c.x0 : a; c.sr[yy - c.y0] = b < 0 ? c.x1 : b;
+      }
+      for (var x2 = c.x0; x2 <= c.x1; x2++) {  // top and bottom edge of the cell at each column (these give its tilt)
+        var t = -1, bt = -1;
+        for (var y2 = c.y0; y2 <= c.y1; y2++) if (lab[y2 * w + x2] === c.id) { if (t < 0) t = y2; bt = y2; }
+        c.st[x2 - c.x0] = t < 0 ? c.y0 : t; c.sb[x2 - c.x0] = bt < 0 ? c.y1 : bt;
+      }
+    });
+    return cells;
+  }
+  // join cells that touch side by side (and overlap vertically) into rows of cells
+  function chainRows(cells) {
+    var par = cells.map(function (_, i) { return i; });
+    function f(a) { while (par[a] !== a) { par[a] = par[par[a]]; a = par[a]; } return a; }
+    for (var a = 0; a < cells.length; a++) for (var b = 0; b < cells.length; b++) {
+      if (a === b) continue;
+      var A = cells[a], B = cells[b], gap = B.x0 - A.x1;
+      if (gap < -6 || gap > 18) continue;
+      var ov = Math.min(A.y1, B.y1) - Math.max(A.y0, B.y0), ha = A.y1 - A.y0 + 1, hb = B.y1 - B.y0 + 1, mh = Math.min(ha, hb);
+      if (ov > 0.5 * mh && Math.max(ha, hb) <= 1.7 * mh) par[f(a)] = f(b);
+    }
+    var g = {};
+    cells.forEach(function (c, i) { (g[f(i)] = g[f(i)] || []).push(c); });
+    return Object.keys(g).map(function (k) {
+      var r = g[k].sort(function (p, q) { return p.x0 - q.x0; });
+      r.cy = r.reduce(function (s, c) { return s + c.cy; }, 0) / r.length;
+      return r;
+    }).sort(function (p, q) { return p.cy - q.cy; });
+  }
+  // ICS-205: a header row plus data rows, all with 10 cells (Ch# … Notes)
+  function find205(bin, w, h) { return find205g(bin, w, h, 1) || find205g(bin, w, h, 2); }
+  function find205g(bin, w, h, g) {
+    var cells = labelCells(bin, w, h, g), rows = chainRows(cells).filter(function (r) { return r.length === 10; });
+    if (rows.length < 9) return null;
+    var wd = rows.map(function (r) { return r[9].x1 - r[0].x0; }).sort(function (a, b) { return a - b; }), med = wd[wd.length >> 1];
+    rows = rows.filter(function (r) { return Math.abs((r[9].x1 - r[0].x0) - med) <= 0.12 * med; });
+    if (rows.length < 9) return null;
+    return { rows: rows, cells: cells };
+  }
+
+  function rowSpan(list) { return list.reduce(function (a, r) { return Math.max(a, r[r.length - 1].x1 - r[0].x0); }, 0); }
+  function sameWidth(list) { // keep rows whose total width matches the typical one
+    if (!list.length) return list;
+    var wd = list.map(function (r) { return r[r.length - 1].x1 - r[0].x0; }).sort(function (a, b) { return a - b; }), med = wd[wd.length >> 1];
+    return list.filter(function (r) { return Math.abs((r[r.length - 1].x1 - r[0].x0) - med) <= 0.12 * med; });
+  }
+  function contiguous(list) { // longest run of rows with an even spacing (drops strays elsewhere on the page)
+    if (list.length < 3) return list;
+    var gaps = list.slice(1).map(function (r, i) { return r.cy - list[i].cy; }).sort(function (a, b) { return a - b; }), med = gaps[gaps.length >> 1], best = [], cur = [list[0]];
+    for (var i = 1; i < list.length; i++) {
+      if (list[i].cy - list[i - 1].cy <= 2.4 * med) cur.push(list[i]); else { if (cur.length > best.length) best = cur; cur = [list[i]]; }
+    }
+    return cur.length > best.length ? cur : best;
+  }
+  // ICS-204: the communications table (9 cells across) and the resource table (7 or 8 across) above it.
+  function find204c(bin, w, h) { return find204g(bin, w, h, 1) || find204g(bin, w, h, 2); }
+  function find204g(bin, w, h, g) {
+    var cells = labelCells(bin, w, h, g), rows = chainRows(cells);
+    var comm = contiguous(sameWidth(rows.filter(function (r) { return r.length === 9; })));
+    if (comm.length < 2) return null;
+    var top = comm[0], cand = rows.filter(function (r) { return (r.length === 8 || r.length === 7) && r.cy < top.cy - 20; });
+    var n8 = cand.filter(function (r) { return r.length === 8; }).length, n7 = cand.length - n8, len = n8 >= n7 ? 8 : 7;
+    var res = contiguous(sameWidth(cand.filter(function (r) { return r.length === len; })));
+    if (res.length < 4) return null;
+    var xL = Math.min.apply(null, comm.concat(res).map(function (r) { return r[0].x0; })), xR = Math.max.apply(null, comm.concat(res).map(function (r) { return r[r.length - 1].x1; }));
+    if (xR - xL < 0.5 * w) return null;
+    var tolX = 0.03 * w, inX = function (c) { return c.x0 >= xL - tolX && c.x1 <= xR + tolX; };
+    var resBottom = Math.max.apply(null, res[res.length - 1].map(function (c) { return c.y1; })), commTop = Math.min.apply(null, comm[0].map(function (c) { return c.y0; }));
+    var commBottom = Math.max.apply(null, comm[comm.length - 1].map(function (c) { return c.y1; })), resTop = Math.min.apply(null, res[0].map(function (c) { return c.y0; }));
+    var inRows = {}; res.concat(comm).forEach(function (r) { r.forEach(function (c) { inRows[c.id] = 1; }); });
+    var area = function (c) { return (c.x1 - c.x0) * (c.y1 - c.y0); };
+    var topCells = cells.filter(function (c) { return !inRows[c.id] && inX(c) && c.y1 <= resTop + 6 && area(c) > 1200; }).sort(function (a, b) { return a.y0 - b.y0 || a.x0 - b.x0; });
+    var mid = cells.filter(function (c) { return !inRows[c.id] && inX(c) && c.y0 >= resBottom - 6 && c.y1 <= commTop + 6 && (c.x1 - c.x0) >= 0.6 * (xR - xL) && (c.y1 - c.y0) >= 0.02 * h; }).sort(function (a, b) { return a.y0 - b.y0; });
+    var foot = cells.filter(function (c) { return !inRows[c.id] && inX(c) && c.y0 >= commBottom - 4 && area(c) > 1500; }).sort(function (a, b) { return Math.round(a.y0 / 30) - Math.round(b.y0 / 30) || a.x0 - b.x0; });
+    return { cells: cells, comm: comm, res: res, resLen: len, xL: xL, xR: xR, topCells: topCells, mid: mid, foot: foot };
+  }
+
   // Prepare one cell for OCR: crop, upscale, flatten light background/watermark, add white margin.
+  // Given a cell from labelCells, anything outside that cell (a neighbour's text, the ruling) is whitened first.
+  function cellInk(bin, w, cell) { // share of the cell (inside its own edges) that is ink
+    var inset = 3, bh = cell.y1 - cell.y0 + 1, ink = 0, tot = 0, x, y;
+    for (y = 0; y < bh; y++) {
+      var a = cell.sl[y] + inset, b = cell.sr[y] - inset;
+      for (x = a; x <= b; x++) { ink += bin[(cell.y0 + y) * w + x]; tot++; }
+    }
+    return tot ? ink / tot : 0;
+  }
+  function edgeSlope(arr) { // least-squares slope (dy/dx) of a cell edge, ignoring the corners
+    var n = arr.length, a = Math.floor(n * 0.1), b = Math.ceil(n * 0.9), sx = 0, sy = 0, sxx = 0, sxy = 0, k = 0, i;
+    for (i = a; i < b; i++) { sx += i; sy += arr[i]; sxx += i * i; sxy += i * arr[i]; k++; }
+    if (k < 8) return 0;
+    var d = k * sxx - sx * sx; return d ? (k * sxy - sx * sy) / d : 0;
+  }
+  function prepCellShape(srcCanvas, bin, w, cell) {
+    var inset = 3, bw = cell.x1 - cell.x0 + 1, bh = cell.y1 - cell.y0 + 1;
+    if (bw < 10 || bh < 10) return null;
+    if (cellInk(bin, w, cell) < 0.012) return null; // empty cell
+    // 1) the cell at its own size: white out everything outside it (neighbours' text, the ruling), then stretch the contrast
+    var T = document.createElement('canvas'); T.width = bw; T.height = bh;
+    var tx = T.getContext('2d'); tx.drawImage(srcCanvas, cell.x0, cell.y0, bw, bh, 0, 0, bw, bh);
+    var im = tx.getImageData(0, 0, bw, bh), d = im.data, hist = new Uint32Array(256), mask = new Uint8Array(bw * bh), n = 0, x, y, i;
+    for (y = 0; y < bh; y++) {
+      var L = cell.sl[y] - cell.x0 + inset, R = cell.sr[y] - cell.x0 - inset;
+      for (x = 0; x < bw; x++) {
+        if (x < L || x > R || y < cell.st[x] - cell.y0 + inset || y > cell.sb[x] - cell.y0 - inset) continue;
+        i = y * bw + x; mask[i] = 1; var g0 = (d[i * 4] * 77 + d[i * 4 + 1] * 150 + d[i * 4 + 2] * 29) >> 8; hist[g0]++; n++;
+      }
+    }
+    if (!n) { T.width = T.height = 0; return null; }
+    var pc = function (f) { var t = n * f, a = 0, k; for (k = 0; k < 256; k++) { a += hist[k]; if (a >= t) return k; } return 255; };
+    var ink = pc(0.02), bg = pc(0.7);
+    if (bg - ink < 40) ink = Math.max(0, bg - 90); // nearly blank / faint cell: keep a sane range
+    var span = bg - ink;
+    for (i = 0; i < bw * bh; i++) {
+      var o = 255;
+      if (mask[i]) { var g = (d[i * 4] * 77 + d[i * 4 + 1] * 150 + d[i * 4 + 2] * 29) >> 8, t = (g - ink) / span; t = t < 0.18 ? 0 : t > 0.8 ? 1 : (t - 0.18) / 0.62; o = Math.round(255 * t * t * (3 - 2 * t)); }
+      d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = o; d[i * 4 + 3] = 255;
+    }
+    tx.putImageData(im, 0, 0);
+    // 2) enlarge and level the text (the cell's own top and bottom edges say how much it is tilted)
+    var th = Math.atan((edgeSlope(cell.st) + edgeSlope(cell.sb)) / 2); th = Math.max(-0.12, Math.min(0.12, th));
+    var sc = Math.max(2, Math.min(3.2, 96 / bh)), pad = 18, ca = Math.abs(Math.cos(th)), sa = Math.abs(Math.sin(th));
+    var cw = Math.ceil((bw * ca + bh * sa) * sc) + pad * 2, chh = Math.ceil((bh * ca + bw * sa) * sc) + pad * 2;
+    var c = document.createElement('canvas'); c.width = cw; c.height = chh;
+    var cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, chh);
+    cx.imageSmoothingQuality = 'high'; cx.translate(cw / 2, chh / 2); cx.rotate(-th); cx.drawImage(T, -bw * sc / 2, -bh * sc / 2, bw * sc, bh * sc);
+    T.width = T.height = 0;
+    // 3) trim to the ink, with a white margin
+    var im2 = c.getContext('2d').getImageData(0, 0, cw, chh), d2 = im2.data, x0 = cw, x1 = 0, y0 = chh, y1 = 0;
+    for (y = 0; y < chh; y++) for (x = 0; x < cw; x++) if (d2[(y * cw + x) * 4] < 140) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 <= x0 || y1 <= y0) { c.width = c.height = 0; return null; }
+    var m = 16, tx0 = Math.max(0, x0 - m), ty0 = Math.max(0, y0 - m), tw = Math.min(cw, x1 + m) - tx0, thh = Math.min(chh, y1 + m) - ty0;
+    var out = document.createElement('canvas'); out.width = tw + 2 * 6; out.height = thh + 2 * 6;
+    var ox = out.getContext('2d'); ox.fillStyle = '#fff'; ox.fillRect(0, 0, out.width, out.height); ox.drawImage(c, tx0, ty0, tw, thh, 6, 6, tw, thh);
+    c.width = c.height = 0;
+    return out;
+  }
   function prepCell(srcCanvas, G, bin, x0, y0, x1, y1) {
     var cw = x1 - x0, ch = y1 - y0; if (cw < 6 || ch < 6) return null;
     var ink = 0, x, y;
@@ -125,20 +298,115 @@
     return c;
   }
 
+  // =====================================================================
+  // Second opinion for frequencies: split the cell into its glyphs and match each digit's shape against digits drawn
+  // with the phone's own sans-serif fonts. Independent of the OCR engine, so it catches its 5/6, 3/8, 1/7 slips.
+  // =====================================================================
+  var GW = 16, GH = 24, BANK = null;
+  function glyphVec(gray, W, x0, y0, x1, y1) { // box-filter the glyph to GW x GH, then centre and unit-length it
+    var bw = x1 - x0 + 1, bh = y1 - y0 + 1, v = new Float32Array(GW * GH), gx, gy, sx, sy, mean = 0, nrm = 0, i;
+    for (gy = 0; gy < GH; gy++) for (gx = 0; gx < GW; gx++) {
+      var xa = x0 + gx * bw / GW, xb = x0 + (gx + 1) * bw / GW, ya = y0 + gy * bh / GH, yb = y0 + (gy + 1) * bh / GH, sum = 0, cnt = 0;
+      for (sy = Math.floor(ya); sy < Math.ceil(yb); sy++) for (sx = Math.floor(xa); sx < Math.ceil(xb); sx++) { sum += 255 - gray[sy * W + sx]; cnt++; }
+      v[gy * GW + gx] = cnt ? sum / cnt : 0;
+    }
+    for (i = 0; i < v.length; i++) mean += v[i]; mean /= v.length;
+    for (i = 0; i < v.length; i++) { v[i] -= mean; nrm += v[i] * v[i]; }
+    nrm = Math.sqrt(nrm) || 1; for (i = 0; i < v.length; i++) v[i] /= nrm;
+    return v;
+  }
+  function inkBox(gray, W, H) { // bounding box of dark pixels
+    var x0 = W, x1 = -1, y0 = H, y1 = -1, x, y;
+    for (y = 0; y < H; y++) for (x = 0; x < W; x++) if (gray[y * W + x] < 128) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    return x1 < 0 ? null : [x0, y0, x1, y1];
+  }
+  function glyphBank() {
+    if (BANK) return BANK;
+    BANK = [];
+    var fonts = ['Arial', 'Helvetica Neue', 'Helvetica', 'Arimo', 'Liberation Sans', 'Roboto', 'sans-serif'], seen = {}, digits = '0123456789';
+    fonts.forEach(function (f) {
+      for (var k = 0; k < digits.length; k++) {
+        var c = document.createElement('canvas'); c.width = 90; c.height = 120; var x = c.getContext('2d');
+        x.fillStyle = '#fff'; x.fillRect(0, 0, 90, 120); x.fillStyle = '#000'; x.font = '84px "' + f + '", sans-serif'.replace('"sans-serif", sans-serif', 'sans-serif'); x.textBaseline = 'alphabetic'; x.fillText(digits[k], 12, 92);
+        var d = x.getImageData(0, 0, 90, 120).data, g = new Uint8Array(90 * 120); for (var i = 0; i < g.length; i++) g[i] = d[i * 4];
+        var bx = inkBox(g, 90, 120); if (!bx) continue;
+        var sig = digits[k] + ':' + bx.join(','); if (seen[sig]) continue; seen[sig] = 1; // fonts that fall back to the same face add nothing
+        BANK.push({ ch: digits[k], v: glyphVec(g, 90, bx[0], bx[1], bx[2], bx[3]), ar: (bx[2] - bx[0] + 1) / (bx[3] - bx[1] + 1) });
+        c.width = c.height = 0;
+      }
+    });
+    return BANK;
+  }
+  function labelInk(gray, W, H) { // 8-connected components of dark pixels
+    var lab = new Int32Array(W * H), comps = [], id = 0, stack = [], i, x, y;
+    for (i = 0; i < W * H; i++) {
+      if (gray[i] >= 128 || lab[i]) continue;
+      id++; stack.length = 0; stack.push(i); lab[i] = id; var x0 = W, x1 = 0, y0 = H, y1 = 0, area = 0;
+      while (stack.length) {
+        var p = stack.pop(), py = (p / W) | 0, px = p - py * W; area++;
+        if (px < x0) x0 = px; if (px > x1) x1 = px; if (py < y0) y0 = py; if (py > y1) y1 = py;
+        for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+          var qx = px + dx, qy = py + dy; if (qx < 0 || qy < 0 || qx >= W || qy >= H) continue;
+          var q = qy * W + qx; if (gray[q] < 128 && !lab[q]) { lab[q] = id; stack.push(q); }
+        }
+      }
+      comps.push({ x0: x0, x1: x1, y0: y0, y1: y1, area: area });
+    }
+    return comps;
+  }
+  // Read a frequency cell (ddd.dddd) by glyph shape. Returns { text, margin } or null when the cell cannot be split cleanly.
+  function readFreqShapes(cv) {
+    var W = cv.width, H = cv.height; if (W < 40 || H < 20) return null;
+    var d = cv.getContext('2d').getImageData(0, 0, W, H).data, gray = new Uint8Array(W * H), i;
+    for (i = 0; i < gray.length; i++) gray[i] = d[i * 4];
+    var comps = labelInk(gray, W, H).filter(function (c) { return c.area >= 8; }).sort(function (a, b) { return a.x0 - b.x0; });
+    if (comps.length !== 8) return null;                                   // 7 digits and the point; anything else is touching or noisy
+    var tall = comps.filter(function (c) { return (c.y1 - c.y0 + 1) > 0.5 * Math.max.apply(null, comps.map(function (k) { return k.y1 - k.y0 + 1; })); });
+    if (tall.length !== 7 || comps[3] === tall[3] || tall.indexOf(comps[3]) >= 0) return null; // the point must be the fourth glyph
+    var bank = glyphBank(), text = '', worst = 9;
+    for (var gi = 0; gi < tall.length; gi++) {
+      var c = tall[gi], v = glyphVec(gray, W, c.x0, c.y0, c.x1, c.y1), ar = (c.x1 - c.x0 + 1) / (c.y1 - c.y0 + 1), best = {}, k;
+      for (k = 0; k < bank.length; k++) {
+        var dot = 0, b = bank[k]; for (i = 0; i < v.length; i++) dot += v[i] * b.v[i];
+        var sc = dot - 0.35 * Math.abs(ar - b.ar);
+        if (best[b.ch] === undefined || sc > best[b.ch]) best[b.ch] = sc;
+      }
+      var ranked = Object.keys(best).sort(function (a, b2) { return best[b2] - best[a]; }), m = best[ranked[0]] - best[ranked[1]];
+      if (m < worst) worst = m; text += ranked[0];
+      if (gi === 2) text += '.';
+    }
+    return { text: text, margin: worst };
+  }
+
   // A frequency is read three ways (slightly larger, black-and-white, larger black-and-white).
   // The majority wins; if the readings disagree the cell is flagged and the alternatives offered.
   function variant(cv, scale, binar) {
     var c = document.createElement('canvas'); c.width = Math.round(cv.width * scale); c.height = Math.round(cv.height * scale);
     var x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(cv, 0, 0, c.width, c.height);
-    if (binar) { var im = x.getImageData(0, 0, c.width, c.height), d = im.data; for (var i = 0; i < d.length; i += 4) { var v = d[i] < 140 ? 0 : 255; d[i] = d[i + 1] = d[i + 2] = v; } x.putImageData(im, 0, 0); }
+    if (binar) { var im = x.getImageData(0, 0, c.width, c.height), d = im.data; for (var i = 0; i < d.length; i += 4) { var v = d[i] < 128 ? 0 : 255; d[i] = d[i + 1] = d[i + 2] = v; } x.putImageData(im, 0, 0); }
     return c;
   }
-  function voteRead(worker, cv) {
-    var vs = [variant(cv, 1.3, false), variant(cv, 1, true), variant(cv, 1.6, true)], out = [];
-    return vs.reduce(function (p, v) { return p.then(function () { return worker.recognize(v).then(function (r) { out.push((r.data.text || '').trim()); }); }); }, Promise.resolve()).then(function () {
-      var cnt = {}; out.forEach(function (t) { cnt[t] = (cnt[t] || 0) + 1; });
-      var ranked = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; });
-      return { text: ranked[0], alts: ranked.slice(1), agree: ranked.length === 1 };
+  function voteRead(worker, cv, isFreq) {
+    // Two OCR readings first (grey, and black-and-white). If they agree, accept. If not, take three more and let the majority decide.
+    // For frequencies the digit-shape reading counts as three votes when it is clear-cut, and forces the extra readings if it disagrees.
+    var out = [], made = [], shape = isFreq ? readFreqShapes(cv) : null, shapeOk = !!(shape && shape.margin > 0.05);
+    function one(v) { made.push(v); return worker.recognize(v).then(function (r) { out.push((r.data.text || '').trim()); }); }
+    function chain(list) { return list.reduce(function (p, v) { return p.then(function () { return one(v); }); }, Promise.resolve()); }
+    var key = function (t) { return isFreq ? String(t).replace(/[^0-9.]/g, '') : t; };
+    return chain([variant(cv, 1.3, false), variant(cv, 1, true)]).then(function () {
+      if (out[0] === out[1] && !(shapeOk && key(out[0]) !== shape.text)) return null;
+      return chain([variant(cv, 1, false), variant(cv, 1.7, false), variant(cv, 1.6, true)]);
+    }).then(function () {
+      made.forEach(function (v) { v.width = v.height = 0; });
+      if (shapeOk) { // the shape reading decides; it is only called settled when at least two OCR readings back it up
+        var back = out.filter(function (t) { return key(t) === shape.text; }).length, others = [];
+        out.forEach(function (t) { var k = key(t); if (k !== shape.text && others.indexOf(k) < 0) others.push(k); });
+        return { text: shape.text, alts: others, agree: back >= 2 };
+      }
+      var cnt = {}, total = 0; out.forEach(function (t) { cnt[key(t)] = (cnt[key(t)] || 0) + 1; total++; });
+      var ranked = Object.keys(cnt).sort(function (x, y) { return cnt[y] - cnt[x]; });
+      var top = cnt[ranked[0]], tie = ranked.length > 1 && cnt[ranked[1]] === top;
+      return { text: ranked[0], alts: ranked.slice(1), agree: !tie && top >= Math.ceil(total * 0.8) };
     });
   }
 
@@ -271,7 +539,7 @@
   var KEYS204 = ['name', 'ch', 'func', 'rx', 'rxTone', 'tx', 'txTone', 'mode', 'notes'];
 
   // read every cell of a ruled grid, column by column; rows[] are pre-made objects that get filled
-  function readCells(worker, work, G, bin, xs, ys, keys, cfg, rows, progress, p0, p1, label, confKey, spans) {
+  function readCells(worker, work, G, bin, xs, ys, keys, cfg, rows, progress, p0, p1, label, confKey, spans, crop) {
     spans = spans || ys.slice(0, -1).map(function (y, i) { return [y, ys[i + 1]]; });
     var nR = spans.length, total = nR * keys.length, done = 0, inset = Math.max(4, Math.round(G.h * 0.0022)), seq = Promise.resolve();
     keys.forEach(function (key, c) {
@@ -281,14 +549,15 @@
           var p = Promise.resolve();
           for (var rr = 0; rr < nR; rr++) (function (rr) {
             p = p.then(function () {
-              var cv = prepCell(work, G, bin, Math.round(xs[c]) + inset, Math.round(spans[rr][0]) + inset, Math.round(xs[c + 1]) - inset, Math.round(spans[rr][1]) - inset);
+              var cv = crop ? crop(rr, c) : prepCell(work, G, bin, Math.round(xs[c]) + inset, Math.round(spans[rr][0]) + inset, Math.round(xs[c + 1]) - inset, Math.round(spans[rr][1]) - inset);
               done++; progress(label + ' ' + Math.round(done / total * 100) + '%', p0 + (p1 - p0) * done / total);
               if (!cv) return null;
               if (cfg[c][2]) {
-                return voteRead(worker, cv).then(function (v) { rows[rr][key] = v.text; rows[rr][key + 'Alts'] = v.alts; rows[rr][key + 'Dis'] = !v.agree; });
+                return voteRead(worker, cv, cfg[c][1] === '0123456789.').then(function (v) { rows[rr][key] = v.text; rows[rr][key + 'Alts'] = v.alts; rows[rr][key + 'Dis'] = !v.agree; cv.width = cv.height = 0; });
               }
               return worker.recognize(cv).then(function (res) {
                 rows[rr][key] = (res.data.text || '').trim();
+                if (!(!rows[rr][key] && cfg[c][3])) cv.width = cv.height = 0;
                 if (confKey === key) { var cf = rows[rr]._cf = (rows[rr]._cf || []); cf.push(res.data.confidence); }
                 if (!rows[rr][key] && cfg[c][3]) { // a lone narrow digit can come back empty: retry as a single word / character
                   var q = Promise.resolve();
@@ -319,9 +588,14 @@
   function analyze(work, deg) {
     var cv = rotateCanvas(work, deg), g0 = grayOf(cv), b0 = binarize(g0), ang = skewAngle(b0, g0.w, g0.h);
     if (Math.abs(ang) > 0.2) { cv = rotateSmall(cv, -ang * Math.PI / 180); g0 = grayOf(cv); b0 = binarize(g0); }
-    var r = { cv: cv, G: g0, bin: b0, grid: null, f204: find204(b0, g0.w, g0.h), type: null };
-    if (r.f204) r.type = '204';                       // checked first: the 204 also has ruled rows that can look like a 205
-    else { r.grid = detectGrid(b0, g0.w, g0.h); if (r.grid && r.grid.cols.length === 11 && r.grid.rows.length >= 9) r.type = '205'; }
+    var r = { cv: cv, G: g0, bin: b0, grid: null, c205: find205(b0, g0.w, g0.h), c204: null, f204: null, type: null };
+    if (r.c205) r.type = '205';                       // enclosed cells, 10 across: works on curved booklet pages
+    else if ((r.c204 = find204c(b0, g0.w, g0.h))) r.type = '204'; // enclosed cells: 9 across (channels) with the resource table above
+    else {
+      r.f204 = find204(b0, g0.w, g0.h);
+      if (r.f204) r.type = '204';                     // checked before the straight-line 205: the 204 also has ruled rows that can look like a 205
+      else { r.grid = detectGrid(b0, g0.w, g0.h); if (r.grid && r.grid.cols.length === 11 && r.grid.rows.length >= 9) r.type = '205'; }
+    }
     return r;
   }
 
@@ -340,24 +614,29 @@
       progress('Checking page direction…', 0.2);
       function headerScore(a) { // read the table header row; right way up it names the columns
         var y0, y1;
-        if (a.type === '205') { var g = a.grid; y0 = Math.max(0, Math.round(g.rows[0] - (g.rows[1] - g.rows[0]) * 1.05)); y1 = Math.round(g.rows[0]); }
+        if (a.type === '205' && a.c205) { var hr = a.c205.rows[0]; y0 = Math.round(Math.min.apply(null, hr.map(function (c) { return c.y0; }))); y1 = Math.round(Math.max.apply(null, hr.map(function (c) { return c.y1; }))); }
+        else if (a.type === '205') { var g = a.grid; y0 = Math.max(0, Math.round(g.rows[0] - (g.rows[1] - g.rows[0]) * 1.05)); y1 = Math.round(g.rows[0]); }
+        else if (a.c204) { var ch0 = a.c204.comm[0]; y0 = Math.round(Math.min.apply(null, ch0.map(function (c) { return c.y0; }))); y1 = Math.round(Math.max.apply(null, ch0.map(function (c) { return c.y1; }))); }
         else { y0 = Math.round(a.f204.commYs[0]); y1 = Math.round(a.f204.commYs[1]); }
         var p = prepCell(a.cv, a.G, a.bin, 4, y0 + 2, a.cv.width - 4, y1 - 2); if (!p) return Promise.resolve(0);
         return ocr(worker, p, 7, '').then(function (r) { var m = r.text.match(/Function|Assigned|Notes|Mode|Name|Freq|Tone/gi); return m ? m.length : 0; });
       }
       return headerScore(A).then(function (s0) {
         if (s0 >= 2) return;
-        var fl = rotateCanvas(A.cv, 180), g1 = grayOf(fl), b1 = binarize(g1), B = { cv: fl, G: g1, bin: b1, grid: null, f204: null, type: A.type };
-        if (A.type === '205') { B.grid = detectGrid(b1, g1.w, g1.h); if (!B.grid || B.grid.cols.length !== 11) return; }
+        var fl = rotateCanvas(A.cv, 180), g1 = grayOf(fl), b1 = binarize(g1), B = { cv: fl, G: g1, bin: b1, grid: null, c205: null, c204: null, f204: null, type: A.type };
+        if (A.type === '205' && A.c205) { B.c205 = find205(b1, g1.w, g1.h); if (!B.c205) return; }
+        else if (A.type === '205') { B.grid = detectGrid(b1, g1.w, g1.h); if (!B.grid || B.grid.cols.length !== 11) return; }
+        else if (A.c204) { B.c204 = find204c(b1, g1.w, g1.h); if (!B.c204) return; }
         else { B.f204 = find204(b1, g1.w, g1.h); if (!B.f204) return; }
         return headerScore(B).then(function (s1) { if (s1 > s0) A = B; });
       });
     }).then(function () {
-      return A.type === '205' ? read205(worker, A, progress) : read204(worker, A, progress);
+      return A.type === '205' ? read205(worker, A, progress) : (A.c204 ? read204Cells(worker, A, progress) : read204(worker, A, progress));
     });
   }
 
   function read205(worker, A, progress) {
+    if (A.c205) return read205Cells(worker, A, progress);
     var work = A.cv, G = A.G, bin = A.bin, grid = A.grid;
     var rows = grid.rows, cols = grid.cols, nR = rows.length - 1, cells = [], r;
     var topY = Math.max(0, Math.round(rows[0] - (rows[1] - rows[0]) * 0.1)), botY = Math.round(rows[rows.length - 1]);
@@ -375,6 +654,86 @@
           return { type: '205', cells: cells, head: head, foot: foot };
         });
     });
+  }
+
+  function read205Cells(worker, A, progress) {
+    var work = A.cv, G = A.G, bin = A.bin, rowsC = A.c205.rows, hdr = rowsC[0], data = rowsC.slice(1), cells = [], r;
+    var topY = Math.round(Math.min.apply(null, hdr.map(function (c) { return c.y0; }))), botY = Math.round(Math.max.apply(null, data[data.length - 1].map(function (c) { return c.y1; })));
+    var post = prepCell(work, G, bin, 4, botY + 3, G.w - 4, G.h - 4);
+    var xA = hdr[0].x0 - 10, xB = hdr[hdr.length - 1].x1 + 10;
+    var boxes = A.c205.cells.filter(function (c) { return c.y1 < topY + 4 && c.x0 >= xA && c.x1 <= xB && (c.x1 - c.x0) * (c.y1 - c.y0) > 2500 && data.every(function (rw) { return rw.indexOf(c) < 0; }) && hdr.indexOf(c) < 0; })
+      .sort(function (p, q) { return Math.round(p.y0 / 40) - Math.round(q.y0 / 40) || p.x0 - q.x0; });
+    var pre = boxes.length ? boxes : null;
+    for (r = 0; r < data.length; r++) cells.push({ pos: r + 1, ch: '', func: '', name: '', assigned: '', rx: '', rxTone: '', tx: '', txTone: '', mode: '', notes: '', conf: null });
+    var crop = function (rr, c) { return prepCellShape(work, bin, G.w, data[rr][c]); };
+    return readCells(worker, work, G, bin, null, null, C.COLS, COLCFG, cells, progress, 0.25, 0.9, 'Reading the channel table…', 'name', data, crop).then(function () {
+      progress('Reading the page header…', 0.92);
+      var head = '', foot = '';
+      return worker.setParameters({ tessedit_pageseg_mode: '6', tessedit_char_whitelist: '' })
+        .then(function () {
+          var seq = Promise.resolve();
+          (pre || []).forEach(function (bx) { seq = seq.then(function () { var cv = prepCellShape(work, bin, G.w, bx); if (!cv) return null; return worker.recognize(cv).then(function (r) { head += r.data.text + '\n'; cv.width = cv.height = 0; }); }); });
+          return seq;
+        })
+        .then(function () { return post ? worker.recognize(post) : null; }).then(function (r) { foot = r ? r.data.text : ''; })
+        .then(function () {
+          cells.forEach(function (c) { if (c._cf) { c.conf = Math.min.apply(null, c._cf); delete c._cf; } });
+          return { type: '205', cells: cells, head: head, foot: foot };
+        });
+    });
+  }
+
+  function read204Cells(worker, A, progress) {
+    var work = A.cv, G = A.G, bin = A.bin, F = A.c204, out = { type: '204', texts: {}, res: [], cells: [] };
+    function ocrCell(cell) {
+      return worker.setParameters({ tessedit_pageseg_mode: '6', tessedit_char_whitelist: '' }).then(function () {
+        var cv = prepCellShape(work, bin, G.w, cell); if (!cv) return '';
+        return worker.recognize(cv).then(function (r) { cv.width = cv.height = 0; return (r.data.text || '').trim(); });
+      });
+    }
+    function ocrAll(list) { var texts = []; return list.reduce(function (p, c) { return p.then(function () { return ocrCell(c).then(function (t) { texts.push(t); }); }); }, Promise.resolve()).then(function () { return texts; }); }
+    var seq = Promise.resolve();
+    // 1) header boxes: sort them out by what they say, so the box layout does not matter
+    seq = seq.then(function () {
+      progress('Reading the header…', 0.22);
+      return ocrAll(F.topCells).then(function (tx) {
+        var T = F.topCells.map(function (c, i) { return { c: c, t: tx[i] }; }), used = {}, inc = '', op = null, ops = [];
+        T.forEach(function (o, i) { if (!inc && /incid\w*\s*n\w*e/i.test(o.t)) { inc = o.t; used[i] = 1; } });
+        T.forEach(function (o, i) { if (!op && /operat\w*\s*per\w*|date\s*from|time\s*from/i.test(o.t)) { op = o; used[i] = 1; } });
+        T.forEach(function (o, i) { if (!used[i] && /operations\s*personnel|section\s*chief|night\s*ops|branch\s*safety|air\s*attack|branch\s*director|group\s*supervisor/i.test(o.t)) { ops.push(o); used[i] = 1; } });
+        var br = T.filter(function (o, i) { // everything to the right of the operational-period box, in its band
+          return !used[i] && op && o.c.x0 >= op.c.x1 - 12 && o.c.y0 >= op.c.y0 - 14 && o.c.y1 <= op.c.y1 + 14 && /[A-Za-z0-9]/.test(o.t);
+        });
+        out.texts.incident = inc; out.texts.op = op ? op.t : ''; out.texts.ops = ops.sort(function (p, q) { return p.c.x0 - q.c.x0; }).map(function (o) { return o.t; }).join('\n'); out.texts.branch = br.map(function (o) { return o.t; }).join('\n');
+      });
+    });
+    // 2) resources: ruled rows of 7 or 8 cells
+    seq = seq.then(function () {
+      progress('Reading the resources…', 0.3);
+      var data = F.res.slice(1), n = F.resLen;
+      var keys = n === 8 ? ['id', 'als', 'x', 'leader', 'pers', 'req', 'hours', 'loc'] : ['id', 'als', 'x', 'leader', 'pers', 'req', 'hl'];
+      var cfgBy = { id: [7, '', 1], leader: [7, ''], pers: [7, '0123456789+/-', 0, [8, 10]], req: [7, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-', 1], hl: [7, ''], hours: [7, '0123456789-'], loc: [7, ''] };
+      var cfg = keys.map(function (k) { return cfgBy[k] || null; }), rr = data.map(function () { return {}; });
+      data.forEach(function (row, i) { rr[i].als = cellInk(bin, G.w, row[1]) > 0.012; });
+      return readCells(worker, work, G, bin, null, null, keys, cfg, rr, progress, 0.3, 0.6, 'Reading the resources…', null, data, function (r, c) { return prepCellShape(work, bin, G.w, data[r][c]); }).then(function () { out.res = rr; });
+    });
+    // 3) work assignments / special instructions: the two big boxes between the tables
+    seq = seq.then(function () {
+      progress('Reading the work assignments…', 0.62);
+      if (F.mid.length < 2) { out.texts.work = ''; out.texts.special = ''; out.blocksMissed = true; return null; }
+      return ocrCell(F.mid[0]).then(function (t) { out.texts.work = t; progress('Reading the special instructions…', 0.7); return ocrCell(F.mid[1]); }).then(function (t) { out.texts.special = t; });
+    });
+    // 4) communications
+    seq = seq.then(function () {
+      var data = F.comm.slice(1), rows = data.map(function (_, i) { return { pos: i + 1, ch: '', func: '', name: '', assigned: '', rx: '', rxTone: '', tx: '', txTone: '', mode: '', notes: '', conf: null }; });
+      return readCells(worker, work, G, bin, null, null, KEYS204, COLCFG204, rows, progress, 0.72, 0.92, 'Reading the channels…', 'name', data, function (r, c) { return prepCellShape(work, bin, G.w, data[r][c]); }).then(function () {
+        rows.forEach(function (c) { if (c._cf) { c.conf = Math.min.apply(null, c._cf); delete c._cf; } });
+        out.cells = rows;
+      });
+    });
+    // 5) footer
+    seq = seq.then(function () { progress('Reading the footer…', 0.94); return ocrAll(F.foot).then(function (tx) { out.texts.foot = tx.join('\n'); }); });
+    return seq.then(function () { return out; });
   }
 
   function read204(worker, A, progress) {
@@ -410,7 +769,7 @@
       var n = rx.length - 1, hasSplit = n === 8;
       var keys = hasSplit ? ['id', 'als', 'x', 'leader', 'pers', 'req', 'hours', 'loc'] : ['id', 'als', 'x', 'leader', 'pers', 'req', 'hl'];
       var NAMEWL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ./-()'&,";
-      var cfgBy = { id: [7, '', 1], leader: [7, ''], pers: [7, '0123456789', 0, [8, 10]], req: [7, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-', 1], hl: [7, ''], hours: [7, '0123456789-'], loc: [7, ''] };
+      var cfgBy = { id: [7, '', 1], leader: [7, ''], pers: [7, '0123456789+/-', 0, [8, 10]], req: [7, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-', 1], hl: [7, ''], hours: [7, '0123456789-'], loc: [7, ''] };
       var cfg = keys.map(function (k) { return cfgBy[k] || null; });
       var rr = spans.map(function () { return {}; });
       spans.forEach(function (y, i) { // ALS mark: any ink in that cell
@@ -883,6 +1242,6 @@
   }
 
   // test hook (headless tests call the pipeline directly)
-  window.__cgIncident = { open: home, scanImage: scanImage, analyze: analyze, vsegs: vsegs, hsegs: hsegs, find204: find204, binarize: binarize, grayOf: grayOf, loadToCanvas: loadToCanvas, detectGrid: detectGrid, state: state, setKnown: function (k) { known = k; } };
+  window.__cgIncident = { readFreqShapes: readFreqShapes, open: home, scanImage: scanImage, prepCellShape: prepCellShape, find205: find205, labelCells: labelCells, chainRows: chainRows, analyze: analyze, vsegs: vsegs, hsegs: hsegs, find204: find204, binarize: binarize, grayOf: grayOf, loadToCanvas: loadToCanvas, detectGrid: detectGrid, state: state, setKnown: function (k) { known = k; } };
   window.__cgOpenIncident = home;
 })();

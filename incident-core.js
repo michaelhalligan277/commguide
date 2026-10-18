@@ -126,6 +126,20 @@
   // ---------- one row ----------
   function cleanText(s) { return String(s || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').replace(/^(?:\S{0,2}\s*[|\[\]]+\s*)+/, '').replace(/^[\s|_\[\]]+|[\s|_\[\]]+$/g, '').trim(); }
 
+  // Notes / assigned-to text: undo the usual OCR slips (a ruled border read as '|', doubled letters like 'Vv' or 'oo').
+  function tidyLabel(raw) {
+    var t = String(raw || '').replace(/[\r\n]+/g, ' ').trim();
+    if (/(BRANCH|DIV|DIVISION|GROUP)\s*[|!]\s*$/.test(t)) t = t.replace(/\s*[|!]\s*$/, ' I'); // a lone I at the end of 'BRANCH I'
+    var toks = cleanText(t).split(' ').filter(Boolean), upper = toks.filter(function (x) { return x.length > 2; }).every(function (x) { return x === x.toUpperCase(); });
+    var out = [];
+    toks.forEach(function (x, i) {
+      if (!/[A-Za-z0-9]/.test(x)) return;                                             // pure punctuation
+      if (upper && i > 0 && x.length === 2 && x[0].toLowerCase() === x[1].toLowerCase()) { if (x[0] === x[0].toUpperCase()) out.push(x[0]); return; } // 'Vv' -> V, 'oo' -> dropped
+      out.push(x);
+    });
+    return out.join(' ');
+  }
+
   function buildRows(cells, known, learnedMap) {
     // cells: array of {ch,func,name,assigned,rx,rxTone,tx,txTone,mode,notes} raw OCR strings (+ optional conf)
     var parsed = cells.map(function (c) { return { rx: parseToneRaw(c.rxTone), tx: parseToneRaw(c.txTone) }; });
@@ -133,8 +147,8 @@
     return cells.map(function (c, i) {
       var flags = [], notes = [];
       var chNum = parseInt(digitsFix(String(c.ch || '').replace(/[^0-9OolISB|]/g, '')), 10);
-      var row = { ch: isNaN(chNum) ? (c.pos || '') : chNum, func: cleanText(c.func), name: cleanText(c.name), assigned: cleanText(c.assigned),
-        rx: '', rxTone: '', tx: '', txTone: '', mode: cleanText(c.mode).toUpperCase().slice(0, 1), notes: cleanText(c.notes), flags: [], fieldFlags: {} };
+      var row = { ch: isNaN(chNum) ? (c.pos || '') : chNum, func: cleanText(c.func), name: cleanText(c.name), assigned: tidyLabel(c.assigned),
+        rx: '', rxTone: '', tx: '', txTone: '', mode: cleanText(c.mode).toUpperCase().slice(0, 1), notes: tidyLabel(c.notes), flags: [], fieldFlags: {} };
       function flag(field, code) { if (row.flags.indexOf(code) < 0) row.flags.push(code); (row.fieldFlags[field] = row.fieldFlags[field] || []).push(code); }
 
       row.suggest = {};
@@ -160,7 +174,10 @@
       ['rx', 'tx'].forEach(function (k) {
         var alts = c[k + 'Alts'] || [], extra = [];
         alts.forEach(function (a) { var p = parseFreq(digitsFix(a)).value; if (p && p !== row[k] && !freqProblems(p).length && extra.indexOf(p) < 0) extra.push(p); });
-        if (c[k + 'Dis']) {
+        var other = k === 'rx' ? 'tx' : 'rx';
+        // two independent reads (the RX cell and the TX cell) that came out identical back each other up
+        var corroborated = row[k] && row[k] === row[other] && !c[other + 'Dis'];
+        if (c[k + 'Dis'] && !corroborated) {
           var winKnown = known.set && known.set[row[k]];
           var altKnown = alts.some(function (a) { var p = parseFreq(digitsFix(a)).value; return known.set && known.set[p]; });
           flag(k, winKnown && !altKnown ? 'freq-disagree-known' : 'freq-disagree');
@@ -194,6 +211,18 @@
   }
 
   // ---------- header / footer text (from a plain OCR block) ----------
+  // A date after a label, tolerant of a dropped slash ("09/1326" -> 09/13/26) or stray spaces.
+  function findDate(text, labelRe) {
+    var m = labelRe.exec(text); if (!m) return '';
+    var rest = text.slice(m.index + m[0].length).replace(/^[\s:]+/, '').slice(0, 14), dm = rest.match(/^[0-9OoIl\/\-.\s]{5,12}/);
+    if (!dm) return '';
+    var d = digitsFix(dm[0]).replace(/[^0-9]/g, '');
+    if (d.length >= 8) d = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4, 8);
+    else if (d.length >= 6) d = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4, 6);
+    else return '';
+    var mo = +d.slice(0, 2), dy = +d.slice(3, 5);
+    return (mo >= 1 && mo <= 12 && dy >= 1 && dy <= 31) ? d : '';
+  }
   function parseHeader(text) {
     var t = String(text || '');
     var out = { incident: '', zone: '', dateFrom: '', timeFrom: '', dateTo: '', timeTo: '', prepared: '', preparedTime: '' };
@@ -207,15 +236,17 @@
       }
     }
     var m;
-    if ((m = t.match(/Date\s*From:?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i))) out.dateFrom = m[1];
-    if ((m = t.match(/Date\s*To:?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i))) out.dateTo = m[1];
+    out.dateFrom = findDate(t, /Date\s*From/i); out.dateTo = findDate(t, /[DdPp]ate\s*To/i);
     if ((m = t.match(/Time\s*From:?\s*(\d{3,4})/i))) out.timeFrom = m[1];
     if ((m = t.match(/Time\s*To:?\s*(\d{3,4})/i))) out.timeTo = m[1];
+    // the date/time the form was prepared (box 2)
+    out.preparedDate = findDate(t, /^\s*Date\s*:/im) || findDate(t, /Date\s*:/i);
+    if ((m = t.match(/\bTime\s*:?\s*(\d{4})\b/i))) out.preparedTime = m[1];
     return out;
   }
   function parseFooter(text) {
     var t = String(text || ''), out = { prepared: '', special: '' }, m;
-    if ((m = t.match(/Name:\s*([A-Za-z][A-Za-z .'\-]{2,40})/))) out.prepared = cleanText(m[1]);
+    if ((m = t.match(/Name:\s*([A-Za-z][A-Za-z .'\-]{2,40})/)) && !/enter\s*name/i.test(m[1])) out.prepared = cleanText(m[1]); // the blank form says 'Enter Name'
     var i = t.search(/Special\s*Instructions/i);
     if (i >= 0) {
       var rest = t.slice(i).split(/\r?\n/).slice(1).map(cleanText).filter(Boolean);
@@ -234,19 +265,21 @@
     return cleanText(lines.join(' ').replace(/^\d\.\s*/, ''));
   }
   function parseBranchDiv(text) {
-    var out = { branch: '', division: '', divName: '' }, lines = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean), m;
+    var out = { branch: '', division: '', divName: '' }, lines = String(text || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean), m, vals = [];
     lines.forEach(function (l) {
       if ((m = l.match(/Page\s*\d+\s*of\s*\d+\s*(.*)$/i))) { out.divName = cleanText(m[1]); return; }
       if (/branch/i.test(l) || /division/i.test(l)) return;
-      if (out.division) return;
-      var t = l.replace(/[^A-Za-z0-9|\s]/g, ' ').trim();
-      if ((m = t.match(/^([A-Za-z0-9|]{1,3})\s+([A-Za-z0-9]{1,3})$/))) { out.branch = m[1].replace('|', 'I'); out.division = m[2]; }
-      else if ((m = t.match(/^([A-Za-z0-9]{1,2})$/))) out.division = m[1]; // the branch mark was dropped; the letter is the division
+      var t = l.replace(/[^A-Za-z0-9|\s]/g, ' ').trim().split(/\s+/).filter(Boolean);
+      t.forEach(function (x) { if (x.length <= 3) vals.push(x.replace('|', 'I')); });
     });
+    if (vals.length >= 2) { out.branch = vals[0]; out.division = vals[1]; }
+    else if (vals.length === 1) out.division = vals[0];   // the branch mark was dropped; the letter is the division
+    // a division is a letter: a lone digit is a look-alike (8 for B, 5 for S, 0 for O, 1 for I, 2 for Z)
+    if (/^[0-9]$/.test(out.division)) out.division = { '8': 'B', '5': 'S', '0': 'O', '1': 'I', '2': 'Z', '6': 'G' }[out.division] || out.division;
     return out;
   }
-  var OPS_LABELS = [['Operations Section Chief', /Operations\s*Sec\w*\s*Chi\w*/i], ['Night Ops', /Night\s*Ops/i], ['Branch Director', /Branch\s*Director/i],
-    ['Branch Safety', /Branch\s*Safety/i], ['Division/Group Supervisor', /Division\s*\/?\s*Group\s*Supervisor/i], ['Air Attack', /Air\s*Attack/i]];
+  var OPS_LABELS = [['Operations Section Chief', /Operations\s*Se\w*\s*Ch\w*/i], ['Night Ops', /Night\s*Ops/i], ['Branch Director', /Branch\s*D\w*r/i],
+    ['Branch Safety', /Branch\s*Safety/i], ['Division/Group Supervisor', /Div\w*\s*\/?\s*Gr\w*\s*Sup\w*/i], ['Air Attack', /Air\s*Attack/i]];
   function parseOps(text) {
     var t = String(text || '').replace(/[\r\n]+/g, ' '), hits = [];
     OPS_LABELS.forEach(function (L) { var m = L[1].exec(t); if (m) hits.push({ label: L[0], at: m.index, end: m.index + m[0].length }); });
@@ -276,22 +309,22 @@
   function buildResource(c) { // c: raw strings {id,als,leader,pers,req,hl|hours,loc} (+ idAlts, leaderAlts, reqAlts)
     var hl = c.hl != null ? parseHoursLoc(c.hl) : { hours: cleanText(c.hours), loc: cleanText(c.loc) };
     var fr = fixReq(c.req);
-    var r = { id: cleanText(c.id), als: !!c.als, leader: cleanText(c.leader).replace(/^[^A-Za-z]+/, ''), personnel: cleanText(c.pers).replace(/[^0-9]/g, ''),
+    var r = { id: cleanText(c.id), als: !!c.als, leader: cleanText(c.leader).replace(/^[^A-Za-z]+/, '').replace(/\bW[I1l]T\b/g, 'W/T'), personnel: ((cleanText(c.pers).match(/\d+/) || [''])[0]),
       request: fr.v, hours: hl.hours, loc: cleanText(hl.loc).replace(/[^A-Za-z0-9)]+$/, ''), flags: [], alts: {} };
     r.alts.id = altsOf(r.id, c.idAlts, alnum);
     r.alts.leader = altsOf(r.leader, c.leaderAlts, alnum);
-    r.alts.request = altsOf(r.request, (c.reqAlts || []).map(function (a) { return fixReq(a).v; }).filter(function (a) { return /^[A-Z]-\d{1,6}$/.test(a); }), alnum);
+    r.alts.request = altsOf(r.request, (c.reqAlts || []).map(function (a) { return fixReq(a).v; }).filter(function (a) { return /^(?:[A-Z]-)?[A-Z]-\d{1,6}$/.test(a); }), alnum);
     if (r.alts.id.length) r.flags.push('id-disagree');
     if (r.alts.leader.length) r.flags.push('leader-disagree');
     if (r.alts.request.length) r.flags.push('request-disagree');
     if (!r.personnel || parseInt(r.personnel, 10) > 99) r.flags.push('personnel');
-    if (!/^[A-Z]-\d{1,6}$/.test(r.request)) r.flags.push('request'); else if (fr.fixed) r.flags.push('request-fixed');
+    if (r.request && !/^(?:[A-Z]-)?[A-Z]-\d{1,6}$/.test(r.request)) r.flags.push('request'); else if (fr.fixed) r.flags.push('request-fixed');
     if (!/^\d{4}-\d{4}$/.test(r.hours)) r.flags.push('hours');
     return r;
   }
   // Request-number letter tells the kind of resource (NWCG convention): E equipment, C crew, O overhead, A aircraft, S supplies.
   var RTYPE = { E: 'Engines & equipment', C: 'Crews', O: 'Overhead', A: 'Aircraft', S: 'Supplies' };
-  function resType(r) { var m = String(r.request || '').match(/^([A-Z])/); return m && RTYPE[m[1]] ? m[1] : '?'; }
+  function resType(r) { var m = String(r.request || '').match(/^(?:M-)?([A-Z])/); return m && RTYPE[m[1]] ? m[1] : '?'; }
   function groupRes(list) {
     var order = ['O', 'C', 'E', 'A', 'S', '?'], g = {};
     list.forEach(function (r) { (g[resType(r)] = g[resType(r)] || []).push(r); });
