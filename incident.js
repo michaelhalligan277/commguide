@@ -708,6 +708,21 @@
     });
   }
 
+  // Has this block any writing beyond its own printed heading ("Work Assignments" / "Special Instructions")?
+  function blockHasText(t) {
+    return String(t || '').replace(/\d{0,2}\s*\.?\s*(work\s*assign\w*|special\s*instr\w*)\s*:?/ig, '').replace(/[^A-Za-z0-9]/g, '').length >= 3;
+  }
+  // One OCR reading of the band holding both blocks -> [work assignments, special instructions].
+  function splitWorkSpecial(t) {
+    t = String(t || '').trim();
+    var m = /special\s*instr/i.exec(t), w = t, s = '';
+    if (m) { w = t.slice(0, m.index).replace(/(^|\n)[ \t]*\d{1,2}[ \t]*[.:]?[ \t]*$/, ''); s = t.slice(m.index); }
+    // keep anything written on the same line as a printed heading: the heading goes on its own line so it is stripped alone
+    w = w.replace(/^(\d{0,2}\s*\.?\s*work\s*assign\w*(?!\w)\s*:?)(?!:)[ \t]*(?=\S)/i, '$1\n');
+    s = s.replace(/^(special\s*instr\w*(?!\w)\s*:?)(?!:)[ \t]*(?=\S)/i, '$1\n');
+    return [w.trim(), s.trim()];
+  }
+
   function read204Cells(worker, A, progress) {
     var work = A.cv, G = A.G, bin = A.bin, F = A.c204, out = { type: '204', texts: {}, res: [], cells: [] };
     function ocrCell(cell, psm) {
@@ -764,8 +779,20 @@
     // 3) work assignments / special instructions: the two big boxes between the tables
     seq = seq.then(function () {
       progress('Reading the work assignments…', 0.62);
-      if (F.mid.length < 2) { out.texts.work = ''; out.texts.special = ''; out.blocksMissed = true; return null; }
-      return ocrCell(F.mid[0]).then(function (t) { out.texts.work = t; progress('Reading the special instructions…', 0.7); return ocrCell(F.mid[1]); }).then(function (t) { out.texts.special = t; });
+      var primary = Promise.resolve();
+      if (F.mid.length >= 2) primary = ocrCell(F.mid[0]).then(function (t) { out.texts.work = t; progress('Reading the special instructions…', 0.7); return ocrCell(F.mid[1]); }).then(function (t) { out.texts.special = t; });
+      else { out.texts.work = ''; out.texts.special = ''; }
+      // Fallback: the two boxes were not found as separate ruled cells, or came back with nothing but their labels.
+      // Read the whole band between the resource table and the channel table and split it at the "Special Instructions" heading.
+      return primary.then(function () {
+        if (blockHasText(out.texts.work) || blockHasText(out.texts.special)) return null;
+        var lr = F.res[F.res.length - 1], rc0 = lr[0], rcN = lr[lr.length - 1], hr = F.comm[0], hc0 = hr[0], hcN = hr[hr.length - 1];
+        var av = function (a) { var t = 0; for (var q = 0; q < a.length; q++) t += a[q]; return t / a.length; };
+        var yA = av(rc0.sb) + 3, yB = av(rcN.sb) + 3, zA = av(hc0.st) - 3, zB = av(hcN.st) - 3;
+        if (Math.min(zA - yA, zB - yB) < 24) { out.blocksMissed = true; return null; }
+        var band = quadCell(G.w, G.h, F.xL + 6, F.xR - 6, yA, yB, zA, zB);
+        return ocrCell(band, '6').then(function (t) { var s = splitWorkSpecial(t); out.texts.work = s[0]; out.texts.special = s[1]; out.blocksMissed = !String(t || '').trim(); });
+      }).catch(function () { out.blocksMissed = true; }); // the fallback must never stop a scan
     });
     // 4) communications
     seq = seq.then(function () {
@@ -834,10 +861,18 @@
     seq = seq.then(function () {
       progress('Reading the work assignments…', 0.62);
       var m = F.mid.slice().sort(function (a, b) { return a - b; });
-      if (m.length < 2) { out.texts.work = ''; out.texts.special = ''; out.blocksMissed = true; return null; }
-      var bounds = [F.res.y1, m[0], m[1]];
-      return blockText(worker, work, G, bin, xL + 6, bounds[0] + 4, xR - 6, bounds[1] - 3, 6).then(function (t) { out.texts.work = t; })
-        .then(function () { progress('Reading the special instructions…', 0.7); return blockText(worker, work, G, bin, xL + 6, bounds[1] + 4, xR - 6, bounds[2] - 3, 6); }).then(function (t) { out.texts.special = t; });
+      var primary = Promise.resolve();
+      if (m.length >= 2) {
+        var bounds = [F.res.y1, m[0], m[1]];
+        primary = blockText(worker, work, G, bin, xL + 6, bounds[0] + 4, xR - 6, bounds[1] - 3, 6).then(function (t) { out.texts.work = t; })
+          .then(function () { progress('Reading the special instructions…', 0.7); return blockText(worker, work, G, bin, xL + 6, bounds[1] + 4, xR - 6, bounds[2] - 3, 6); }).then(function (t) { out.texts.special = t; });
+      } else { out.texts.work = ''; out.texts.special = ''; }
+      // Fallback: read the whole band between the two tables and split it at the "Special Instructions" heading.
+      return primary.then(function () {
+        if (blockHasText(out.texts.work) || blockHasText(out.texts.special)) return null;
+        if (F.comm.y0 - F.res.y1 < 24) { out.blocksMissed = true; return null; }
+        return blockText(worker, work, G, bin, xL + 6, F.res.y1 + 4, xR - 6, F.comm.y0 - 4, 6).then(function (t) { var s = splitWorkSpecial(t); out.texts.work = s[0]; out.texts.special = s[1]; out.blocksMissed = !String(t || '').trim(); });
+      }).catch(function () { out.blocksMissed = true; }); // the fallback must never stop a scan
     });
     // 4) communications table
     seq = seq.then(function () {
