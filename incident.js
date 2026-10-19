@@ -970,9 +970,22 @@
     });
   }
 
+  // The file input must live in the DOM and be referenced for the whole time the camera/photo picker is open.
+  // A detached, unreferenced <input> can be garbage-collected by iOS Safari while the picker is up, and then
+  // its change event never fires: the sheet just sits on "Take or choose a photo" and nothing happens.
+  var pickInput = null;
   function pick() {
-    var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
-    inp.onchange = function () { if (inp.files && inp.files[0]) run(inp.files[0]); };
+    if (pickInput && pickInput.parentNode) pickInput.parentNode.removeChild(pickInput);
+    var inp = pickInput = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';
+    var fired = false;
+    function handle() {
+      if (fired || !inp.files || !inp.files[0]) return;
+      fired = true; run(inp.files[0]);
+    }
+    inp.addEventListener('change', handle);
+    inp.addEventListener('input', handle);
+    document.body.appendChild(inp);
     inp.click();
   }
 
