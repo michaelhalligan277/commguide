@@ -585,7 +585,7 @@
     // Coords: USGS GNIS summit records (verified 07/02/26) unless approx:true.
     // Tones shown are repeater INPUT (TX/keying) tones per Statewide Call Plan Jan 2023.
     { id: 'sierra_vista', name: 'Sierra Vista', net: 'TCU Local', batt: 'Batt 3', lat: 38.22992, lng: -120.61382, tone: '110.9', note: 'TCU L-T1 · Mountain Ranch / Esperanza — Sierra Vista LO, Quiggs Mtn Unit map: TCU T1 only.' },
-    { id: 'bear', name: 'Bear Mtn', net: 'TCU Local', batt: 'Batt 1', lat: 38.11867, lng: -120.72528, tone: '123.0', note: 'TCU L-T2 · San Andreas / Valley Springs — Bear Mountain III tower site (MRA/ASR listing)' },
+    { id: 'bear', name: 'Bear Mtn', net: 'TCU Local', batt: 'Batt 1', lat: 38.11867, lng: -120.72528, tone: '123.0', note: 'TCU L-T2 · San Andreas / Valley Springs — Bear Mountain III tower site (MRA/ASR listing) ⚠ TEMP 10/19/26: Tone 2 moved to another Bear Mtn facility for interference testing. No field change. Outage: report to Aaron Boulger, Cal OES, (209) 483-4571 — backup encoder steers 13 CCN to Tone 1 (business hours).' },
     { id: 'fowler', name: 'Fowler Peak', net: 'TCU Local', batt: 'Batt 2', lat: 38.02279, lng: -120.59032, tone: '131.8', note: 'TCU L-T3 · Angels Camp / Copperopolis — Fowler LO atop Bear Mountain. Also CMD12-T3' },
     { id: 'penon', name: 'Peñon Blanco', net: 'TCU Local', batt: 'Batt 6', lat: 37.73215, lng: -120.26158, tone: '136.5', note: 'TCU L-T4 · Lake McClure / Coulterville. Also CMD2-T8' },
     { id: 'blue_mtn', name: 'Blue Mountain', net: 'TCU Local', batt: 'Batt 4', lat: 38.34241, lng: -120.36520, tone: '146.2', note: 'TCU L-T5 · Arnold / Hwy 4 high country. Also CMD12-T5' },
@@ -602,7 +602,7 @@
     TCU: [
       // GNIS-verified coords (07/02/26) unless approx:true.
       { peak: 'Sierra Vista', toneNum: 1, hz: '110.9', lat: 38.23012, lng: -120.61432, desc: 'TCU L-T1 · Mountain Ranch, Esperanza — Sierra Vista LO on Quiggs Mtn, Batt 3.' },
-      { peak: 'Bear Mtn', toneNum: 2, hz: '123.0', lat: 38.11861, lng: -120.72529, desc: 'TCU L-T2 · San Andreas, Valley Springs — Bear Mountain III site, Batt 1.' },
+      { peak: 'Bear Mtn', toneNum: 2, hz: '123.0', lat: 38.11861, lng: -120.72529, desc: 'TCU L-T2 · San Andreas, Valley Springs — Bear Mountain III site, Batt 1. ⚠ TEMP 10/19/26: Tone 2 moved to another Bear Mtn facility for interference testing. No field change. Outage: report to Aaron Boulger, Cal OES, (209) 483-4571 — backup encoder steers 13 CCN to Tone 1 (business hours).' },
       { peak: 'Fowler Peak', toneNum: 3, hz: '131.8', lat: 38.02279, lng: -120.59032, desc: 'TCU L-T3 · Angels Camp, Altaville, Copperopolis — Fowler LO atop Bear Mountain, Batt 2.' },
       { peak: 'Peñon Blanco', toneNum: 4, hz: '136.5', lat: 37.73215, lng: -120.26158, desc: 'TCU L-T4 · Lake McClure, Coulterville — SW corner, Batt 6.' },
       { peak: 'Blue Mountain', toneNum: 5, hz: '146.2', lat: 38.34222, lng: -120.36488, desc: 'TCU L-T5 · Arnold, Hwy 4 high country — Batt 4.' },
