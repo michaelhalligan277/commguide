@@ -2473,8 +2473,20 @@
   // points; disagreements are cells straddling a boundary line.
   // Values 1=SRA 2=LRA 3=FRA 0=no data.
   // SRA_GRID now lives in comm-geo.js (lazy-loaded via RADIO.loadGeo)
+  // Hand corrections to the FRAP grid. Baseline Fire Center sits on Bureau of
+  // Reclamation land, which the FRAP grid paints FRA, but the fire center itself
+  // is State Responsibility Area (confirmed by Michael, Oct 2026). Scoped to the
+  // fire-center compound only (radius in meters) — the surrounding BOR land is
+  // left as the grid has it.
+  const SRA_FIXES = [
+    { name: 'Baseline Fire Center', lat: 37.92456, lng: -120.52952, r: 350, val: 'SRA' }
+  ];
   function sraAt(lat, lng){
     try{
+      for(const f of SRA_FIXES){
+        const dy=(lat-f.lat)*111320, dx=(lng-f.lng)*111320*Math.cos(f.lat*Math.PI/180);
+        if(dx*dx+dy*dy <= f.r*f.r) return f.val;
+      }
       const G=window.RADIO&&window.RADIO.SRA_GRID; if(!G) return null;
       const r=Math.floor((lat-G.miny)/G.step), c=Math.floor((lng-G.minx)/G.step);
       if(r<0||c<0||r>=G.h||c>=G.w) return null;
